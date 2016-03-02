@@ -94,8 +94,10 @@ std::vector<std::string> Utilities::split(const std::string &text, char sep)
     return tokens;
 }
 
-
-void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
+/*
+ * RoundedRectangle helper
+ */
+void Utilities::RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
             double x, double y, double width, double height, double radius)
     {
         // radius can be no larger than half our height or width

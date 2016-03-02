@@ -32,19 +32,15 @@
 #include <gdkmm/screen.h>
 #include <gtkmm/alignment.h>
 
-
+/*
 #include <gdkmm-3.0/gdkmm/pixbuf.h>
 #include <glibmm-2.4/glibmm/timer.h>
 #include <gtk-2.0/gtk/gtkwindow.h>
 #include <gtk-2.0/gdk/gdkwindow.h>
 #include <gtk-2.0/gdk/gdktypes.h>
-//#include <libwnck-3.0/libwnck/wnck-enum-types.h>
-//#include <libwnck-3.0/libwnck/window.h>
-//#include <libwnck-3.0/libwnck/window.h>
-//#include <libwnck-3.0/libwnck/window.h>
-//#include <libwnck-3.0/libwnck/window.h>
+ */ 
 #include "math.h"
-//#include <gio/gio.h>
+
 
 // the static collection
 std::vector<DockItem*>*DockPanel::_itemsvector;

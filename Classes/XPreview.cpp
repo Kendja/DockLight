@@ -1,23 +1,34 @@
-/* 
- * File:   XPreview.cpp
- * Author: yoo
- * 
- * Created on February 3, 2016, 5:48 PM
- */
+//*****************************************************************
+//
+//  Copyright (C) 2015 Juan R. Gonzalez
+//  Created on February 3, 2016, 5:48 PM
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//****************************************************************
 
 #include "XPreview.h"
 #include <cairo.h>
 #include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <codecvt>
-
 //#include <gtkmm/window.h>
 
 
 
-#define WIN_WIDTH 384
-#define WIN_HEIGHT 384
+//#define WIN_WIDTH 384
+//#define WIN_HEIGHT 384
 
 XPreview::XPreview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
@@ -46,17 +57,6 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
     //Window(WINDOW_POPUP);
 
     set_resizable(true);
-    //            
-    //    //this->Window::ty
-    //    // this->set_state_flags(StateFlags )
-    //    //this->set_decorated(false);
-    //    set_default_size(400, 200);
-    //
-    //    Gtk::Label *label = Gtk::manage(new Gtk::Label("New Popup Window"));
-    //
-    //    add(*label);
-
-    //how_all();
     show_all_children();
 
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &XPreview::on_timeoutDraw), 50);
@@ -121,8 +121,6 @@ void XPreview::on_menuCloseWindow_event()
  ****************************************************************/
 bool XPreview::on_button_press_event(GdkEventButton *event)
 {
-
-
 
     if ((event->type == GDK_BUTTON_PRESS)) {
         // Check if the event is a left button click.
@@ -328,33 +326,6 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
                 0, 0, real_coordinates.width, real_coordinates.height);
 
-
-        //Gdk::Window::
-        //wm_window.>
-        // Gdk::Window* juan;
-        //Glib::RefPtr<Gdk::Window> ramon;
-        //auto cssd = Glib::RefPtr<Gdk::Window>::cast_dynamic(wm_window);
-
-        //Glib::RefPtr<Gdk::Window>refWindow =  Glib::RefPtr<Gdk::Window>::cast_dynamic( wm_window);
-
-        //Glib::RefPtr<Gdk::Window> refWindow( wm_window );
-
-        //Glib::RefPtr<Gdk::Window> ccccc = reinterpret_cast<Gdk::Window*>(wm_window);
-
-        // Glib::RefPtr<Gdk::Window>::cast_dynamic(Glib::RefPtr<wm_window>);
-
-        //Gtk::Window  gtkwin2;
-        // Gdk::Pixbuf::create(Glib::RefPtr<Window>)
-        //dynamic_cast<Gtk::Container*>(m_InfoBar.get ... gtkmm arranges widgets ...
-
-        // Glib::RefPtr<Window>::cast_dynamic(t->m_xid); 
-        //auto cc = static_cast<Window>(t->m_xid);
-        //Glib::RefPtr<Window> gccw = Glib::RefPtr<Window>::cast_dynamic(gtkwin2);
-        //auto bbb = Gdk::Pixbuf::create( ramon,0, 0, real_coordinates.width, real_coordinates.height);
-
-        // Glib::RefPtr<Gdk::Pixbuf> pic;
-        //pic->scale(
-
         GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
                 DEF_PREVIEW_PIXBUF_WIDTH,
                 DEF_PREVIEW_PIXBUF_HEIGHT,
@@ -390,32 +361,16 @@ bool XPreview::on_drawX(const Cairo::RefPtr<Cairo::Context>& cr)
     //  double m_radius = 5.0;
 
     cr->set_line_width(1.0);
-    //
-    //    cairo_text_extents_t te;
-    //    char letter[2];
-    //    *letter = '\0';
-
-    //cairo_text_extents(cr, letter, &te);
-
-    //  Cairo::TextExtents textents;
-    // Cairo::FontExtents fextents;
-
-    //Glib::RefPtr<Pango::Layout> layout = Pango::Layout::create(cr);
-
+   
     Pango::FontDescription font;
     font.set_family("System");
     font.set_weight(Pango::WEIGHT_NORMAL);
-    int text_width = 0;
-    int text_height = 0;
-
-    //te->width;
-
-    // cr->select_font_face("System", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
-    // cr->set_font_size(11);
+   // int text_width = 0;
+   // int text_height = 0;
 
     int idx = 0;
 
-    int maxtextlength = 23;
+   // int maxtextlength = 23;
     // int maxtextlength_selected = 34;
 
     std::string caption = "";

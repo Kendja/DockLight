@@ -8,13 +8,13 @@ CPPFLAGS =  -g  -std=c++11 `pkg-config  --cflags gtkmm-3.0 libwnck-3.0`
 APPNAME = docklight
 BINDIR = bin
 
-# Here is a Make Macro that uses the backslash to extend to multiple lines.
+# Macro that uses the backslash to extend to multiple lines.
 OBJS =  \
+ Utilities.o \
  AppWindow.o \
  DockPanel.o \
  DockItem.o \
  XPreview.o \
- Utilities.o \
  main.o \
  $(NULL)
 

@@ -49,26 +49,16 @@ typedef enum StrutsPosition_t
 
 #define	DEF_ICONSIZE 48
 #define	DEF_CELLSIZE 58//48
-
 #define	DEF_PANELHIGHT 72 //68
 #define	DEF_PANELBCKHIGHT 62 
 #define	DEF_PANELBCKTOP 6 
-
-
 #define	DEF_OFFSE_TOP 10
-
-
-#define	DEF_PREVIEW_WIDTH 220       // the preview popup window width
-#define	DEF_PREVIEW_HEIGHT 200      // the preview popup window height
-
-
-#define	DEF_PREVIEW_PIXBUF_WIDTH 210      // the image pixbuf width
-#define	DEF_PREVIEW_PIXBUF_HEIGHT 140      // the image pixbuf height
-
-#define	DEF_PREVIEW_PIXBUF_TOP 36        // the image pixbuf top
-
-#define	DEF_UTF8MAX  512    // the max buff used by g_utf8_strncpy   
-
+#define	DEF_PREVIEW_WIDTH 220           // the preview popup window width
+#define	DEF_PREVIEW_HEIGHT 200          // the preview popup window height
+#define	DEF_PREVIEW_PIXBUF_WIDTH 210    // the image pixbuf width
+#define	DEF_PREVIEW_PIXBUF_HEIGHT 140   // the image pixbuf height
+#define	DEF_PREVIEW_PIXBUF_TOP 36       // the image pixbuf top
+#define	DEF_UTF8MAX  512                // the max buff used by g_utf8_strncpy   
 
 #endif	/* DEFINES_H */
 
