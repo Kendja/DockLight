@@ -1,9 +1,22 @@
-/* 
- * File:   Utilities.cpp
- * Author: yoo
- * 
- * Created on February 22, 2016, 4:40 PM
- */
+//*****************************************************************
+//
+//  Copyright (C) 2015 Juan R. Gonzalez
+//  Created on November 20, 2015, 12:17 PM 
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//****************************************************************
 
 #include "Utilities.h"
 
@@ -80,3 +93,17 @@ std::vector<std::string> Utilities::split(const std::string &text, char sep)
     tokens.push_back(text.substr(start));
     return tokens;
 }
+
+
+void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
+            double x, double y, double width, double height, double radius)
+    {
+        // radius can be no larger than half our height or width
+        radius = std::min(radius, std::min(width / 2, height / 2));
+        cr->move_to(x + radius, y);
+        cr->arc(x + width - radius, y + radius, radius, M_PI * 1.5, M_PI * 2);
+        cr->arc(x + width - radius, y + height - radius, radius, 0, M_PI * .5);
+        cr->arc(x + radius, y + height - radius, radius, M_PI * .5, M_PI);
+        cr->arc(x + radius, y + radius, radius, M_PI, M_PI * 1.5);
+
+    }
