@@ -26,6 +26,7 @@ all:	$(OBJS)
 clean:  
 	rm -f $(OBJS)
 	
+	
 main.o: proj.linux/main.cpp 
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c proj.linux/main.cpp
 
