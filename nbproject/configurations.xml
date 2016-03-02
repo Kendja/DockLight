@@ -42,7 +42,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>bin/docklight</executablePath>
           <ccTool>
             <incDir>
               <pElem>Classes</pElem>

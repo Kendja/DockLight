@@ -40,8 +40,8 @@ public:
 
 
     XPreview* m_preview;
-    
-    void SelectWindow(int index,GdkEventButton *event);
+
+    void SelectWindow(int index, GdkEventButton *event);
     void ShowPreview(int index, GdkEventButton *event);
 
 
@@ -52,12 +52,12 @@ public:
     int getIndex(int x, int y);
     void FocusWindow(WnckWindow *window);
     void LaunchApplication(const DockItem *dockitem);
-    
+
     static std::string removeExtension(std::string text, const char* extension);
     static std::string removeExtension(std::string text, const std::string extensions[]);
-    
-    
-    
+
+
+
     static void Update(WnckWindow* window, bool mode);
     static Glib::RefPtr<Gdk::Pixbuf> GetWindowIcon(WnckWindow* window);
     static Glib::RefPtr<Gdk::Pixbuf> PixbufConvert(GdkPixbuf* buf);
@@ -67,16 +67,16 @@ public:
     void listFiles(const char* path);
     std::string getexepath();
     std::string getFilePath(const std::string filename);
-    
+
     Gdk::Rectangle monitor_geo;
-    
+
 
     bool m_mouseLeftButtonDown;
     bool m_mouseRightButtonDown;
     bool m_mouseLeftDoubleClickButtonDown;
-    
+
     void setPanelLocation(panel_locationType m_panelLocation);
-    
+
 
     bool m_mouseIn;
     //int m_currentIndex;
@@ -84,44 +84,45 @@ public:
     int m_selectedIndex;
 
     static std::vector<DockItem*>*_itemsvector;
-  // www.lugod.org/presentations/gtkmm/menus.html
+    // www.lugod.org/presentations/gtkmm/menus.html
     // Popup menu and submenus
     Gtk::Menu m_Menu_Popup;
-    
+
     Gtk::MenuItem MenuItemNewApp;
     Gtk::MenuItem MenuItemPin;
     Gtk::MenuItem MenuItemCloseAll;
-   // Gtk::MenuItem MenuItemUnPin;
+    // Gtk::MenuItem MenuItemUnPin;
     Gtk::MenuItem MenuItemRemoveFromDock;
-    
+
     Gtk::SeparatorMenuItem m_separatorMenuItem;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
-    
-    Gtk::Menu m_QuitMenu_Popup;
+
+    Gtk::Menu m_HomeMenu_Popup;
     Gtk::MenuItem m_QuitMenuItem;
-    
+
 
     // Signal handlers (run when a popup item is clicked)
     void on_QuitMenu_event();
     void on_menuNew_event();
     void on_Pin_event();
     void on_CloseAll_event();
-   // void on_UnPin_event();
+    // void on_UnPin_event();
     void on_RemoveFromDock_event();
-    
+
 protected:
-    
+
+    GdkEventButton *m_LastEventButton;
     panel_locationType m_panelLocation;
-    
+
 
     virtual bool on_button_press_event(GdkEventButton *event);
     virtual bool on_button_release_event(GdkEventButton *event);
     virtual bool on_motion_notify_event(GdkEventMotion*event);
     //http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
-   
+
     virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
-    
+
 private:
     // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm
     double last_time;
@@ -130,11 +131,16 @@ private:
     int fps;
     Glib::Timer m_fpstimer;
 
+
+    //callback slot
+    void on_popup_menu_position(int& x, int& y, bool& push_in);
+    void on_popup_homemenu_position(int& x, int& y, bool& push_in);
+    
     void get_FramesPerSecond();
 
     //https://git.gnome.org/browse/gtkmm/tree/demos/gtk-demo/example_pixbufs.cc?h=gtkmm-2-24#n127
     sigc::connection m_TimeoutConnection;
-    
+
     static void on_window_opened(WnckScreen *screen, WnckWindow *window,
             gpointer data)
     {

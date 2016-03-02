@@ -1,2 +1,3 @@
 # DockLight
-Linux Gtkmm Dock Panel with Preview. 
+Linux Gtkmm Dock Panel with window Preview. 
+Status: Experimental

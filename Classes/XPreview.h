@@ -57,8 +57,7 @@ public:
 protected:
 
     panel_locationType m_panelLocation;
- 
-        
+    bool on_scroll_event(GdkEventScroll *event);
     bool on_button_press_event(GdkEventButton *event);
     bool on_motion_notify_event(GdkEventMotion*event);
 

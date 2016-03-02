@@ -7,4 +7,23 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/Utilities.h</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/DockPanel.h</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/DockPanel.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/DockItem.h</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/XPreview.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/XPreview.h</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/Utilities.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/DockItem.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/AppWindow.h</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/AppWindow.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/Defines.h</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Makefile</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/README.md</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/proj.linux/main.cpp</file>
+        </group>
+    </open-files>
 </project-private>

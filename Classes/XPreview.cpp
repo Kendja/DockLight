@@ -198,6 +198,34 @@ bool XPreview::on_motion_notify_event(GdkEventMotion*event)
     return true;
 }
 
+/*
+ * 
+ * handles the mouse scroll . 
+ * 
+ */
+bool XPreview::on_scroll_event(GdkEventScroll * event)
+{
+//    int index = m_currentMoveIndex;
+//    if (index == -1 || index == 0)
+//        return true;
+//
+//    DockItem *item = _itemsvector->at(index)->GetNext();
+//    if (item == NULL)
+//        return true;
+//
+//    WnckWindow *itemWindow = item->m_window;
+//    int ct = gtk_get_current_event_time();
+//
+//    if ((int) e->delta_y == (int) 1) {
+//        wnck_window_activate(itemWindow, (guint32) ct);
+//    } else if ((int) e->delta_y == (int) - 1) {
+//        wnck_window_activate(itemWindow, (guint32) ct);
+//    }
+
+    // Event has been handled
+    return true;
+}
+
 bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
     if (m_item == NULL) {

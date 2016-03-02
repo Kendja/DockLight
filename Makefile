@@ -24,9 +24,9 @@ INCLUDE = Classes -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk
 all:	$(OBJS)
 	$(CC) $(CPPFLAGS) -o$(BINDIR)/$(APPNAME) $(OBJS) $(LDFLAGS) 
 clean:  
-	rm -f $(OBJS)
-	
-	
+	rm -f *.o
+	rm -f Classes/*.o
+
 main.o: proj.linux/main.cpp 
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c proj.linux/main.cpp
 

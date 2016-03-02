@@ -38,7 +38,7 @@
 #include <gtk-2.0/gtk/gtkwindow.h>
 #include <gtk-2.0/gdk/gdkwindow.h>
 #include <gtk-2.0/gdk/gdktypes.h>
- */ 
+ */
 #include "math.h"
 
 
@@ -158,9 +158,15 @@ DockPanel::DockPanel()
     // menu 2
     m_QuitMenuItem.set_label("Quit");
     m_QuitMenuItem.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
-    m_QuitMenu_Popup.append(m_QuitMenuItem);
-    m_QuitMenu_Popup.show_all();
-    m_QuitMenu_Popup.accelerate(*this);
+    m_HomeMenu_Popup.append(m_QuitMenuItem);
+    m_HomeMenu_Popup.show_all();
+    m_HomeMenu_Popup.accelerate(*this);
+
+
+
+
+    //  pMenu->popup(sigc::mem_fun(m_Button, 
+    // &Button::on_popup_menu_position),1,gtk_get_current_event_time());
 
 }
 
@@ -378,7 +384,7 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
-    
+
     if (m_preview->m_active && m_selectedIndex != m_currentMoveIndex) {
         m_selectedIndex = -1;
         m_preview->m_mouseIn = true;
@@ -404,6 +410,8 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     //        return true;
     //    }
 
+    m_LastEventButton = event;
+    
     if (m_mouseLeftButtonDown) {
         //    m_currentMoveIndex = getIndex(event->x, event->y);
         m_selectedIndex = m_currentMoveIndex;
@@ -431,18 +439,28 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
                 m_Menu_Popup.attach_to_widget(*this);
 
 
+            //Gtk::Menu::SlotPositionCalc slot;// = new Gtk::Menu::SlotPositionCalc();
+            // auto the_slot = static_cast<Gtk::Menu::SlotPositionCalc*>(NULL /*data void* data*/);
+            //m_Menu_Popup.popup(the_slot, event->button, event->time );
+
             // m_Menu_Popup.set_opacity(0.3);
             m_Menu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
-            m_Menu_Popup.popup(event->button, event->time);
+            //m_Menu_Popup.popup(event->button, event->time);
+            m_Menu_Popup.popup(sigc::mem_fun(*this, 
+                    &DockPanel::on_popup_menu_position), 1,event->time /* gtk_get_current_event_time()*/);
+            //gtk_menu_popup()
 
             return true;
         }
 
         if (m_currentMoveIndex == 0) {
-            if (!m_QuitMenu_Popup.get_attach_widget())
-                m_QuitMenu_Popup.attach_to_widget(*this);
+            if (!m_HomeMenu_Popup.get_attach_widget())
+                m_HomeMenu_Popup.attach_to_widget(*this);
 
-            m_QuitMenu_Popup.popup(event->button, event->time);
+            m_HomeMenu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
+           // m_HomeMenu_Popup.popup(event->button, event->time);
+            m_HomeMenu_Popup.popup(sigc::mem_fun(*this,
+                    &DockPanel::on_popup_homemenu_position), 1,event->time /* gtk_get_current_event_time()*/);
             return true;
         }
 
@@ -452,6 +470,26 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 
     // Propagate the event further.
     return false;
+}
+
+void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
+{
+    int center = (this->monitor_geo.get_width() / 2 ) -
+        (m_HomeMenu_Popup.get_allocated_width() /2);
+    
+    int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
+    x = col+ (DEF_CELLSIZE / 2) ;
+    
+}
+
+void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
+{
+    int center = (this->monitor_geo.get_width() / 2 ) -
+        (m_Menu_Popup.get_allocated_width() /2);
+    
+    int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
+    x = col+ (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
+    
 }
 
 /****************************************************************
@@ -898,11 +936,11 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 //    }
 //}
 
-/****************************************************************
+/*
  * 
  * handles the mouse scroll . 
  * 
- ****************************************************************/
+ */
 bool DockPanel::on_scroll_event(GdkEventScroll * e)
 {
     int index = m_currentMoveIndex;
@@ -1220,71 +1258,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->stroke();
     cr->restore();
 
-    /* rounded
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
-    cr->move_to(x, y + radius);
-    cr->arc(x + radius, y + radius, radius, M_PI, -M_PI / 2);
-    cr->line_to(x + width - radius, y);
-    cr->arc(x + width - radius, y + radius, radius, -M_PI / 2, 0);
-    cr->line_to(x + width, y + height - radius);
-    cr->arc(x + width - radius, y + height - radius, radius, 0, M_PI / 2);
-    cr->line_to(x + radius, y + height);
-    cr->arc(x + radius, y + height - radius, radius, M_PI / 2, M_PI);
-    cr->fill_preserve();
-    cr->close_path();
-    cr->stroke();
-    cr->restore();
-     */
-
-    /*
-    
-    
-    
-    
-    
-    
-    
-    
-    
-     */
-
-
-    /*
-        cr->arc(x + width - radius, y + radius, radius, -90 * degrees, 0 * degrees);
-        cr->arc(x + width - radius, y + height - radius, radius, 0 * degrees, 90 * degrees);
-        cr->arc(x + radius, y + height - radius, radius, 90 * degrees, 180 * degrees);
-        cr->arc(x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
-        cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
-        cr->set_line_width(0.0);
-        cr->fill_preserve();
-        cr->restore(); // back to opaque black
-        cr->stroke();
-        cr->close_path();
-     */
-
-    /*
-     * https://developer.gnome.org/gtkmm-tutorial/unstable/sec-cairo-drawing-arcs.html.en
-     // This is where we draw on the window
-  Gtk::Allocation allocation = get_allocation();
-  const int width = allocation.get_width();
-  const int height = allocation.get_height();
-  const int lesser = MIN(width, height);
-  
-    // coordinates for the center of the window
-  int xc, yc;
-  xc = 1000;
-  yc = 10;
-    
-    // now draw a circle
-  cr->save();
-  cr->arc(xc, yc, lesser / 4.0, 0.0, 2.0 * M_PI); // full circle
-  cr->set_source_rgba(0.0, 0.0, 0.8, 0.6);    // partially translucent
-  cr->fill_preserve();
-  cr->restore();  // back to opaque black
-  cr->stroke();
-     */
-
-    if ( (m_currentMoveIndex != -1 && m_mouseIn ) || (m_currentMoveIndex==m_selectedIndex && m_preview->m_active && m_currentMoveIndex != -1 ) ) {
+    if ((m_currentMoveIndex != -1 && m_mouseIn) || (m_currentMoveIndex == m_selectedIndex && m_preview->m_active && m_currentMoveIndex != -1)) {
 
         // rectangle background selector
         int pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
@@ -1304,16 +1278,6 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
         cr->stroke();
 
-
-
-        //        
-        //        cr->set_line_width(1);
-        //        cr->set_source_rgba(1.0, 1.0, 0.8, 1); // partially translucent
-        //        cr->rectangle(col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex), DEF_PANELBCKTOP + 3, DEF_CELLSIZE - 1, DEF_PANELBCKHIGHT - 12);
-        //        cr->fill();
-        //        
-
-
     }
 
 
@@ -1323,11 +1287,6 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     for (auto item : *_itemsvector) {
         if (item->m_image == (Glib::RefPtr<Gdk::Pixbuf>)NULL)
             continue;
-
-        //         if (item->m_window == NULL)
-        //         {
-        //            continue;
-        //         }
 
         if (item->m_items->size() == 1) {
             cr->arc(col + (DEF_CELLSIZE / 2), DEF_PANELBCKHIGHT, 2, 0, 2 * M_PI);
@@ -1347,16 +1306,6 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     for (auto item : *_itemsvector) {
         if (item->m_image == (Glib::RefPtr<Gdk::Pixbuf>)NULL)
             continue;
-
-        // gdk_pixbuf_get_from_window( item->m_image)
-        //item->m_window.
-
-
-        //auto xw = Gdk::Window::window->WINDOW_FOREIGN
-        //..GDK_WINDOW_XID(window)
-        // GdkNativeWindow nwwin;
-        //  GdkWindow* nvv = gdk_window_foreign_new(item->m_xid);
-        //  GdkWindow *xwindow = gdk_window_lookup(item->m_xid);
 
         icon = item->m_image;
 
@@ -1383,11 +1332,11 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 }
 
-/****************************************************************
+/*
  * 
  * Get the window icons as Gdk::Pixbuf.
  * 
- ****************************************************************/
+ */
 Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window)
 {
     Glib::RefPtr<Gdk::Pixbuf> result;
