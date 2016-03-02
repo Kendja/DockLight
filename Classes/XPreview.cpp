@@ -23,12 +23,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <gtkmm/window.h>
 
-
-
-//#define WIN_WIDTH 384
-//#define WIN_HEIGHT 384
 
 XPreview::XPreview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
@@ -49,12 +44,9 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 
     set_app_paintable(true);
 
-
-
     m_item = NULL;
     m_mouseIn = false;
     m_currentIndex = 0;
-    //Window(WINDOW_POPUP);
 
     set_resizable(true);
     show_all_children();
@@ -64,11 +56,9 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 
     m_MenuCloseWindow.set_label("Close this window");
     m_MenuCloseWindow.signal_activate().connect(sigc::mem_fun(*this, &XPreview::on_menuCloseWindow_event));
-
     m_Menu_Popup.append(m_MenuCloseWindow);
     // Show the menu
     m_Menu_Popup.show_all();
-
     // Connect the menu to this Widget
     m_Menu_Popup.accelerate(*this);
 
@@ -113,12 +103,12 @@ void XPreview::on_menuCloseWindow_event()
 
 }
 
-/****************************************************************
+/*
  *
  * handles Mouse button press : process mouse button event
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further.
- ****************************************************************/
+ */
 bool XPreview::on_button_press_event(GdkEventButton *event)
 {
 
@@ -148,17 +138,11 @@ bool XPreview::on_button_press_event(GdkEventButton *event)
                 return true;
             }
 
-
-
-
-
             if (!wnck_window_is_active(item->m_window)) {
                 wnck_window_activate(item->m_window, (guint32) ct);
             } else {
                 wnck_window_minimize(item->m_window);
             }
-
-
 
             // The event has been handled.
             return true;
@@ -169,11 +153,11 @@ bool XPreview::on_button_press_event(GdkEventButton *event)
     }
 }
 
-/****************************************************************
+/*
  * 
  * get the item index from mouse coordinates.
  * 
- ****************************************************************/
+ */
 int XPreview::getIndex(int x, int y)
 {
     if (m_item == NULL) {
@@ -199,19 +183,18 @@ int XPreview::getIndex(int x, int y)
 
 }
 
-/****************************************************************
+/*
  * 
  * handles on_motion_notify_event 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
- ****************************************************************/
+ */
 bool XPreview::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentIndex = getIndex(event->x, event->y);
     if (m_currentIndex < 1)
         return true;
 
-    // Gtk::Widget::queue_draw();
     return true;
 }
 
@@ -251,20 +234,8 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         // get the current window title;
         t->m_appname = wnck_window_get_name(t->m_window);
         std::string caption = t->m_appname;
-        int chlength = utf8Legth(t->m_appname.c_str());
         int length = t->m_appname.length(); // // number of bytes not including null
 
-        // TODO: fix the utf8/unicode problem
-        /*
-        if( chlength > 16  )
-        {
-             char utfbuffer[DEF_UTF8MAX];
-            // guarantee null-termination for Utf8
-            utf8cpy(utfbuffer, t->m_appname.c_str(), 4);
-            caption = utfbuffer;
-            caption += "...";
-        }
-         */
         // Draw the pango text
         auto layout = create_pango_layout(caption);
         layout->set_font_description(font);
@@ -272,8 +243,6 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         int text_width;
         int text_height;
         layout->get_pixel_size(text_width, text_height);
-
-
 
         cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
         cr->move_to(pos_x, pos_y);
@@ -318,8 +287,11 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             //g_print("%s\n",t->m_appname.c_str());    
         }
 
-        // get the preview for the window.
-        GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(gdk_display_get_default(), t->m_xid);
+        // get the preview for t->m_xid the window.
+        GdkWindow *wm_window = 
+                gdk_x11_window_foreign_new_for_display(gdk_display_get_default(), 
+                t->m_xid);
+        
         GdkRectangle real_coordinates;
         gdk_window_get_frame_extents(wm_window, &real_coordinates);
         // create the image
@@ -333,7 +305,8 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         Glib::RefPtr<Gdk::Pixbuf> screenshot = PixbufConvert(scaledpb);
 
-        Gdk::Cairo::set_source_pixbuf(cr, screenshot, (DEF_PREVIEW_WIDTH * idx) + 20, DEF_PREVIEW_PIXBUF_TOP);
+        Gdk::Cairo::set_source_pixbuf(cr, screenshot, (DEF_PREVIEW_WIDTH * idx) +
+            20, DEF_PREVIEW_PIXBUF_TOP);
         cr->paint();
 
         g_object_unref(scaledpb);
@@ -345,215 +318,6 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return true;
 
 }
-
-bool XPreview::on_drawX(const Cairo::RefPtr<Cairo::Context>& cr)
-{
-    if (m_item == NULL) {
-        return true;
-    }
-
-    // Fill the background with gray
-    cr->set_source_rgb(0.5, 0.5, 0.5);
-
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
-    cr->rectangle(0, 0, this->get_width(), this->get_height());
-    cr->fill_preserve();
-    //  double m_radius = 5.0;
-
-    cr->set_line_width(1.0);
-   
-    Pango::FontDescription font;
-    font.set_family("System");
-    font.set_weight(Pango::WEIGHT_NORMAL);
-   // int text_width = 0;
-   // int text_height = 0;
-
-    int idx = 0;
-
-   // int maxtextlength = 23;
-    // int maxtextlength_selected = 34;
-
-    std::string caption = "";
-    for (auto t : *m_item->m_items) {
-
-        if (t->m_window == NULL)
-            continue;
-
-        // get the current window title;
-        t->m_appname = wnck_window_get_name(t->m_window);
-        int length = t->m_appname.length(); // // number of bytes not including null
-        //   size_t bytescount =  strlen(t->m_appname.c_str()); // number of bytes not including null
-
-        // http://developer.gnome.org/pangomm/unstable/classPango_1_1Layout.html
-        //  auto layout = create_pango_layout(t->m_appname);
-        //  layout->set_font_description(font);
-        // get the text dimensions (it updates the variables -- by reference)
-        //  layout->get_pixel_size(text_width, text_height);
-
-        // layout->set_text(t->m_appname);
-        int stringWidth, stringHeight;
-        // layout->get_pixel_size(stringWidth, stringHeight);
-
-        int sizechars = utf8Legth(t->m_appname.c_str());
-        //  t->m_appname ="gtkmm Cairo  \340\270\204\340\271\211\340\270\231\340\270\253\340\270\262\340\270\224\340\271\211\340\270\247\340\270\242 Google - Mozilla Firefox";
-
-        // t->m_appname="sdasda แคช  ใกล้เคียง  sd sdas - แคช  ใกล้เคียง";
-
-        //    cr->get_text_extents(t->m_appname.c_str(), textents);
-        // cr->get_font_extents(fextents);
-
-
-        //  int textWidth = (int) textents.width;
-
-
-        // layout->set_text(t->m_appname);
-        //  int stringWidth, stringHeight;
-        // layout->get_pixel_size(stringWidth, stringHeight);
-        if (1 == 2/*sizechars > maxtextlength*/) {
-            //if (length > maxtextlength) {
-            // TODO: use this lib http://site.icu-project.org/
-            //https://randomascii.wordpress.com/2013/04/03/stop-using-strncpy-already/
-            char utfbuffer[DEF_UTF8MAX];
-
-            // guarantee null-termination for Utf8
-            // g_utf8_strncpy(utfbuffer, t->m_appname.c_str(), maxtextlength);
-            utf8cpy(utfbuffer, t->m_appname.c_str(), 10);
-
-            //utfbuffer[maxtextlength - 1] = '\0';
-            caption = utfbuffer;
-            caption += "...";
-
-            //int mw = textWidth/length;
-            //int mw = textWidth/20;
-
-            //int cf = mw ;
-            //   double gg = textents.x_bearing - textents.width;
-
-
-            //int cf = (mw * length)/10;
-            // char buffer [33];
-            //  sprintf(buffer,"%d",mw);
-            //std::string num = itoa(mw,buffer,10); 
-
-            //  caption = t->m_appname.substr(0, maxtextlength ) + "...";
-
-            // they do not guarantee null-termination Utf8
-
-            // caption = t->m_appname.substr(0,maxtextlength);
-        } else {
-            caption = t->m_appname;
-        }
-
-        // cr->set_source_rgb(1.0, 1.0, 1.0);
-        // cr->move_to(20 + (DEF_PREVIEW_WIDTH * idx), 30);
-
-        // char* invalid = utf8::find_invalid(caption.c_str(), utf_invalid.c_str() + 6);
-        //assert (invalid == utf_invalid + 5);
-        //caption = "sdasda แคช  ใกล้เคียง  sd sdas - แคช  ใกล้เคียง";
-
-        // caption ="gtkmm Cairo  \340\270\204\340\271\211\340\270\231\340\270\253\340\270\262\340\270\224\340\271\211\340\270\247\340\270\242 Google - Mozilla Firefox";
-        // char utfbuffer[DEF_UTF8MAX];
-        // utfbuffer[maxtextlength - 1] = '\0';
-        //strncpy(utfbuffer, caption.c_str(),maxtextlength);
-        // g_utf8_strncpy(utfbuffer,caption.c_str(),maxtextlength);
-        //  g_print("%s\n",utfbuffer);
-        // caption = utfbuffer;
-
-
-        // caption = t->m_appname.substr(0,maxtextlength);
-        // caption = caption.substr(0, maxtextlength );
-        //  fix_utf8_string(caption);
-        //caption[maxtextlength]='\0';
-
-        // std::u8
-        // fix_utf8_string(caption);
-        //cr->show_text(caption);
-
-        draw_rectangle(cr, 20 + (DEF_PREVIEW_WIDTH * idx), 10, 60, 30);
-        drawText(cr, 20 + (DEF_PREVIEW_WIDTH * idx), 18, caption);
-        cr->reset_clip();
-
-        //cr->save();
-        /*
-        Pango::FontDescription font;
-        font.set_family("System");
-        font.set_weight(Pango::WEIGHT_NORMAL);
-        int text_width = 0;
-        int text_height = 0;
-
-        auto layout = create_pango_layout(caption);
-        layout->set_font_description(font);
-
-        layout->get_pixel_size(text_width, text_height);
-        
-        cr->move_to(20 + (DEF_PREVIEW_WIDTH * idx), 18);
-        layout->show_in_cairo_context(cr);
-         */
-
-        if (m_currentIndex >= 0) {
-
-            // rectangle background selector
-            double pos_x = 14 + (DEF_PREVIEW_WIDTH * m_currentIndex);
-            double pos_y = 16;
-            double pos_width = DEF_PREVIEW_WIDTH + 1;
-            double pos_height = DEF_PREVIEW_HEIGHT - 30;
-
-            cr->set_line_width(2);
-            cr->set_source_rgba(1.0, 1.0, 1.8, 0.1); // partially translucent
-            cr->rectangle(pos_x, pos_y, pos_width, pos_height);
-            cr->fill();
-
-            // rectangle frame selector
-            cr->set_source_rgba(1.0, 1.0, 1.0, 0.3); // partially translucent
-            cr->rectangle(pos_x, pos_y, pos_width, pos_height);
-            cr->stroke();
-
-            // Close rectangle
-            cr->set_source_rgba(1.0, 1.0, 1.0, 1);
-            cr->set_source_rgba(0.337, 0.612, 0.117, 1.0); // green
-            pos_x = (DEF_PREVIEW_WIDTH - 5) + (DEF_PREVIEW_WIDTH * m_currentIndex);
-            cr->rectangle(pos_x, 19, 14, 14);
-            cr->fill();
-            cr->stroke();
-
-            // Close X text
-            cr->set_source_rgba(1.0, 1.0, 1.0, 1); //white
-            cr->move_to(pos_x + 3, 30);
-            cr->show_text("X");
-
-            //g_print("%s\n",t->m_appname.c_str());    
-        }
-
-
-        // get the preview for the xid window
-        GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(gdk_display_get_default(), t->m_xid);
-        GdkRectangle real_coordinates;
-
-        gdk_window_get_frame_extents(wm_window, &real_coordinates);
-        GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
-                0, 0, real_coordinates.width, real_coordinates.height);
-
-        GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
-                DEF_PREVIEW_PIXBUF_WIDTH,
-                DEF_PREVIEW_PIXBUF_HEIGHT,
-                GDK_INTERP_BILINEAR);
-
-        Glib::RefPtr<Gdk::Pixbuf> screenshot = PixbufConvert(scaledpb);
-
-        Gdk::Cairo::set_source_pixbuf(cr, screenshot, (DEF_PREVIEW_WIDTH * idx) + 20, DEF_PREVIEW_PIXBUF_TOP);
-        cr->paint();
-
-        idx++;
-        g_object_unref(scaledpb);
-        g_object_unref(pb);
-
-    }
-
-    return true;
-}
-
-
-
 
 void XPreview::setXid(DockItem * item)
 {
@@ -582,8 +346,6 @@ XPreview::PixbufConvert(GdkPixbuf * icon)
 
     result = Gdk::Pixbuf::create_from_data(pdata,
             Gdk::COLORSPACE_RGB, hasalpha, bitsaple, width, height, stride);
-
-
 
     return result;
 }
