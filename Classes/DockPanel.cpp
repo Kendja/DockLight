@@ -48,11 +48,11 @@ std::vector<DockItem*>*DockPanel::_itemsvector;
 
 DockPanel::DockPanel()
 {
-    
-    
-    
-    
-    
+
+
+
+
+
     m_preview = new XPreview();
 
     this->m_panelLocation = panel_locationType::BOTTOM;
@@ -83,7 +83,7 @@ DockPanel::DockPanel()
             Gdk::POINTER_MOTION_MASK);
 
 
-     _itemsvector = new std::vector<DockItem*>();
+    _itemsvector = new std::vector<DockItem*>();
 
     DockItem *dockItem = new DockItem();
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico"),
@@ -95,19 +95,19 @@ DockPanel::DockPanel()
 
     g_print("\nPATH=%s\n", binpath.c_str());
     listFiles(binpath.c_str());
-    
-    
-    
-    
 
 
-   
 
-    
+
+
+
+
+
+
     // Set X Window signals
     WnckScreen *wnckscreen;
     wnckscreen = wnck_screen_get_default();
-    
+
     g_signal_connect(wnckscreen, "window-opened",
             G_CALLBACK(DockPanel::on_window_opened), NULL);
     g_signal_connect(wnckscreen, "window_closed",
@@ -168,8 +168,8 @@ DockPanel::DockPanel()
     m_Menu_Popup.show_all(); // Show the menu
     m_Menu_Popup.accelerate(*this); // Connect the menu to this Widget
     //m_Menu_Popup.set_opacity(0.5);
-    
-    
+
+
     Gdk::RGBA color;
     color.set_rgba(1.0, 1.0, 1.0, 1.0);
     m_Menu_Popup.override_background_color(color, Gtk::STATE_FLAG_NORMAL);
@@ -178,10 +178,10 @@ DockPanel::DockPanel()
     m_QuitMenuItem.set_label("Quit");
     m_QuitMenuItem.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
     m_HomeMenu_Popup.append(m_QuitMenuItem);
-    
+
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
-    
+
 
 
     //set_opacity(0.9);
@@ -433,7 +433,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     //    }
 
     m_LastEventButton = event;
-    
+
     if (m_mouseLeftButtonDown) {
         //    m_currentMoveIndex = getIndex(event->x, event->y);
         m_selectedIndex = m_currentMoveIndex;
@@ -468,8 +468,8 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             // m_Menu_Popup.set_opacity(0.3);
             m_Menu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             //m_Menu_Popup.popup(event->button, event->time);
-            m_Menu_Popup.popup(sigc::mem_fun(*this, 
-                    &DockPanel::on_popup_menu_position), 1,event->time /* gtk_get_current_event_time()*/);
+            m_Menu_Popup.popup(sigc::mem_fun(*this,
+                    &DockPanel::on_popup_menu_position), 1, event->time /* gtk_get_current_event_time()*/);
             //gtk_menu_popup()
 
             return true;
@@ -480,9 +480,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
                 m_HomeMenu_Popup.attach_to_widget(*this);
 
             m_HomeMenu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
-           // m_HomeMenu_Popup.popup(event->button, event->time);
+            // m_HomeMenu_Popup.popup(event->button, event->time);
             m_HomeMenu_Popup.popup(sigc::mem_fun(*this,
-                    &DockPanel::on_popup_homemenu_position), 1,event->time /* gtk_get_current_event_time()*/);
+                    &DockPanel::on_popup_homemenu_position), 1, event->time /* gtk_get_current_event_time()*/);
             return true;
         }
 
@@ -496,22 +496,22 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 
 void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 {
-    int center = (this->monitor_geo.get_width() / 2 ) -
-        (m_HomeMenu_Popup.get_allocated_width() /2);
-    
+    int center = (this->monitor_geo.get_width() / 2) -
+            (m_HomeMenu_Popup.get_allocated_width() / 2);
+
     int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
-    x = col+ (DEF_CELLSIZE / 2) ;
-    
+    x = col + (DEF_CELLSIZE / 2);
+
 }
 
 void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 {
-    int center = (this->monitor_geo.get_width() / 2 ) -
-        (m_Menu_Popup.get_allocated_width() /2);
-    
+    int center = (this->monitor_geo.get_width() / 2) -
+            (m_Menu_Popup.get_allocated_width() / 2);
+
     int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
-    x = col+ (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-    
+    x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
+
 }
 
 /****************************************************************
@@ -1075,14 +1075,24 @@ int DockPanel::getCountItems()
 void DockPanel::Update(WnckWindow* window, bool mode)
 {
 
+    
+//  WNCK_WINDOW_NORMAL,       /* document/app window */
+//  WNCK_WINDOW_DESKTOP,      /* desktop background */
+//  WNCK_WINDOW_DOCK,         /* panel */
+//  WNCK_WINDOW_DIALOG,       /* dialog */
+//  WNCK_WINDOW_TOOLBAR,      /* tearoff toolbar */
+//  WNCK_WINDOW_MENU,         /* tearoff menu */
+//  WNCK_WINDOW_UTILITY,      /* palette/toolbox window */
+//  WNCK_WINDOW_SPLASHSCREEN  /* splash screen */
+  
     WnckWindowType wt = wnck_window_get_window_type(window);
 
-    //    if (wt & (WNCK_WINDOW_MENU | WNCK_WINDOW_DOCK | WNCK_WINDOW_DIALOG |
-    //            WNCK_WINDOW_TOOLBAR | WNCK_WINDOW_UTILITY)) {
-    //        return;
-    //    }
-
-    if (wt & (WNCK_WINDOW_MENU | WNCK_WINDOW_DOCK | WNCK_WINDOW_TOOLBAR)) {
+    if (wt == WNCK_WINDOW_DESKTOP || 
+        wt == WNCK_WINDOW_DOCK || 
+        wt == WNCK_WINDOW_TOOLBAR ||
+        wt == WNCK_WINDOW_MENU ||
+        wt == WNCK_WINDOW_UTILITY ||
+        wt == WNCK_WINDOW_SPLASHSCREEN) {
         return;
     }
 
@@ -1091,20 +1101,22 @@ void DockPanel::Update(WnckWindow* window, bool mode)
     const char* appname = wnck_window_get_name(window);
     const char* instancename = wnck_window_get_class_instance_name(window);
 
-    if (groupname == NULL || realgroupname == NULL || appname == NULL || instancename == NULL) {
+    if (groupname == NULL || realgroupname == NULL || 
+            appname == NULL || instancename == NULL) {
         g_print("Update wnck returns NULL\n");
         return;
     }
 
     // handle window_open event
     if (mode == 1) {
-        // Handles spacial case with wine
+        // Handles special case with wine
         if (std::strncmp(groupname, "Wine", 4) == 0) {
             groupname = instancename;
         }
 
         auto appIcon = DockPanel::GetWindowIcon(window);
-        appIcon = appIcon->scale_simple(DEF_ICONSIZE, DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
+        appIcon = appIcon->scale_simple(DEF_ICONSIZE, 
+                DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
 
 
         // handle DockItems groups
@@ -1280,7 +1292,9 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->stroke();
     cr->restore();
 
-    if ((m_currentMoveIndex != -1 && m_mouseIn) || (m_currentMoveIndex == m_selectedIndex && m_preview->m_active && m_currentMoveIndex != -1)) {
+    if ((m_currentMoveIndex != -1 && m_mouseIn) ||
+            (m_currentMoveIndex == m_selectedIndex &&
+            m_preview->m_active && m_currentMoveIndex != -1)) {
 
         // rectangle background selector
         int pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
@@ -1341,6 +1355,19 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_OFFSE_TOP);
         cr->paint();
+
+
+
+        int pos_x = col + (DEF_CELLSIZE / 2) - (DEF_CELLSIZE/2 );
+        int pos_y = DEF_PANELBCKTOP;
+        int pos_width = DEF_CELLSIZE - 1;
+        int pos_height = DEF_PANELBCKHIGHT; //- 12;
+
+        cr->set_source_rgba(1.0, 1.0, 1.0, 0.8); // partially translucent
+       cr->set_line_width(0.7);
+        Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
+        cr->stroke();
+
         // Fill the area with the image
         //cr->fill();
 
