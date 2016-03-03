@@ -28,6 +28,24 @@
 XPreview::XPreview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 {
+    //Gtk::WindowType::WINDOW_POPUP
+   // set_opacity(0.9);
+    /*
+    GdkScreen *screen;
+    GdkVisual *visual;
+
+    //gtk_widget_set_app_paintable(GTK_WIDGET(gobj()), TRUE);
+    
+    set_app_paintable(true);
+    screen = gdk_screen_get_default();
+    visual = gdk_screen_get_rgba_visual(screen);
+
+    if (visual != NULL && gdk_screen_is_composited(screen)) {
+        gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
+        //gtk_widget_set_visual(win, visual);
+
+    }
+    */
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
             Gdk::BUTTON_RELEASE_MASK |
@@ -235,14 +253,19 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     font.set_family("System");
     font.set_weight(Pango::WEIGHT_NORMAL);
 
-    cr->set_source_rgb(0.5, 0.5, 0.5);
+   // cr->set_source_rgb(0.5, 0.5, 0.5);
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
+   //  cr->set_source_rgba(0.0, 0.0, 0.0, 1.0); // partially translucent
     cr->rectangle(0, 0, this->get_width(), this->get_height());
+   // Utilities::RoundedRectangle(cr,0, 0, this->get_width(), this->get_height(),12.0);
     cr->fill();
     cr->set_line_width(1.0);
-
+    
+   // return true;
+    
+    
+    
     int idx = 0;
-
     for (auto t : *m_item->m_items) {
 
         if (t->m_window == NULL)

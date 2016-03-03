@@ -31,6 +31,7 @@
 #include "Utilities.h"
 #include <gdkmm/screen.h>
 #include <gtkmm/alignment.h>
+#include <gdkmm/rgba.h>
 
 /*
 #include <gdkmm-3.0/gdkmm/pixbuf.h>
@@ -47,6 +48,11 @@ std::vector<DockItem*>*DockPanel::_itemsvector;
 
 DockPanel::DockPanel()
 {
+    
+    
+    
+    
+    
     m_preview = new XPreview();
 
     this->m_panelLocation = panel_locationType::BOTTOM;
@@ -77,12 +83,7 @@ DockPanel::DockPanel()
             Gdk::POINTER_MOTION_MASK);
 
 
-    // Set X Window signals
-    WnckScreen *screen;
-    screen = wnck_screen_get_default();
-
-
-    _itemsvector = new std::vector<DockItem*>();
+     _itemsvector = new std::vector<DockItem*>();
 
     DockItem *dockItem = new DockItem();
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico"),
@@ -94,12 +95,24 @@ DockPanel::DockPanel()
 
     g_print("\nPATH=%s\n", binpath.c_str());
     listFiles(binpath.c_str());
+    
+    
+    
+    
 
-    g_signal_connect(screen, "window-opened",
+
+   
+
+    
+    // Set X Window signals
+    WnckScreen *wnckscreen;
+    wnckscreen = wnck_screen_get_default();
+    
+    g_signal_connect(wnckscreen, "window-opened",
             G_CALLBACK(DockPanel::on_window_opened), NULL);
-    g_signal_connect(screen, "window_closed",
+    g_signal_connect(wnckscreen, "window_closed",
             G_CALLBACK(DockPanel::on_window_closed), NULL);
-    g_signal_connect(screen, "active-window-changed",
+    g_signal_connect(wnckscreen, "active-window-changed",
             G_CALLBACK(DockPanel::on_active_window_changed), NULL);
 
 
@@ -154,15 +167,24 @@ DockPanel::DockPanel()
     m_Menu_Popup.set_border_width(4);
     m_Menu_Popup.show_all(); // Show the menu
     m_Menu_Popup.accelerate(*this); // Connect the menu to this Widget
+    //m_Menu_Popup.set_opacity(0.5);
+    
+    
+    Gdk::RGBA color;
+    color.set_rgba(1.0, 1.0, 1.0, 1.0);
+    m_Menu_Popup.override_background_color(color, Gtk::STATE_FLAG_NORMAL);
 
     // menu 2
     m_QuitMenuItem.set_label("Quit");
     m_QuitMenuItem.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
     m_HomeMenu_Popup.append(m_QuitMenuItem);
+    
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
+    
 
 
+    //set_opacity(0.9);
 
 
     //  pMenu->popup(sigc::mem_fun(m_Button, 
@@ -1246,13 +1268,13 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     double degrees = M_PI / 180.0;
     double width = (itemsCount * DEF_CELLSIZE) + DEF_CELLSIZE;
     double height = DEF_PANELBCKHIGHT;
-    double radius = 12;
+    double radius = 2.0;
     int x = col = center - ((itemsCount * DEF_CELLSIZE) / 2) - DEF_CELLSIZE / 2;
     int y = DEF_PANELBCKTOP;
 
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
     //cr->rectangle(x, y, width, height);
-    Utilities::RoundedRectangle(cr, x, y, width, height, 2.0);
+    Utilities::RoundedRectangle(cr, x, y, width, height, radius);
     cr->fill_preserve();
     cr->close_path();
     cr->stroke();
