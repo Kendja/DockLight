@@ -109,3 +109,46 @@ void Utilities::RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
         cr->arc(x + radius, y + radius, radius, M_PI, M_PI * 1.5);
 
     }
+
+
+
+std::string Utilities::removeExtension(std::string text, const char* extension)
+{
+    // find extension
+    std::size_t found = text.find(extension);
+    if (found != std::string::npos) {
+        // let's replace the extension with an empty string:
+        text.replace(text.find(extension),
+                text.length(), "");
+    }
+    return text;
+}
+
+std::string Utilities::removeExtension(std::string text, const std::string extensions[])
+{
+    // find extensions
+    for (int i = 0; i < extensions->size() - 1; i++) {
+        std::string e = extensions[i];
+        std::size_t found = text.find(e);
+        if (found != std::string::npos) {
+            // let's replace the extension with an empty string:
+            text.replace(text.find(e),
+                    text.length(), "");
+        }
+    }
+    return text;
+}
+
+
+/*
+ * 
+ * stringToLower helper.
+ * 
+ */
+std::string Utilities::stringToLower(const char* strp)
+{
+    std::string str = strp;
+    transform(str.begin(), str.end(), str.begin(), ::tolower);
+
+    return str;
+}

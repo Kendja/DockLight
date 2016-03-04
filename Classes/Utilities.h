@@ -36,9 +36,11 @@ public:
     static std::string getExecPath();
     static std::string getExecPath(const std::string str);
     static std::vector<std::string> split(const std::string &text, char sep);
-
     static void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
             double x, double y, double width, double height, double radius);
+    static std::string removeExtension(std::string text, const char* extension);
+    static std::string removeExtension(std::string text, const std::string extensions[]);
+    static std::string stringToLower(const char* strp);
     
 private:
 
