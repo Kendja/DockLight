@@ -64,7 +64,7 @@ public:
     static GdkPixbuf* dimm_icon(GdkPixbuf *pixbuf);
     static std::string stringToLower(const char* strp);
 
-    void listFiles(const char* path);
+    void readPinItems(const char* path);
     std::string getexepath();
     std::string getFilePath(const std::string filename);
 

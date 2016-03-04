@@ -24,22 +24,11 @@
 #include <sstream>
 #include <vector>
 #include <cstring>
-#include <pthread.h>
-#include <mutex>
-
 #include "DockPanel.h"
 #include "Utilities.h"
 #include <gdkmm/screen.h>
 #include <gtkmm/alignment.h>
 #include <gdkmm/rgba.h>
-
-/*
-#include <gdkmm-3.0/gdkmm/pixbuf.h>
-#include <glibmm-2.4/glibmm/timer.h>
-#include <gtk-2.0/gtk/gtkwindow.h>
-#include <gtk-2.0/gdk/gdkwindow.h>
-#include <gtk-2.0/gdk/gdktypes.h>
- */
 #include "math.h"
 
 
@@ -48,27 +37,18 @@ std::vector<DockItem*>*DockPanel::_itemsvector;
 
 DockPanel::DockPanel()
 {
-
-
-
-
-
     m_preview = new XPreview();
 
-    this->m_panelLocation = panel_locationType::BOTTOM;
+    m_panelLocation = panel_locationType::BOTTOM;
     m_mouseLeftDoubleClickButtonDown =
-            m_mouseRightButtonDown =
-            m_mouseLeftButtonDown = false;
-
+    m_mouseRightButtonDown =
+    m_mouseLeftButtonDown = false;
     m_mouseIn = false;
     m_selectedIndex = -1;
     m_currentMoveIndex = 0;
     m_fpstimer.start();
-
-
     frames = 0;
     last_time = 0;
-
 
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
@@ -94,15 +74,8 @@ DockPanel::DockPanel()
     std::string binpath = Utilities::getExecPath();
 
     g_print("\nPATH=%s\n", binpath.c_str());
-    listFiles(binpath.c_str());
-
-
-
-
-
-
-
-
+    readPinItems(binpath.c_str());
+    
 
     // Set X Window signals
     WnckScreen *wnckscreen;
@@ -116,80 +89,47 @@ DockPanel::DockPanel()
             G_CALLBACK(DockPanel::on_active_window_changed), NULL);
 
 
-    m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this, &DockPanel::on_timeoutDraw), 50/*1000*/);
-    //Glib::signal_expose_event().connect(sigc::mem_fun(*this,&DockPanel::on_expose_event));
-
-
-    //  signal_focus_in_event().connect(sigc::mem_fun(*this, &DockPanel::on_focus_in) );
-
-
-    //    this->signal_motion_notify_event().connect(
-    //    sigc::mem_fun(this, &DockPanel::_on_motion_notify));
-
-
-
-
-    // Menu
-    // Add and connect action 1
-
+    m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
+            &DockPanel::on_timeoutDraw), 50);
+    
+    // Context Menus
     MenuItemNewApp.set_label("Open");
     MenuItemNewApp.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_menuNew_event));
     m_Menu_Popup.append(MenuItemNewApp);
 
     // Add a separator
-
     m_Menu_Popup.append(m_separatorMenuItem);
 
     MenuItemPin.set_label("Pin to Dock");
     MenuItemPin.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_Pin_event));
     m_Menu_Popup.append(MenuItemPin);
 
-
-    //    MenuItemUnPin.set_label("Unpin from Dock");
-    //    MenuItemUnPin.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_UnPin_event));
-    //    m_Menu_Popup.append(MenuItemUnPin);
-
     MenuItemRemoveFromDock.set_label("Remove from Dock");
     MenuItemRemoveFromDock.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_RemoveFromDock_event));
     m_Menu_Popup.append(MenuItemRemoveFromDock);
 
-
-
-
-
-    //    // Add a separator
+    // Add a separator
     m_Menu_Popup.append(m_separatorMenuItem2);
 
-    // Add and connect action 2
+    
     MenuItemCloseAll.set_label("Close all");
     MenuItemCloseAll.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_CloseAll_event));
     m_Menu_Popup.append(MenuItemCloseAll);
     m_Menu_Popup.set_border_width(4);
     m_Menu_Popup.show_all(); // Show the menu
     m_Menu_Popup.accelerate(*this); // Connect the menu to this Widget
-    //m_Menu_Popup.set_opacity(0.5);
-
+    
 
     Gdk::RGBA color;
     color.set_rgba(1.0, 1.0, 1.0, 1.0);
     m_Menu_Popup.override_background_color(color, Gtk::STATE_FLAG_NORMAL);
 
-    // menu 2
+    // HomeMenu
     m_QuitMenuItem.set_label("Quit");
     m_QuitMenuItem.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
     m_HomeMenu_Popup.append(m_QuitMenuItem);
-
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
-
-
-
-    //set_opacity(0.9);
-
-
-    //  pMenu->popup(sigc::mem_fun(m_Button, 
-    // &Button::on_popup_menu_position),1,gtk_get_current_event_time());
-
 }
 
 void DockPanel::setPanelLocation(panel_locationType panelLocation)
@@ -204,7 +144,6 @@ void DockPanel::on_menuNew_event()
         return;
 
     LaunchApplication(_itemsvector->at(m_currentMoveIndex));
-
 }
 
 void DockPanel::on_Pin_event()
@@ -231,26 +170,17 @@ void DockPanel::on_Pin_event()
 
     g_print("DockItem is now Pinged selected for index : %d\n", m_currentMoveIndex);
 
-    //listFiles(getexepath().c_str());
-    // listFiles("/home/yoo/GameDev/LinuxDev/DockLight");
-
 }
-
-
-// Signal handlers for acion 2
 
 void DockPanel::on_QuitMenu_event()
 {
-    //  hide(); //Closes the main window to stop the Gtk::Main::run().
-    //Gdk.Screen.Default.IsComposited ? 12 : 0;
-    //Gdk::Screen::get_default().Co
+    //FIXME: segmentation fault...
     Gtk::Main::quit();
-    //Gtk::Application::
+
 }
 
 void DockPanel::on_RemoveFromDock_event()
 {
-
     if (m_currentMoveIndex < 0)
         return;
 
@@ -270,18 +200,15 @@ void DockPanel::on_RemoveFromDock_event()
             dockitem->m_instancename.c_str()
             );
 
-
     if (remove(filename) != 0) {
         g_print("on_UnPin_event. ERROR remove file. ");
     }
 
     _itemsvector->erase(_itemsvector->begin() + m_currentMoveIndex);
-
 }
 
 void DockPanel::on_CloseAll_event()
 {
-
     if (m_currentMoveIndex < 0)
         return;
 
@@ -297,28 +224,7 @@ void DockPanel::on_CloseAll_event()
     }
 }
 
-//std::string DockPanel::getFilePath(const std::string filename)
-//{
-//    std::string path = getexepath() + "//" + filename;
-//    return path;
-//}
-//
-////http://www.cplusplus.com/reference/string/string/find_last_of/
-//
-//std::string DockPanel::getexepath()
-//{
-//    char result[ PATH_MAX ];
-//    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-//    std::string path = result;
-//    std::size_t found = path.find_last_of("/\\");
-//    path = path.substr(0, found);
-//
-//    // g_print("----%s\n",path.c_str() );
-//
-//    return path; //std::string(result, (count > 0) ? count : 0);
-//}
-
-void DockPanel::listFiles(const char* path)
+void DockPanel::readPinItems(const char* path)
 {
     DIR* dirFile = opendir(path);
     struct dirent* hFile;
@@ -333,9 +239,6 @@ void DockPanel::listFiles(const char* path)
             std::string filename = hFile->d_name;
             std::string imageFilePath = std::string(path) + std::string("/") + filename;
             g_print("found an .png file: %s\n", imageFilePath.c_str());
-
-
-
 
             std::vector<std::string> tokens = Utilities::split(filename, '_');
 
@@ -366,17 +269,17 @@ void DockPanel::listFiles(const char* path)
 
 DockPanel::~DockPanel()
 {
-    //https://git.gnome.org/browse/gtkmm/tree/demos/gtk-demo/example_pixbufs.cc?h=gtkmm-2-24#n127
+    // TODO: free pointers
     //Will probably happen anyway, in the destructor.
     m_TimeoutConnection.disconnect();
 }
 
-/****************************************************************
+/* bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  * 
  * handles on_leave_notify_event 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
- ****************************************************************/
+ */
 bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
 {
     m_mouseIn = true;
@@ -391,18 +294,16 @@ bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  */
 bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
-
-
     m_mouseIn = false;
     return true;
 }
 
-/****************************************************************
+/* bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
  * 
  * handles on_motion_notify_event 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
- ****************************************************************/
+ */
 bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
@@ -416,29 +317,21 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
     return true;
 }
 
-/****************************************************************
+/* bool DockPanel::on_button_release_event(GdkEventButton *event)
  * 
  * handles Mouse button released : process mouse button event 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
- ****************************************************************/
+ */
 bool DockPanel::on_button_release_event(GdkEventButton *event)
 {
-    //    if (m_mouseLeftDoubleClickButtonDown) {
-    //        m_currentIndex = getIndex(event->x, event->y);
-    //        ShowPreview(m_currentIndex, event);
-    //        m_mouseLeftDoubleClickButtonDown = false;
-    //        // The event has been handled.
-    //        return true;
-    //    }
-
     m_LastEventButton = event;
 
     if (m_mouseLeftButtonDown) {
-        //    m_currentMoveIndex = getIndex(event->x, event->y);
         m_selectedIndex = m_currentMoveIndex;
         SelectWindow(m_currentMoveIndex, event);
         m_mouseLeftButtonDown = false;
+        
         // The event has been handled.
         return true;
     }
@@ -460,17 +353,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             if (!m_Menu_Popup.get_attach_widget())
                 m_Menu_Popup.attach_to_widget(*this);
 
-
-            //Gtk::Menu::SlotPositionCalc slot;// = new Gtk::Menu::SlotPositionCalc();
-            // auto the_slot = static_cast<Gtk::Menu::SlotPositionCalc*>(NULL /*data void* data*/);
-            //m_Menu_Popup.popup(the_slot, event->button, event->time );
-
-            // m_Menu_Popup.set_opacity(0.3);
             m_Menu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
-            //m_Menu_Popup.popup(event->button, event->time);
             m_Menu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_menu_position), 1, event->time /* gtk_get_current_event_time()*/);
-            //gtk_menu_popup()
 
             return true;
         }
@@ -480,16 +365,11 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
                 m_HomeMenu_Popup.attach_to_widget(*this);
 
             m_HomeMenu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
-            // m_HomeMenu_Popup.popup(event->button, event->time);
             m_HomeMenu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_homemenu_position), 1, event->time /* gtk_get_current_event_time()*/);
             return true;
         }
-
-
-
     }
-
     // Propagate the event further.
     return false;
 }
@@ -514,23 +394,14 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 
 }
 
-/****************************************************************
+/* bool DockPanel::on_button_press_event(GdkEventButton *event)
  * 
  * handles Mouse button press : process mouse button event 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
- ****************************************************************/
+ */
 bool DockPanel::on_button_press_event(GdkEventButton *event)
 {
-    //    if ((event->type == GDK_2BUTTON_PRESS)) {
-    //        // Check if the event is a double click.
-    //        if (event->button == 1 && !m_mouseLeftDoubleClickButtonDown) {
-    //            m_mouseLeftDoubleClickButtonDown = true;
-    //
-    //            return true;
-    //        }
-    //    }
-
     m_currentMoveIndex = getIndex(event->x, event->y);
     if ((event->type == GDK_BUTTON_PRESS)) {
         // Check if the event is a left button click.
@@ -547,54 +418,20 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
             return true;
         }
     }
-
     // Propagate the event further.
     return false;
-
 }
-//Gtk::Window *parent = dynamic_cast<Gtk::Window *>(this->get_toplevel());
 
+// obsolete
 void DockPanel::ShowPreview(int index, GdkEventButton *event)
 {
     if (index < 1)
         return;
 
-
-
-
 }
 
-// http://www.sw-at.com/blog/2011/03/23/popen-execute-shell-command-from-cc/
-// /usr/share/applications
 
-std::string DockPanel::removeExtension(std::string text, const char* extension)
-{
-    // find extension
-    std::size_t found = text.find(extension);
-    if (found != std::string::npos) {
-        // let's replace the extension with an empty string:
-        text.replace(text.find(extension),
-                text.length(), "");
-    }
-    return text;
-}
-
-std::string DockPanel::removeExtension(std::string text, const std::string extensions[])
-{
-    // find extensions
-    for (int i = 0; i < extensions->size() - 1; i++) {
-        std::string e = extensions[i];
-        std::size_t found = text.find(e);
-        if (found != std::string::npos) {
-            // let's replace the extension with an empty string:
-            text.replace(text.find(e),
-                    text.length(), "");
-        }
-    }
-    return text;
-}
-
-/****************************************************************
+/* void DockPanel::LaunchApplication(const DockItem * item)
  * gtk-launch launches an application using the given name. The application 
  * is started with proper startup notification on a default display, unless specified otherwise.
  * gtk-launch takes at least one argument, the name of the application to launch. 
@@ -602,61 +439,9 @@ std::string DockPanel::removeExtension(std::string text, const std::string exten
  * with or without the '.desktop' suffix.
  * If called with more than one argument, the rest of them besides the application name 
  * are considered URI locations and are passed as arguments to the launched application.
- ****************************************************************/
-//http://cat-in-136.github.io/2010/05/how-to-launch-application-in-terminal.html
-//https://developer.gnome.org/gio/stable/GAppInfo.html
-
+ */
 void DockPanel::LaunchApplication(const DockItem * item)
 {
-    /*
-     //http://www.crategus.com/books/cl-cffi-gtk/pages/gdk_class_gdk-app-launch-context.html
-    GError *error = NULL;
-    GdkAppLaunchContext *context;
-    GAppLaunchContext *launch_context = (GAppLaunchContext*) gdk_display_get_app_launch_context(gdk_display_get_default ());
-    
-    //context = gdk_display_get_app_launch_context(gdk_display_get_default ());
-    //gdk_app_launch_context_set_screen(context, gdk_screen_get_default() );
-    
-    //if (!g_app_info_launch_default_for_uri("http://www.gtk.org",launch_context, &error))
-    //     g_warning ("Launching failed: %sn", error->message);
-    
-    
-    //file:///usr/share/applications/Tiled
-    if (!g_app_info_launch_default_for_uri("file:///usr/bin/tiled",launch_context, &error))
-         g_warning ("-----| Launching failed: %sn", error->message);
-
-   g_object_unref (launch_context);  
-    
-   // Gdk::Display::get_app_launch_context();
-   
-   return;
-     */
-
-    /* Dont work!
-    GdkScreen  *screen = gdk_screen_get_default();        
-    GError      **error;
-    
-    GdkAppLaunchContext *context;
-    gboolean ret;
-  
-    //context = gdk_app_launch_context_new ();
-    guint32 timestamp = gtk_get_current_event_time();
-       // wnck_window_activate(wncwin, (guint32) ct);
-        
-              
-    context = gdk_display_get_app_launch_context(gdk_display_get_default() ); 
-   // gdk_app_launch_context_set_screen (context, screen);
-  //  gdk_app_launch_context_set_timestamp(context, timestamp);
-    
-    
-    ret = g_app_info_launch_default_for_uri ("http://www.spiegel.de" , (GAppLaunchContext*)context, error);
-    g_object_unref (context);
-  
-    
-    return;   
-     */
-
-
     char command[128];
     int result = 0;
 
@@ -664,12 +449,10 @@ void DockPanel::LaunchApplication(const DockItem * item)
     std::string groupname = item->m_groupname;
     std::string appname = item->m_appname;
 
-
     const std::string extensions[] = {".py", ".exe"};
-    instancename = DockPanel::removeExtension(instancename, extensions);
-    groupname = DockPanel::removeExtension(groupname, extensions);
-    appname = DockPanel::removeExtension(appname, extensions);
-
+    instancename = Utilities::removeExtension(instancename, extensions);
+    groupname = Utilities::removeExtension(groupname, extensions);
+    appname = Utilities::removeExtension(appname, extensions);
 
     // wine handling
     if (strcmp(item->m_realgroupname.c_str(), "Wine") == 0) {
@@ -679,48 +462,24 @@ void DockPanel::LaunchApplication(const DockItem * item)
             return;
     }
 
-    //  WORK OPEN but shuutdown the caller after close this app.
-    /*
-    GAppInfo *appinfo = NULL;
-    gboolean ret = FALSE;
-    
-    appinfo = g_app_info_create_from_commandline(instancename.c_str(),
-                                             instancename.c_str(),
-                                             G_APP_INFO_CREATE_NONE,//G_APP_INFO_CREATE_NEEDS_TERMINAL,
-                                             NULL);
-    
-    g_assert(appinfo != NULL); // TODO error handling is not implemented.
-    ret = g_app_info_launch(appinfo, NULL, NULL, NULL);
-    g_assert(ret == TRUE); // TODO error handling is not implemented.
-    
-    return;
-     */
-
-    //    if (std::system(NULL)) puts("Ok");
-    //    else exit(EXIT_FAILURE);
-
-    //    xterm -e %s
-
     sprintf(command, "gtk-launch %s ", instancename.c_str());
     result = std::system(command);
     if (result == 0)
         return;
 
     // lower case 
-    std::string lowerNameInstanceName = stringToLower(instancename.c_str());
+    std::string lowerNameInstanceName = Utilities::stringToLower(instancename.c_str());
     sprintf(command, "gtk-launch %s", lowerNameInstanceName.c_str());
     result = std::system(command);
     if (result == 0)
         return;
-
-
 
     sprintf(command, "gtk-launch %s", groupname.c_str());
     result = std::system(command);
     if (result == 0)
         return;
 
-    std::string lowerGrpName = stringToLower(groupname.c_str());
+    std::string lowerGrpName = Utilities::stringToLower(groupname.c_str());
     sprintf(command, "gtk-launch %s", lowerGrpName.c_str());
     result = std::system(command);
     if (result == 0)
@@ -732,8 +491,7 @@ void DockPanel::LaunchApplication(const DockItem * item)
     if (result == 0)
         return;
 
-
-    std::string lowerAppName = stringToLower(appname.c_str());
+    std::string lowerAppName = Utilities::stringToLower(appname.c_str());
     sprintf(command, "gtk-launch %s", lowerAppName.c_str());
     result = std::system(command);
     if (result == 0)
@@ -756,15 +514,12 @@ void DockPanel::LaunchApplication(const DockItem * item)
     if (result == 0)
         return;
 
-
-
 }
 
 void DockPanel::SelectWindow(int index, GdkEventButton * event)
 {
     if (index < 1)
         return;
-
 
     DockItem *dockitem = _itemsvector->at(index);
     int itemscount = dockitem->m_items->size();
@@ -777,7 +532,6 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (_itemsvector->at(index)->m_window == NULL)
         return;
 
-
     int width = (DEF_PREVIEW_WIDTH * dockitem->m_items->size() - 1) + 30;
     m_preview->resize(width, DEF_PREVIEW_HEIGHT);
 
@@ -789,176 +543,10 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     m_preview->setXid(dockitem);
     m_preview->present();
-    /*
-    if (dockitem->m_items->size() == 1) {
-
-        WnckScreen *screen = wnck_screen_get_default();
-        bool restore = false;
-        int count = 0;
-        for (auto w : *_itemsvector->at(index)->m_items) {
-            if (wnck_window_is_minimized(w->m_window) || !wnck_window_is_active(w->m_window)) {
-                count++;
-            }
-        }
-
-        restore = count == _itemsvector->at(index)->m_items->size();
-
-        if (restore) {
-            for (auto w : *_itemsvector->at(index)->m_items) {
-
-                FocusWindow(w->m_window);
-            }
-        } else {
-            for (auto w : *_itemsvector->at(index)->m_items) {
-
-                wnck_window_minimize(w->m_window);
-            }
-        }
-    } else {
-        m_preview->setXid(NULL);
-
-        int width = (DEF_PREVIEW_WIDTH * dockitem->m_items->size() - 1) + 30;
-        m_preview->resize(width, DEF_PREVIEW_HEIGHT);
-        m_preview->move(event->x - width / 2, DEF_PANELBCKHIGHT + 8);
-        m_preview->setXid(dockitem);
-
-        m_preview->present();
-    }
-     */
 }
 
-/****************************************************************
- * 
- * selects the window by the given index
- *
- ****************************************************************/
-//void DockPanel::WindowSelector(int index, GdkEventButton *event)
-//{
-//    if (index < 1)
-//        return;
-//
-//    if (_itemsvector->at(index)->m_window == NULL)
-//        return;
-//
-//    DockItem* item = _itemsvector->at(index);
-//
-//
-//    XID cxid = 0;
-//    int idx = 0;
-//
-//    for (auto t : *item->m_items) {
-//
-//
-//        //int ccxid = _itemsvector->at(index)->m_xid;
-//
-//
-//    }
-//
-//
-//    int xid = _itemsvector->at(index)->m_xid;
-//
-//    Glib::RefPtr<Gdk::Window> gdkwindow = get_window();
-//    if (gdkwindow)
-//        XID xid = GDK_WINDOW_XID(gdkwindow->gobj());
-//    //
-//    //    if (m_preview == NULL) {
-//    //        //  GtkWindowType type = GTK_WINDOW_POPUP;
-//    //        //  Gtk::WindowType type2 =  Gtk::WindowType::WINDOW_POPUP;   
-//    //
-//    //        m_preview = new XPreview(Gtk::WindowType::WINDOW_POPUP);
-//    //        // m_preview->set_
-//    //    }
-//
-//
-//    int counter = item->m_items->size() - 1;
-//
-//
-//
-//    // m_preview->xid = xid;//GDK_WINDOW_XID(gdkwindow->gobj());
-//
-//    m_preview->setXid(NULL);
-//    int width = (DEF_PREVIEW_WIDTH * item->m_items->size() - 1) + 30;
-//    m_preview->resize(width, DEF_PREVIEW_HEIGHT);
-//    m_preview->move(event->x - width / 2, DEF_PANELBCKHIGHT + 8);
-//    m_preview->setXid(item);
-//
-//    m_preview->present();
-//
-//
-//    //m_preview->sh
-//    //m_preview->raise();
-//    //m_preview->Window::activate_default();
-//    //m_preview->Widget::activate();
-//    //m_preview->show_now();
-//
-//    //m_preview->show();
-//    // gtk_widget_show(m_preview->gobj());
-//
-//    //Gtk::Window::
-//
-//
-//    // GdkWindow* xgdkwindow = gtk_widget_get_window( m_preview->gobj() );
-//    // gdk_window_show (xgdkwindow);
-//    //gtk_window_present( gtkwindow  );
-//    //gtk_window_move(gtkwindow,event->x ,event->y);
-//    // m_preview->present();
-//    // m_preview->move(event->x -m_preview->get_width()/2 ,event->y);
-//
-//    //GtkWindowType type
-//    // GtkWidget *gtkw = gtk_window_new(GTK_WINDOW_POPUP/*GtkWindowType type*/);
-//    // gtk_widget_show (gtkw);
-//    //Gtk::Window::
-//    //m_preview->Widget->activate();
-//    //  GdkWindow* gdkwindow = gtk_widget_get_window(GTK_WIDGET(m_preview->gobj()));
-//
-//
-//    //gtk_window_activate_default(m_preview->gobj());
-//
-//
-//
-//    //  Window wm = GDK_WINDOW_XID((GdkWindow*) m_preview->get_gobj());
-//    // WnckWindow *wncwin = wnck_window_get(wm);
-//
-//    //int ct = gtk_get_current_event_time();
-//    //wnck_window_activate(wncwin, (guint32) ct);
-//
-//    //gtk_window_activate_focus(m_preview->gobj());
-//    //int ct = gtk_get_current_event_time();
-//    //wnck_window_activate(window, (guint32) ct);
-//
-//    //m_preview->activate();
-//
-//
-//
-//    g_print("XID: %d\n", xid);
-//    return;
-//    WnckScreen *screen = wnck_screen_get_default();
-//
-//    bool restore = false;
-//    int count = 0;
-//    for (auto w : *_itemsvector->at(index)->m_items) {
-//        if (wnck_window_is_minimized(w->m_window) || !wnck_window_is_active(w->m_window)) {
-//            count++;
-//        }
-//    }
-//
-//    restore = count == _itemsvector->at(index)->m_items->size();
-//
-//    // int ct = gtk_get_current_event_time();
-//    if (restore) {
-//        for (auto w : *_itemsvector->at(index)->m_items) {
-//
-//            FocusWindow(w->m_window);
-//        }
-//    } else {
-//        for (auto w : *_itemsvector->at(index)->m_items) {
-//
-//            wnck_window_minimize(w->m_window);
-//        }
-//    }
-//}
 
-/*
+/* bool DockPanel::on_scroll_event(GdkEventScroll * e)
  * 
  * handles the mouse scroll . 
  * 
@@ -986,11 +574,11 @@ bool DockPanel::on_scroll_event(GdkEventScroll * e)
     return true;
 }
 
-/****************************************************************
+/*
  * 
  * force to redraw the entire content.
  * 
- ****************************************************************/
+ */
 bool DockPanel::on_timeoutDraw()
 {
     /*
@@ -1006,26 +594,19 @@ bool DockPanel::on_timeoutDraw()
     return true;
 }
 
-/****************************************************************
+/* int DockPanel::getIndex(int x, int y)
  * 
  * get the item index from mouse coordinates.
  * 
- ****************************************************************/
+ */
 int DockPanel::getIndex(int x, int y)
 {
-
     if (!m_mouseIn)
         return -1;
 
-    // if (y < DEF_PANELBCKTOP || y > DEF_PANELBCKHIGHT)
-    //    return -1;
-
-    //  g_print("%d/%d\n",x,y);   
     int center = this->monitor_geo.get_width() / 2;
     Gdk::Point mouse(x, y);
     int result = -1;
-
-
     int idx = 0;
     int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
 
@@ -1034,10 +615,6 @@ int DockPanel::getIndex(int x, int y)
             continue;
 
         if (mouse.get_x() >= col && mouse.get_x() <= col + DEF_CELLSIZE) {
-
-            //        if (mouse.get_x() >= col && mouse.get_x() <= col + DEF_CELLSIZE &&
-            //                mouse.get_y() > DEF_PANELBCKTOP ){// && mouse.get_y() < DEF_PANELBCKHIGHT /*(DEF_PANELBCKHIGHT + DEF_PANELBCKTOP + 12 )*/ ) {
-
             return idx;
         }
 
@@ -1049,11 +626,11 @@ int DockPanel::getIndex(int x, int y)
 
 }
 
-/****************************************************************
+/* int DockPanel::getCountItems()
  * 
  * count all items where m_image are not null
  * 
- ****************************************************************/
+ */
 int DockPanel::getCountItems()
 {
     int count = 0;
@@ -1067,15 +644,13 @@ int DockPanel::getCountItems()
     return count;
 }
 
-/****************************************************************
+/* void DockPanel::Update(WnckWindow* window, bool mode)
  * 
  * Update the items and handle the X Window events window_close and window_open.
  * 
- ****************************************************************/
+ */
 void DockPanel::Update(WnckWindow* window, bool mode)
 {
-
-    
 //  WNCK_WINDOW_NORMAL,       /* document/app window */
 //  WNCK_WINDOW_DESKTOP,      /* desktop background */
 //  WNCK_WINDOW_DOCK,         /* panel */
@@ -1125,7 +700,6 @@ void DockPanel::Update(WnckWindow* window, bool mode)
                 DockItem* newItem = new DockItem();
                 newItem->m_groupname = groupname;
                 newItem->m_realgroupname = realgroupname;
-
                 newItem->m_appname = appname;
                 newItem->m_instancename = instancename;
                 newItem->m_isDirty = false;
@@ -1134,7 +708,6 @@ void DockPanel::Update(WnckWindow* window, bool mode)
                 newItem->m_image = appIcon;
 
                 if (item->m_isFixed && item->m_isDirty) {
-
                     item->m_window = window;
                     item->m_xid = wnck_window_get_xid(window);
                     item->m_isDirty = false;
@@ -1217,11 +790,11 @@ void DockPanel::Update(WnckWindow* window, bool mode)
 
 }
 
-/****************************************************************
+/* void DockPanel::get_FramesPerSecond()
  * 
  * calculates Frames Per Second
  * 
- ****************************************************************/
+ */
 void DockPanel::get_FramesPerSecond()
 {
     ++frames;
@@ -1237,17 +810,17 @@ void DockPanel::get_FramesPerSecond()
     //  g_print("FPS: %d\n", (int)_curFPS);
 }
 
-/****************************************************************
+/*
  * 
  * draw the cairo content
  * 
- ****************************************************************/
+ */
 bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-
-    int center = this->monitor_geo.get_width() / 2;
     Glib::RefPtr<Gdk::Pixbuf> icon;
-
+    
+    //FIXME: get the coordinates from the current monitor
+    int center = this->monitor_geo.get_width() / 2;
     int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
 
 #ifdef DEBUG
@@ -1273,31 +846,27 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 #endif
 
     int itemsCount = this->getCountItems();
-
-    // http://www.mono-project.com/docs/tools+libraries/libraries/Mono.Cairo/cookbook/
-
-
-    double degrees = M_PI / 180.0;
-    double width = (itemsCount * DEF_CELLSIZE) + DEF_CELLSIZE;
+    double width = (itemsCount * DEF_CELLSIZE) ;//+ DEF_CELLSIZE;
     double height = DEF_PANELBCKHIGHT;
     double radius = 2.0;
-    int x = col = center - ((itemsCount * DEF_CELLSIZE) / 2) - DEF_CELLSIZE / 2;
+    int x = col = center - ((itemsCount * DEF_CELLSIZE) / 2) ;//- DEF_CELLSIZE / 2;
     int y = DEF_PANELBCKTOP;
 
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
+    
+    cr->set_source_rgba(0.0, 0.0, 0.8, 0.2); // partially translucent
     //cr->rectangle(x, y, width, height);
     Utilities::RoundedRectangle(cr, x, y, width, height, radius);
     cr->fill_preserve();
     cr->close_path();
     cr->stroke();
     cr->restore();
-
+   
     if ((m_currentMoveIndex != -1 && m_mouseIn) ||
             (m_currentMoveIndex == m_selectedIndex &&
             m_preview->m_active && m_currentMoveIndex != -1)) {
 
         // rectangle background selector
-        int pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
+        int pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex) - DEF_CELLSIZE / 2;
         int pos_y = DEF_PANELBCKTOP;
         int pos_width = DEF_CELLSIZE - 1;
         int pos_height = DEF_PANELBCKHIGHT; //- 12;
@@ -1368,20 +937,16 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
         cr->stroke();
 
-        // Fill the area with the image
-        //cr->fill();
-
+     
         col += DEF_CELLSIZE;
         idxc++;
     }
 
-
     get_FramesPerSecond();
-
 
 }
 
-/*
+/* Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window)
  * 
  * Get the window icons as Gdk::Pixbuf.
  * 
@@ -1391,12 +956,7 @@ Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window)
     Glib::RefPtr<Gdk::Pixbuf> result;
     GdkPixbuf *icon = NULL;
     GError *error = NULL;
-    //
-    //    XID windowxid = wnck_window_get_xid(window);
-    //    WnckApplication *app = wnck_application_get(windowxid);
-    //    auto nnn = wnck_application_get_name(app);
-
-
+   
     std::string iconname = wnck_window_get_class_instance_name(window);
 
     if (iconname.empty())
@@ -1407,14 +967,14 @@ Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window)
             DEF_CELLSIZE, DEF_CELLSIZE, true);
 
     const std::string extensions[] = {".py", ".exe"};
-    iconname = DockPanel::removeExtension(iconname, extensions);
-    std::string lowerName = stringToLower(iconname.c_str());
+    iconname = Utilities::removeExtension(iconname, extensions);
+    std::string lowerName = Utilities::stringToLower(iconname.c_str());
 
     GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
     if (gtk_icon_theme_has_icon(icon_theme, lowerName.c_str())) {
 
         icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
-                64, // 64=highcolor
+                64,
                 GTK_ICON_LOOKUP_GENERIC_FALLBACK, &error);
     } else {
 
@@ -1487,11 +1047,11 @@ GdkPixbuf * DockPanel::dimm_icon(GdkPixbuf * pixbuf)
     return dimmed;
 }
 
-/****************************************************************
+/*
  * 
  * Focus the Window. 
  * 
- ****************************************************************/
+ */
 void DockPanel::FocusWindow(WnckWindow * window)
 {
     WnckScreen *screen = wnck_screen_get_default();
@@ -1513,17 +1073,3 @@ void DockPanel::FocusWindow(WnckWindow * window)
     wnck_window_activate_transient(window, (guint32) ct);
 
 }
-
-/****************************************************************
- * 
- * stringToLower helper.
- * 
- ****************************************************************/
-std::string DockPanel::stringToLower(const char* strp)
-{
-    std::string str = strp;
-    transform(str.begin(), str.end(), str.begin(), ::tolower);
-
-    return str;
-}
-
