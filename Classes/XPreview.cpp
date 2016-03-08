@@ -401,6 +401,49 @@ XPreview::PixbufConvert(GdkPixbuf * icon)
     return result;
 }
 
+void XPreview::drawText(const Cairo::RefPtr<Cairo::Context>& cr,
+            int x, int y, const std::string text)
+    {
+        // http://developer.gnome.org/pangomm/unstable/classPango_1_1FontDescription.html
+        Pango::FontDescription font;
+        font.set_family("Sans");
+        font.set_weight(Pango::WEIGHT_NORMAL);
+       
+        // http://developer.gnome.org/pangomm/unstable/classPango_1_1Layout.html
+        auto layout = create_pango_layout(text);
+       // layout->set_height(40);
+
+        Cairo::TextExtents textents;
+        layout->set_font_description(font);
+        int text_width;
+        int text_height;
+
+        //get the text dimensions (it updates the variables -- by reference)
+        layout->get_pixel_size(text_width, text_height);
+         cr->get_text_extents("พ", textents);
+
+        cr->set_source_rgb(1.0, 1.0, 1.0);
+        // Position the text in the middle
+        //cr->move_to(x, textents.y_bearing+ textents.height + y);
+        cr->move_to(x,  y);
+        //cr->rel_move_to(x, text_height + y);
+        layout->show_in_cairo_context(cr);
+    }
+
+    void XPreview::draw_rectangle(const Cairo::RefPtr<Cairo::Context>& cr,
+           int x, int y, int width, int height)
+    {
+        
+        //cr->save();
+        
+        cr->set_source_rgba(1.0, 1.0, 1.0, 1.0);
+        cr->rectangle(x, y, width, height);
+        cr->clip_preserve();
+        //cr->clip();
+        cr->stroke();
+       // cr->restore();
+
+    }
 XPreview::~XPreview()
 {
 }
