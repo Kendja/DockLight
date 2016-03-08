@@ -24,10 +24,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 XPreview::XPreview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 {
+<<<<<<< HEAD
+=======
+    //Gtk::WindowType::WINDOW_POPUP
+    // set_opacity(0.9);
+    /*
+    GdkScreen *screen;
+    GdkVisual *visual;
+
+    //gtk_widget_set_app_paintable(GTK_WIDGET(gobj()), TRUE);
+    
+    set_app_paintable(true);
+    screen = gdk_screen_get_default();
+    visual = gdk_screen_get_rgba_visual(screen);
+
+    if (visual != NULL && gdk_screen_is_composited(screen)) {
+        gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
+        //gtk_widget_set_visual(win, visual);
+
+    }
+     */
+>>>>>>> current
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
             Gdk::BUTTON_RELEASE_MASK |
@@ -63,9 +83,10 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 
 
 }
+
 void XPreview::setPanelLocation(panel_locationType panelLocation)
 {
-       this->m_panelLocation =  panelLocation;
+    this->m_panelLocation = panelLocation;
 }
 
 bool XPreview::on_enter_notify_event(GdkEventCrossing* crossing_event)
@@ -203,8 +224,42 @@ bool XPreview::on_motion_notify_event(GdkEventMotion*event)
  * 
  */
 bool XPreview::on_scroll_event(GdkEventScroll * event)
+<<<<<<< HEAD
 {
 
+=======
+{   
+    if( this->m_item == NULL )
+        return false;
+    
+    int count = this->m_item->m_items->size() ;
+    if ( count == 0 )
+        return false;
+    
+    WnckWindow *itemWindow;
+    int index = m_currentIndex;
+            
+    if ((int) event->delta_y == (int) 1) {
+        index++ ;
+    } else if ((int) event->delta_y == (int) - 1) {
+        index--;
+    }
+    
+    if( index < 0 )
+    {
+        index = 0;
+    }
+    else if ( index >= count )
+    {
+        index = count -1;
+    }
+    
+    m_currentIndex = index;
+    
+    itemWindow = this->m_item->m_items->at( m_currentIndex )->m_window;
+    wnck_window_activate(itemWindow, gtk_get_current_event_time());
+    
+>>>>>>> current
     // Event has been handled
     return true;
 }
@@ -218,18 +273,18 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     font.set_family("System");
     font.set_weight(Pango::WEIGHT_NORMAL);
 
-   // cr->set_source_rgb(0.5, 0.5, 0.5);
+    // cr->set_source_rgb(0.5, 0.5, 0.5);
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
-   //  cr->set_source_rgba(0.0, 0.0, 0.0, 1.0); // partially translucent
+    //  cr->set_source_rgba(0.0, 0.0, 0.0, 1.0); // partially translucent
     cr->rectangle(0, 0, this->get_width(), this->get_height());
-   // Utilities::RoundedRectangle(cr,0, 0, this->get_width(), this->get_height(),12.0);
+    // Utilities::RoundedRectangle(cr,0, 0, this->get_width(), this->get_height(),12.0);
     cr->fill();
     cr->set_line_width(1.0);
-    
-   // return true;
-    
-    
-    
+
+    // return true;
+
+
+
     int idx = 0;
     for (auto t : *m_item->m_items) {
 
@@ -277,14 +332,14 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             cr->set_line_width(2);
             cr->set_source_rgba(1.0, 1.0, 1.8, 0.1); // partially translucent
             //cr->rectangle(pos_x, pos_y, pos_width, pos_height);
-            Utilities::RoundedRectangle(cr,pos_x, pos_y, pos_width, pos_height,2.0);
+            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
             cr->fill();
 
             // rectangle frame selector
             cr->set_source_rgba(1.0, 1.0, 1.0, 0.3); // partially translucent
             //cr->rectangle(pos_x, pos_y, pos_width, pos_height);
-            Utilities::RoundedRectangle(cr,pos_x, pos_y, pos_width, pos_height,2.0);
-            
+            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
+
             cr->stroke();
 
             // Close rectangle
@@ -304,10 +359,10 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
 
         // get the preview for t->m_xid the window.
-        GdkWindow *wm_window = 
-                gdk_x11_window_foreign_new_for_display(gdk_display_get_default(), 
+        GdkWindow *wm_window =
+                gdk_x11_window_foreign_new_for_display(gdk_display_get_default(),
                 t->m_xid);
-        
+
         GdkRectangle real_coordinates;
         gdk_window_get_frame_extents(wm_window, &real_coordinates);
         // create the image
@@ -322,7 +377,7 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         Glib::RefPtr<Gdk::Pixbuf> screenshot = PixbufConvert(scaledpb);
 
         Gdk::Cairo::set_source_pixbuf(cr, screenshot, (DEF_PREVIEW_WIDTH * idx) +
-            20, DEF_PREVIEW_PIXBUF_TOP);
+                20, DEF_PREVIEW_PIXBUF_TOP);
         cr->paint();
 
         g_object_unref(scaledpb);
@@ -367,48 +422,49 @@ XPreview::PixbufConvert(GdkPixbuf * icon)
 }
 
 void XPreview::drawText(const Cairo::RefPtr<Cairo::Context>& cr,
-            int x, int y, const std::string text)
-    {
-        // http://developer.gnome.org/pangomm/unstable/classPango_1_1FontDescription.html
-        Pango::FontDescription font;
-        font.set_family("Sans");
-        font.set_weight(Pango::WEIGHT_NORMAL);
-       
-        // http://developer.gnome.org/pangomm/unstable/classPango_1_1Layout.html
-        auto layout = create_pango_layout(text);
-       // layout->set_height(40);
+        int x, int y, const std::string text)
+{
+    // http://developer.gnome.org/pangomm/unstable/classPango_1_1FontDescription.html
+    Pango::FontDescription font;
+    font.set_family("Sans");
+    font.set_weight(Pango::WEIGHT_NORMAL);
 
-        Cairo::TextExtents textents;
-        layout->set_font_description(font);
-        int text_width;
-        int text_height;
+    // http://developer.gnome.org/pangomm/unstable/classPango_1_1Layout.html
+    auto layout = create_pango_layout(text);
+    // layout->set_height(40);
 
-        //get the text dimensions (it updates the variables -- by reference)
-        layout->get_pixel_size(text_width, text_height);
-         cr->get_text_extents("พ", textents);
+    Cairo::TextExtents textents;
+    layout->set_font_description(font);
+    int text_width;
+    int text_height;
 
-        cr->set_source_rgb(1.0, 1.0, 1.0);
-        // Position the text in the middle
-        //cr->move_to(x, textents.y_bearing+ textents.height + y);
-        cr->move_to(x,  y);
-        //cr->rel_move_to(x, text_height + y);
-        layout->show_in_cairo_context(cr);
-    }
+    //get the text dimensions (it updates the variables -- by reference)
+    layout->get_pixel_size(text_width, text_height);
+    cr->get_text_extents("พ", textents);
 
-    void XPreview::draw_rectangle(const Cairo::RefPtr<Cairo::Context>& cr,
-           int x, int y, int width, int height)
-    {
-        
-        //cr->save();
-        
-        cr->set_source_rgba(1.0, 1.0, 1.0, 1.0);
-        cr->rectangle(x, y, width, height);
-        cr->clip_preserve();
-        //cr->clip();
-        cr->stroke();
-       // cr->restore();
+    cr->set_source_rgb(1.0, 1.0, 1.0);
+    // Position the text in the middle
+    //cr->move_to(x, textents.y_bearing+ textents.height + y);
+    cr->move_to(x, y);
+    //cr->rel_move_to(x, text_height + y);
+    layout->show_in_cairo_context(cr);
+}
 
-    }
+void XPreview::draw_rectangle(const Cairo::RefPtr<Cairo::Context>& cr,
+        int x, int y, int width, int height)
+{
+
+    //cr->save();
+
+    cr->set_source_rgba(1.0, 1.0, 1.0, 1.0);
+    cr->rectangle(x, y, width, height);
+    cr->clip_preserve();
+    //cr->clip();
+    cr->stroke();
+    // cr->restore();
+
+}
+
 XPreview::~XPreview()
 {
 }
