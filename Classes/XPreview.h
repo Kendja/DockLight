@@ -58,8 +58,6 @@ protected:
 
     //Override default signal handler:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-    bool on_drawX(const Cairo::RefPtr<Cairo::Context>& cr);
-
     bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     bool on_leave_notify_event(GdkEventCrossing* crossing_event);
     bool on_timeoutDraw();
