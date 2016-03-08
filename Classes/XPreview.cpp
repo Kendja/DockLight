@@ -28,24 +28,6 @@
 XPreview::XPreview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 {
-    //Gtk::WindowType::WINDOW_POPUP
-   // set_opacity(0.9);
-    /*
-    GdkScreen *screen;
-    GdkVisual *visual;
-
-    //gtk_widget_set_app_paintable(GTK_WIDGET(gobj()), TRUE);
-    
-    set_app_paintable(true);
-    screen = gdk_screen_get_default();
-    visual = gdk_screen_get_rgba_visual(screen);
-
-    if (visual != NULL && gdk_screen_is_composited(screen)) {
-        gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
-        //gtk_widget_set_visual(win, visual);
-
-    }
-    */
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
             Gdk::BUTTON_RELEASE_MASK |
@@ -58,8 +40,6 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
             Gdk::LEAVE_NOTIFY_MASK |
             Gdk::POINTER_MOTION_MASK);
 
-
-
     set_app_paintable(true);
 
     m_item = NULL;
@@ -69,7 +49,8 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
     set_resizable(true);
     show_all_children();
 
-    Glib::signal_timeout().connect(sigc::mem_fun(*this, &XPreview::on_timeoutDraw), 50);
+    Glib::signal_timeout().connect(sigc::mem_fun(*this,
+            &XPreview::on_timeoutDraw), DEF_FRAME_DELAY);
 
 
     m_MenuCloseWindow.set_label("Close this window");
@@ -223,22 +204,6 @@ bool XPreview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool XPreview::on_scroll_event(GdkEventScroll * event)
 {
-//    int index = m_currentMoveIndex;
-//    if (index == -1 || index == 0)
-//        return true;
-//
-//    DockItem *item = _itemsvector->at(index)->GetNext();
-//    if (item == NULL)
-//        return true;
-//
-//    WnckWindow *itemWindow = item->m_window;
-//    int ct = gtk_get_current_event_time();
-//
-//    if ((int) e->delta_y == (int) 1) {
-//        wnck_window_activate(itemWindow, (guint32) ct);
-//    } else if ((int) e->delta_y == (int) - 1) {
-//        wnck_window_activate(itemWindow, (guint32) ct);
-//    }
 
     // Event has been handled
     return true;

@@ -59,6 +59,8 @@ typedef enum StrutsPosition_t
 #define	DEF_PREVIEW_PIXBUF_HEIGHT 140   // the image pixbuf height
 #define	DEF_PREVIEW_PIXBUF_TOP 36       // the image pixbuf top
 #define	DEF_UTF8MAX  512                // the max buff used by g_utf8_strncpy   
+#define	DEF_FRAME_DELAY  50             
 
+        
 #endif	/* DEFINES_H */
 

@@ -31,14 +31,11 @@
 #include <gdkmm/rgba.h>
 #include "math.h"
 
-
-// the static collection
+// The static collection
 std::vector<DockItem*>*DockPanel::_itemsvector;
 
 DockPanel::DockPanel()
-{
-    m_preview = new XPreview();
-
+{  
     m_panelLocation = panel_locationType::BOTTOM;
     m_mouseLeftDoubleClickButtonDown =
     m_mouseRightButtonDown =
@@ -88,9 +85,9 @@ DockPanel::DockPanel()
     g_signal_connect(wnckscreen, "active-window-changed",
             G_CALLBACK(DockPanel::on_active_window_changed), NULL);
 
-
+    
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &DockPanel::on_timeoutDraw), 50);
+            &DockPanel::on_timeoutDraw), DEF_FRAME_DELAY);
     
     // Context Menus
     MenuItemNewApp.set_label("Open");
@@ -135,7 +132,7 @@ DockPanel::DockPanel()
 void DockPanel::setPanelLocation(panel_locationType panelLocation)
 {
     this->m_panelLocation = panelLocation;
-    m_preview->setPanelLocation(this->m_panelLocation);
+    m_preview.setPanelLocation(this->m_panelLocation);
 }
 
 void DockPanel::on_menuNew_event()
@@ -211,16 +208,14 @@ void DockPanel::on_CloseAll_event()
 {
     if (m_currentMoveIndex < 0)
         return;
-
+    
     DockItem *dockitem = _itemsvector->at(m_currentMoveIndex);
     for (auto item : *dockitem->m_items) {
-
         WnckWindow *window = item->m_window;
         if (window == NULL)
             continue;
-
-        int ct = gtk_get_current_event_time();
-        wnck_window_close(window, (guint32) ct);
+        
+        wnck_window_close(window, gtk_get_current_event_time());
     }
 }
 
@@ -235,7 +230,6 @@ void DockPanel::readPinItems(const char* path)
         if ((hFile->d_name[0] == '.')) continue; // in linux hidden files all start with '.'
 
         if (std::strstr(hFile->d_name, "_png")) {
-
             std::string filename = hFile->d_name;
             std::string imageFilePath = std::string(path) + std::string("/") + filename;
             g_print("found an .png file: %s\n", imageFilePath.c_str());
@@ -245,17 +239,13 @@ void DockPanel::readPinItems(const char* path)
             DockItem* item = new DockItem();
             item->m_groupname = tokens.at(0);
             item->m_realgroupname = tokens.at(0);
-
             item->m_appname = tokens.at(1);
             item->m_instancename = tokens.at(2);
             item->m_window = NULL;
             item->m_xid = 0;
             item->m_image = item->m_image->create_from_file(imageFilePath);
-            // item->m_image = item->m_image->scale_simple(DEF_ICONSIZE, DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
-
             item->m_isFixed = 1;
             item->m_isDirty = true;
-
             item->m_items->clear(); //TODO: need to free space
 
             if (strcmp(item->m_groupname.c_str(), "Wine") == 0) {
@@ -308,10 +298,10 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
 
-    if (m_preview->m_active && m_selectedIndex != m_currentMoveIndex) {
+    if (m_preview.m_active && m_selectedIndex != m_currentMoveIndex) {
         m_selectedIndex = -1;
-        m_preview->m_mouseIn = true;
-        m_preview->hideMe();
+        m_preview.m_mouseIn = true;
+        m_preview.hideMe();
     }
 
     return true;
@@ -337,8 +327,8 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     }
 
     if (m_mouseRightButtonDown) {
-        m_preview->m_mouseIn = true;
-        m_preview->hideMe();
+        m_preview.m_mouseIn = true;
+        m_preview.hideMe();
 
         m_mouseRightButtonDown = false;
 
@@ -533,16 +523,16 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
         return;
 
     int width = (DEF_PREVIEW_WIDTH * dockitem->m_items->size() - 1) + 30;
-    m_preview->resize(width, DEF_PREVIEW_HEIGHT);
+    m_preview.resize(width, DEF_PREVIEW_HEIGHT);
 
     if (m_panelLocation == panel_locationType::TOP) {
-        m_preview->move(event->x - width / 2, DEF_PANELBCKHIGHT + 4);
+        m_preview.move(event->x - width / 2, DEF_PANELBCKHIGHT + 4);
     } else {
-        m_preview->move(event->x - width / 2, Gdk::screen_height() - (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 4));
+        m_preview.move(event->x - width / 2, Gdk::screen_height() - (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 4));
     }
 
-    m_preview->setXid(dockitem);
-    m_preview->present();
+    m_preview.setXid(dockitem);
+    m_preview.present();
 }
 
 
@@ -574,9 +564,9 @@ bool DockPanel::on_scroll_event(GdkEventScroll * e)
     return true;
 }
 
-/*
+/* bool DockPanel::on_timeoutDraw()
  * 
- * force to redraw the entire content.
+ * Timeout handler to regenerate the frame 
  * 
  */
 bool DockPanel::on_timeoutDraw()
@@ -863,7 +853,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
    
     if ((m_currentMoveIndex != -1 && m_mouseIn) ||
             (m_currentMoveIndex == m_selectedIndex &&
-            m_preview->m_active && m_currentMoveIndex != -1)) {
+            m_preview.m_active && m_currentMoveIndex != -1)) {
 
         // rectangle background selector
         int pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex) - DEF_CELLSIZE / 2;
@@ -914,19 +904,17 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         icon = item->m_image;
 
-        if (m_currentMoveIndex == idxc && m_mouseIn) {
-            // icon = PixbufConvert(dimm_icon(item->m_image->gobj()));
-            //    icon = icon->scale_simple(64,64,Gdk::INTERP_BILINEAR);
-            //cr->scale(200,200);
-            //http://www.lucidarme.me/?p=4828
-        }
+//        if (m_currentMoveIndex == idxc && m_mouseIn) {
+//            // icon = PixbufConvert(dimm_icon(item->m_image->gobj()));
+//            //    icon = icon->scale_simple(64,64,Gdk::INTERP_BILINEAR);
+//            //cr->scale(200,200);
+//            //http://www.lucidarme.me/?p=4828
+//        }
 
 
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_OFFSE_TOP);
         cr->paint();
-
-
-
+        
         int pos_x = col + (DEF_CELLSIZE / 2) - (DEF_CELLSIZE/2 );
         int pos_y = DEF_PANELBCKTOP;
         int pos_width = DEF_CELLSIZE - 1;
@@ -936,7 +924,6 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
        cr->set_line_width(0.7);
         Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
         cr->stroke();
-
      
         col += DEF_CELLSIZE;
         idxc++;
