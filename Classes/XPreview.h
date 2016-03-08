@@ -21,8 +21,13 @@
 #define	XPREVIEW_H
 
 #include <gtkmm.h>
+<<<<<<< HEAD
 #include <gtk/gtk.h> // user c version for samples
 //#include <X11/Intrinsic.h>
+=======
+#include <gtk/gtk.h> 
+#include <X11/Intrinsic.h>
+>>>>>>> current
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
@@ -30,30 +35,25 @@
 #include <gdk/gdkx.h>
 #include "DockItem.h"
 #include <math.h>
-#include <pango/pangocairo.h> // https://developer.gnome.org/pango/stable/pango-Cairo-Rendering.html
+#include <pango/pangocairo.h> 
 #include "Utilities.h"
 
 class XPreview : public Gtk::Window
 {
 public:
-    
     XPreview(); 
+    
     void hideMe();
     bool m_mouseIn;
     bool m_active;
     int m_currentIndex;
     Gtk::Menu m_Menu_Popup;
     Gtk::MenuItem m_MenuCloseWindow;
-
     void on_menuCloseWindow_event();
-
     void setXid(DockItem* item);
     int getIndex(int x, int y);
-
     virtual ~XPreview();
-    
     void setPanelLocation(panel_locationType panelLocation);
-    
 protected:
 
     panel_locationType m_panelLocation;
@@ -72,52 +72,11 @@ protected:
     Glib::RefPtr<Gdk::Pixbuf> PixbufConvert(GdkPixbuf* icon);
    
     void drawText(const Cairo::RefPtr<Cairo::Context>& cr,
-            int x, int y, const std::string text)
-    {
-
-        // http://developer.gnome.org/pangomm/unstable/classPango_1_1FontDescription.html
-        Pango::FontDescription font;
-        font.set_family("Sans");
-        font.set_weight(Pango::WEIGHT_NORMAL);
-
-
-        
-        // http://developer.gnome.org/pangomm/unstable/classPango_1_1Layout.html
-        auto layout = create_pango_layout(text);
-       // layout->set_height(40);
-
-        Cairo::TextExtents textents;
-        layout->set_font_description(font);
-        int text_width;
-        int text_height;
-
-        //get the text dimensions (it updates the variables -- by reference)
-        layout->get_pixel_size(text_width, text_height);
-         cr->get_text_extents("พ", textents);
-
-        cr->set_source_rgb(1.0, 1.0, 1.0);
-        // Position the text in the middle
-        //cr->move_to(x, textents.y_bearing+ textents.height + y);
-        cr->move_to(x,  y);
-        //cr->rel_move_to(x, text_height + y);
-        layout->show_in_cairo_context(cr);
-    }
-
+            int x, int y, const std::string text);
+    
     void draw_rectangle(const Cairo::RefPtr<Cairo::Context>& cr,
-           int x, int y, int width, int height)
-    {
-        
-        //cr->save();
-        
-        cr->set_source_rgba(1.0, 1.0, 1.0, 1.0);
-        cr->rectangle(x, y, width, height);
-        cr->clip_preserve();
-        //cr->clip();
-        cr->stroke();
-       // cr->restore();
-
-    }
-
+           int x, int y, int width, int height);
+    
 private:
 
     DockItem* m_item;
