@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
       <df name="Classes">
         <in>AppWindow.cpp</in>
         <in>DockItem.cpp</in>
         <in>DockPanel.cpp</in>
+        <in>TitleWindow.cpp</in>
         <in>Utilities.cpp</in>
         <in>XPreview.cpp</in>
       </df>
@@ -82,6 +83,10 @@
             </incDir>
           </ccTool>
         </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand></preBuildCommand>
+        </preBuild>
       </makefileType>
       <item path="Classes/AppWindow.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
@@ -92,6 +97,10 @@
         </ccTool>
       </item>
       <item path="Classes/DockPanel.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="Classes/TitleWindow.cpp" ex="false" tool="1" flavor2="8">
         <ccTool flags="0">
         </ccTool>
       </item>
