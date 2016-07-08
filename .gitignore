@@ -1,4 +1,4 @@
-# Ignore everything
+# Ignore everything.
 *
 
 # Don't ignore directories, so we can recurse into them
