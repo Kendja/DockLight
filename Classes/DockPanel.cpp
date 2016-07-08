@@ -427,7 +427,7 @@ void DockPanel::ShowPreview(int index, GdkEventButton *event) {
  * are considered URI locations and are passed as arguments to the launched application.
  */
 void DockPanel::LaunchApplication(const DockItem * item) {
-    char command[128];
+    char command[200];
     int result = 0;
 
     std::string instancename = item->m_instancename;
@@ -468,14 +468,13 @@ void DockPanel::LaunchApplication(const DockItem * item) {
             return;
     }
 
-
-    sprintf(command, "%gtk-launch %s ", lowerrealgroupname.c_str());
+    sprintf(command, "gtk-launch %s ", lowerrealgroupname.c_str());
     result = std::system(command);
     if (result == 0)
         return;
 
-
-    sprintf(command, "%gtk-launch %s ", item->m_realgroupname.c_str());
+     
+    sprintf(command, (char*)"gtk-launch %s ", item->m_realgroupname.c_str());
     result = std::system(command);
     if (result == 0)
         return;
