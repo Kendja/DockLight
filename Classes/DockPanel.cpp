@@ -535,8 +535,8 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event) {
 
     if (_itemsvector->at(index)->m_window == NULL)
         return;
-    // calculate the preview postion.
-
+    
+    // calculate the preview postion. (current)
     int width = (DEF_PREVIEW_WIDTH * dockitem->m_items->size() - 1) + 30;
     m_preview->resize(width, DEF_PREVIEW_HEIGHT);
    
