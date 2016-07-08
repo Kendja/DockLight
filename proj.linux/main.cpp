@@ -31,7 +31,7 @@
 #include "AppWindow.h"
 
 /*
- * The Entry Point.
+ * The Entry main Point.
  *
  */
 int main(int argc, char *argv[])
