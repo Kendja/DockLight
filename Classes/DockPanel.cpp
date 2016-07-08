@@ -445,12 +445,12 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     std::string lowerAppName = Utilities::stringToLower(appname.c_str());
     std::string lowerrealgroupname = Utilities::stringToLower(item->m_realgroupname.c_str());
 
-
+/*
     g_print("lowerNameInstanceName--->%s\n", lowerNameInstanceName.c_str());
     g_print("lowerGrpName--->%s\n", lowerGrpName.c_str());
     g_print("lowerAppName--->%s\n", lowerAppName.c_str());
     g_print("lowerrealgroupname--->%s\n", lowerrealgroupname.c_str());
-
+*/
     // wine handling
     if (strcmp(item->m_realgroupname.c_str(), "Wine") == 0) {
         sprintf(command, "%s &", instancename.c_str());
