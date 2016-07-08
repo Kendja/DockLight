@@ -362,7 +362,30 @@ bool DockPanel::on_button_release_event(GdkEventButton *event) {
 }
 
 void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in) {
+    /*
+    int valor = x;
+    g_print("VALOR THE X %d\n",x-2560);
+     g_print("MONITOR X%d\n",this->monitor_geo.get_x());
+    int center = (this->monitor_geo.get_width() / 2) ;
+            //(m_HomeMenu_Popup.get_allocated_width() / 2);
+
+    g_print("VALOR THE CENTER %d\n",center);
     
+    int col = center - (this->getCountItems() * DEF_CELLSIZE) - m_HomeMenu_Popup.get_width();
+    //x = col + (DEF_CELLSIZE / 2);
+
+    
+    // FIXME: get the coordinates from the current monitor
+  //  int center = this->monitor_geo.get_width() / 2;
+//    int col = (this->getCountItems() * DEF_CELLSIZE) / 2;
+//x = col + (DEF_CELLSIZE / 2);
+int startpos = (this->monitor_geo.get_x() + (center/2)) - (DEF_CELLSIZE*2 - m_HomeMenu_Popup.get_width());    
+x = startpos;
+y -= DEF_CELLSIZE;
+
+push_in = false;
+     */
+
     int center = (this->monitor_geo.get_width() / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
 
@@ -535,11 +558,25 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event) {
 
     if (_itemsvector->at(index)->m_window == NULL)
         return;
+<<<<<<< HEAD
+
+=======
     
     // calculate the preview postion. (current)
+>>>>>>> current
     int width = (DEF_PREVIEW_WIDTH * dockitem->m_items->size() - 1) + 30;
     m_preview->resize(width, DEF_PREVIEW_HEIGHT);
-   
+    /*
+    int x = (( this->monitor_geo.get_width() / 2 ) - ( DEF_CELLSIZE * this->getCountItems()))   + 
+       ( (DEF_CELLSIZE * index) + DEF_PREVIEW_WIDTH * 2  );// - (width * dockitem->m_items->size());
+    
+    int center = 0;
+    if( dockitem->m_items->size() >1)
+         center = (DEF_PREVIEW_WIDTH/3) * dockitem->m_items->size()-1 ;
+    
+    int leftpos = this->monitor_geo.get_x() + x -center;//- DEF_PREVIEW_WIDTH / dockitem->m_items->size() ;
+     */
+
     int center = (this->monitor_geo.get_width() / 2);
     int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
     int leftpos = this->monitor_geo.get_x() + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
