@@ -72,6 +72,7 @@ protected:
     
 private:
 
+ 
     DockItem* m_item;
 };
 

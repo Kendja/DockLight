@@ -152,3 +152,23 @@ std::string Utilities::stringToLower(const char* strp)
 
     return str;
 }
+
+int Utilities::calculateMonitorX()
+{
+    int result = 0;
+    Gdk::Rectangle monitor_geo;
+     
+    auto screen = Gdk::Screen::get_default();
+    GdkScreen *defaultscreen = gdk_screen_get_default ();
+    
+    int dm = (int)gdk_screen_get_primary_monitor (defaultscreen);
+    
+    
+    for(int i = 0 ; i <= dm; i++)
+    {
+        screen->get_monitor_geometry(i, monitor_geo);
+        result += monitor_geo.get_x(); 
+    }
+    
+    return result;
+}

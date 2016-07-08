@@ -17,36 +17,21 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //****************************************************************
-#ifndef UTILITIES_H
-#define	UTILITIES_H
 
-#include <string>
-#include <algorithm>
-#include <gtk/gtk.h> 	
-#include <gtkmm.h> 	
-#include <math.h>
+#ifndef TITLEWINDOW_H
+#define	TITLEWINDOW_H
 
-class Utilities
+
+#include <gtkmm/window.h>
+
+class TitleWindow : public Gtk::Window
 {
 public:
-    Utilities();
-    Utilities(const Utilities& orig);
-    virtual ~Utilities();
-
-    static std::string getExecPath();
-    static std::string getExecPath(const std::string str);
-    static std::vector<std::string> split(const std::string &text, char sep);
-    static void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
-            double x, double y, double width, double height, double radius);
-    static std::string removeExtension(std::string text, const char* extension);
-    static std::string removeExtension(std::string text, const std::string extensions[]);
-    static std::string stringToLower(const char* strp);
-    static int calculateMonitorX();
-    
-    
+    TitleWindow();
+    virtual ~TitleWindow();
 private:
 
 };
 
-#endif	/* UTILITIES_H */
+#endif	/* TITLEWINDOW_H */
 

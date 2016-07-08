@@ -42,6 +42,7 @@ AppWindow::AppWindow()
         gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
         //gtk_widget_set_visual(win, visual);
     }
+   
 }
 
 /*
@@ -59,7 +60,10 @@ int AppWindow::Init(panel_locationType location)
     // Monitor numbers start at 0. To obtain the number of monitors of screen, 
     // use get_n_monitors()
     auto screen = Gdk::Screen::get_default();
-    screen->get_monitor_geometry(0, this->m_dockpanel.monitor_geo);
+    GdkScreen *defaultscreen = gdk_screen_get_default ();
+    
+    gint dm = gdk_screen_get_primary_monitor (defaultscreen);
+    screen->get_monitor_geometry(dm, this->m_dockpanel.monitor_geo);
 
     this->set_default_size(this->m_dockpanel.monitor_geo.get_width(), height);
 
@@ -91,10 +95,13 @@ int AppWindow::Init(panel_locationType location)
             insets[strutsPosition::TopEnd] = this->m_dockpanel.monitor_geo.get_width() - 1;
             break;
 
+            
         case panel_locationType::BOTTOM:
-
-            this->move(0, Gdk::screen_height() - DEF_PANELHIGHT);
-
+            
+            //this->move(this->m_dockpanel.monitor_geo.get_x(), Gdk::screen_height() - DEF_PANELHIGHT);
+            this->move(this->m_dockpanel.monitor_geo.get_x(), this->m_dockpanel.monitor_geo.get_height() - DEF_PANELHIGHT);
+            
+            
             insets[strutsPosition::Bottom] = (DEF_PANELHIGHT + (Gdk::screen_height() - 
                     (this->m_dockpanel.monitor_geo.get_y() + this->m_dockpanel.monitor_geo.get_height())));
             insets[strutsPosition::BottomStart] = this->m_dockpanel.monitor_geo.get_x();
@@ -116,7 +123,11 @@ int AppWindow::Init(panel_locationType location)
             gdk_atom_intern("_NET_WM_STRUT", FALSE),
             gdk_atom_intern("CARDINAL", FALSE), 32, GDK_PROP_MODE_REPLACE,
             (unsigned char *) &insets, 4);
+ 
     
+    
+
+     
     return 0;
 }
 
