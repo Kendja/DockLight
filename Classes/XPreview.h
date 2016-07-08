@@ -21,13 +21,8 @@
 #define	XPREVIEW_H
 
 #include <gtkmm.h>
-<<<<<<< HEAD
-#include <gtk/gtk.h> // user c version for samples
-//#include <X11/Intrinsic.h>
-=======
 #include <gtk/gtk.h> 
 #include <X11/Intrinsic.h>
->>>>>>> current
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
@@ -77,6 +72,7 @@ protected:
     
 private:
 
+ 
     DockItem* m_item;
 };
 

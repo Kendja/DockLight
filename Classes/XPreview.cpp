@@ -25,10 +25,7 @@
 #include <stdlib.h>
 
 XPreview::XPreview() :
-Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
-{
-<<<<<<< HEAD
-=======
+Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false) {
     //Gtk::WindowType::WINDOW_POPUP
     // set_opacity(0.9);
     /*
@@ -47,7 +44,9 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 
     }
      */
->>>>>>> current
+
+
+
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
             Gdk::BUTTON_RELEASE_MASK |
@@ -60,6 +59,8 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
             Gdk::LEAVE_NOTIFY_MASK |
             Gdk::POINTER_MOTION_MASK);
 
+
+
     set_app_paintable(true);
 
     m_item = NULL;
@@ -69,8 +70,7 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
     set_resizable(true);
     show_all_children();
 
-    Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &XPreview::on_timeoutDraw), DEF_FRAME_DELAY);
+    Glib::signal_timeout().connect(sigc::mem_fun(*this, &XPreview::on_timeoutDraw), 50);
 
 
     m_MenuCloseWindow.set_label("Close this window");
@@ -84,20 +84,17 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP), m_active(false)
 
 }
 
-void XPreview::setPanelLocation(panel_locationType panelLocation)
-{
+void XPreview::setPanelLocation(panel_locationType panelLocation) {
     this->m_panelLocation = panelLocation;
 }
 
-bool XPreview::on_enter_notify_event(GdkEventCrossing* crossing_event)
-{
+bool XPreview::on_enter_notify_event(GdkEventCrossing* crossing_event) {
 
     m_mouseIn = true;
     return true;
 }
 
-void XPreview::hideMe()
-{
+void XPreview::hideMe() {
     if (!m_mouseIn)
         return;
 
@@ -105,21 +102,18 @@ void XPreview::hideMe()
     m_mouseIn = false;
 }
 
-bool XPreview::on_leave_notify_event(GdkEventCrossing* crossing_event)
-{
+bool XPreview::on_leave_notify_event(GdkEventCrossing* crossing_event) {
     this->m_active = false;
     this->hideMe();
     return true;
 }
 
-bool XPreview::on_timeoutDraw()
-{
+bool XPreview::on_timeoutDraw() {
     queue_draw();
     return true;
 }
 
-void XPreview::on_menuCloseWindow_event()
-{
+void XPreview::on_menuCloseWindow_event() {
 
 }
 
@@ -129,8 +123,7 @@ void XPreview::on_menuCloseWindow_event()
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further.
  */
-bool XPreview::on_button_press_event(GdkEventButton *event)
-{
+bool XPreview::on_button_press_event(GdkEventButton *event) {
 
     if ((event->type == GDK_BUTTON_PRESS)) {
         // Check if the event is a left button click.
@@ -178,8 +171,7 @@ bool XPreview::on_button_press_event(GdkEventButton *event)
  * get the item index from mouse coordinates.
  * 
  */
-int XPreview::getIndex(int x, int y)
-{
+int XPreview::getIndex(int x, int y) {
     if (m_item == NULL) {
         return -1;
     }
@@ -209,8 +201,7 @@ int XPreview::getIndex(int x, int y)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool XPreview::on_motion_notify_event(GdkEventMotion*event)
-{
+bool XPreview::on_motion_notify_event(GdkEventMotion*event) {
     m_currentIndex = getIndex(event->x, event->y);
     if (m_currentIndex < 1)
         return true;
@@ -223,56 +214,56 @@ bool XPreview::on_motion_notify_event(GdkEventMotion*event)
  * handles the mouse scroll . 
  * 
  */
-bool XPreview::on_scroll_event(GdkEventScroll * event)
-<<<<<<< HEAD
-{
+bool XPreview::on_scroll_event(GdkEventScroll * event) {
+    if (this->m_item == NULL)
+        return false;
 
-=======
-{   
-    if( this->m_item == NULL )
+    int count = this->m_item->m_items->size();
+    if (count == 0)
         return false;
-    
-    int count = this->m_item->m_items->size() ;
-    if ( count == 0 )
-        return false;
-    
+
     WnckWindow *itemWindow;
     int index = m_currentIndex;
-            
+
     if ((int) event->delta_y == (int) 1) {
-        index++ ;
+        index++;
     } else if ((int) event->delta_y == (int) - 1) {
         index--;
     }
-    
-    if( index < 0 )
-    {
+
+    if (index < 0) {
         index = 0;
+    } else if (index >= count) {
+        index = count - 1;
     }
-    else if ( index >= count )
-    {
-        index = count -1;
-    }
-    
+
     m_currentIndex = index;
-    
-    itemWindow = this->m_item->m_items->at( m_currentIndex )->m_window;
+
+    itemWindow = this->m_item->m_items->at(m_currentIndex)->m_window;
     wnck_window_activate(itemWindow, gtk_get_current_event_time());
-    
->>>>>>> current
+
     // Event has been handled
     return true;
 }
 
-bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
+static bool pangoset = false;
+
+bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+
     if (m_item == NULL) {
         return true;
     }
-    Pango::FontDescription font;
-    font.set_family("System");
-    font.set_weight(Pango::WEIGHT_NORMAL);
 
+    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8); // partially translucent
+    cr->paint();
+
+    Pango::FontDescription font;
+
+    if (!pangoset) {
+        font.set_family("System");
+        font.set_weight(Pango::WEIGHT_NORMAL);
+        pangoset = true;
+    }
     // cr->set_source_rgb(0.5, 0.5, 0.5);
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
     //  cr->set_source_rgba(0.0, 0.0, 0.0, 1.0); // partially translucent
@@ -280,9 +271,6 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     // Utilities::RoundedRectangle(cr,0, 0, this->get_width(), this->get_height(),12.0);
     cr->fill();
     cr->set_line_width(1.0);
-
-    // return true;
-
 
 
     int idx = 0;
@@ -321,6 +309,7 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         cr->reset_clip(); // Reset the clipping 
 
+
         if (m_currentIndex >= 0) {
 
             // rectangle background selector
@@ -357,7 +346,6 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             //g_print("%s\n",t->m_appname.c_str());    
         }
-
         // get the preview for t->m_xid the window.
         GdkWindow *wm_window =
                 gdk_x11_window_foreign_new_for_display(gdk_display_get_default(),
@@ -390,8 +378,7 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 }
 
-void XPreview::setXid(DockItem * item)
-{
+void XPreview::setXid(DockItem * item) {
     m_active = true;
     m_currentIndex = 0;
     this->m_item = item;
@@ -400,8 +387,7 @@ void XPreview::setXid(DockItem * item)
 }
 
 Glib::RefPtr<Gdk::Pixbuf>
-XPreview::PixbufConvert(GdkPixbuf * icon)
-{
+XPreview::PixbufConvert(GdkPixbuf * icon) {
     Glib::RefPtr<Gdk::Pixbuf> result;
 
     int width = gdk_pixbuf_get_width(icon);
@@ -422,8 +408,7 @@ XPreview::PixbufConvert(GdkPixbuf * icon)
 }
 
 void XPreview::drawText(const Cairo::RefPtr<Cairo::Context>& cr,
-        int x, int y, const std::string text)
-{
+        int x, int y, const std::string text) {
     // http://developer.gnome.org/pangomm/unstable/classPango_1_1FontDescription.html
     Pango::FontDescription font;
     font.set_family("Sans");
@@ -451,8 +436,7 @@ void XPreview::drawText(const Cairo::RefPtr<Cairo::Context>& cr,
 }
 
 void XPreview::draw_rectangle(const Cairo::RefPtr<Cairo::Context>& cr,
-        int x, int y, int width, int height)
-{
+        int x, int y, int width, int height) {
 
     //cr->save();
 
@@ -465,7 +449,6 @@ void XPreview::draw_rectangle(const Cairo::RefPtr<Cairo::Context>& cr,
 
 }
 
-XPreview::~XPreview()
-{
+XPreview::~XPreview() {
 }
 

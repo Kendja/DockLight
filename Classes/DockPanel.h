@@ -37,10 +37,14 @@ class DockPanel : public Gtk::DrawingArea
 public:
     DockPanel();
     virtual ~DockPanel();
-    XPreview m_preview;
+
+
+    XPreview* m_preview;
 
     void SelectWindow(int index, GdkEventButton *event);
     void ShowPreview(int index, GdkEventButton *event);
+
+
     bool on_scroll_event(GdkEventScroll *e);
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
     bool on_timeoutDraw();
@@ -48,6 +52,11 @@ public:
     int getIndex(int x, int y);
     void FocusWindow(WnckWindow *window);
     void LaunchApplication(const DockItem *dockitem);
+
+    static std::string removeExtension(std::string text, const char* extension);
+    static std::string removeExtension(std::string text, const std::string extensions[]);
+
+
 
     static void Update(WnckWindow* window, bool mode);
     static Glib::RefPtr<Gdk::Pixbuf> GetWindowIcon(WnckWindow* window);
@@ -60,14 +69,17 @@ public:
     std::string getFilePath(const std::string filename);
 
     Gdk::Rectangle monitor_geo;
+
+
     bool m_mouseLeftButtonDown;
     bool m_mouseRightButtonDown;
     bool m_mouseLeftDoubleClickButtonDown;
 
     void setPanelLocation(panel_locationType m_panelLocation);
 
+
     bool m_mouseIn;
-  
+    //int m_currentIndex;
     int m_currentMoveIndex;
     int m_selectedIndex;
 
@@ -103,11 +115,13 @@ protected:
     panel_locationType m_panelLocation;
 
 
-    bool on_button_press_event(GdkEventButton *event);
-    bool on_button_release_event(GdkEventButton *event);
-    bool on_motion_notify_event(GdkEventMotion*event);
-    bool on_enter_notify_event(GdkEventCrossing* crossing_event);
-    bool on_leave_notify_event(GdkEventCrossing* crossing_event);
+    virtual bool on_button_press_event(GdkEventButton *event);
+    virtual bool on_button_release_event(GdkEventButton *event);
+    virtual bool on_motion_notify_event(GdkEventMotion*event);
+    //http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
+
+    virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
+    virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
 
 private:
     // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm
