@@ -472,7 +472,6 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     result = std::system(command);
     if (result == 0)
         return;
-
      
     sprintf(command, (char*)"gtk-launch %s ", item->m_realgroupname.c_str());
     result = std::system(command);
@@ -484,7 +483,6 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     if (result == 0)
         return;
 
-
     sprintf(command, "gtk-launch %s", lowerNameInstanceName.c_str());
     result = std::system(command);
     if (result == 0)
@@ -495,12 +493,10 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     if (result == 0)
         return;
 
-
     sprintf(command, "gtk-launch %s", lowerGrpName.c_str());
     result = std::system(command);
     if (result == 0)
         return;
-
 
     sprintf(command, "gtk-launch %s", appname.c_str());
     result = std::system(command);
@@ -511,7 +507,6 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     result = std::system(command);
     if (result == 0)
         return;
-
 
     sprintf(command, "%s", lowerrealgroupname.c_str());
     result = std::system(command);
