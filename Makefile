@@ -15,6 +15,7 @@ OBJS =  \
  DockPanel.o \
  DockItem.o \
  XPreview.o \
+TitleWindow.o \
  main.o \
  $(NULL)
 
@@ -44,3 +45,7 @@ XPreview.o: Classes/XPreview.o
 
 Utilities.o: Classes/Utilities.o
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/Utilities.cpp	
+
+TitleWindow.o: Classes/TitleWindow.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/TitleWindow.cpp	
+

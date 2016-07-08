@@ -13,8 +13,8 @@
         <group/>
 =======
         <group>
-            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/XPreview.h</file>
-            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/XPreview.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/DockPanel.cpp</file>
+            <file>file:/home/yoo/GameDev/GitHub/DockLight/Classes/AppWindow.cpp</file>
             <file>file:/home/yoo/GameDev/GitHub/DockLight/proj.linux/main.cpp</file>
         </group>
 >>>>>>> current
