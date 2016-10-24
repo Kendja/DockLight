@@ -36,6 +36,10 @@
  */
 int main(int argc, char *argv[])
 {
+    
+    //auto ver = WNCK_MAJOR_VERSION (3);
+            
+    
     Glib::RefPtr<Gtk::Application> app = 
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
     

@@ -96,9 +96,11 @@ public:
 
     Gtk::SeparatorMenuItem m_separatorMenuItem;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
+    Gtk::SeparatorMenuItem m_separatorMenuItem3;
 
     Gtk::Menu m_HomeMenu_Popup;
     Gtk::MenuItem m_QuitMenuItem;
+    Gtk::MenuItem m_CloseAllWindowsMenuItem;
 
 
     // Signal handlers (run when a popup item is clicked)
@@ -106,41 +108,12 @@ public:
     void on_menuNew_event();
     void on_Pin_event();
     void on_CloseAll_event();
+    void on_CloseAllWindows_event();
+    
     // void on_UnPin_event();
     void on_RemoveFromDock_event();
 
-protected:
-
-    GdkEventButton *m_LastEventButton;
-    panel_locationType m_panelLocation;
-
-
-    virtual bool on_button_press_event(GdkEventButton *event);
-    virtual bool on_button_release_event(GdkEventButton *event);
-    virtual bool on_motion_notify_event(GdkEventMotion*event);
-    //http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
-
-    virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
-    virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
-
-private:
-    // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm
-    double last_time;
-    int frames;
-    float _curFPS;
-    int fps;
-    Glib::Timer m_fpstimer;
-
-
-    //callback slot
-    void on_popup_menu_position(int& x, int& y, bool& push_in);
-    void on_popup_homemenu_position(int& x, int& y, bool& push_in);
     
-    void get_FramesPerSecond();
-
-    //https://git.gnome.org/browse/gtkmm/tree/demos/gtk-demo/example_pixbufs.cc?h=gtkmm-2-24#n127
-    sigc::connection m_TimeoutConnection;
-
     static void on_window_opened(WnckScreen *screen, WnckWindow *window,
             gpointer data)
     {
@@ -167,9 +140,9 @@ private:
             WnckWindow *previously_active_window,
             gpointer data)
     {
-        WnckWindow *active_window;
+        //WnckWindow *active_window;
 
-        active_window = wnck_screen_get_active_window(screen);
+       // active_window = wnck_screen_get_active_window(screen);
 #ifdef DEBUG
         if (active_window)
             g_print("active: %s\n", wnck_window_get_name(active_window));
@@ -177,6 +150,42 @@ private:
             g_print("no active window\n");
 #endif
     }
+protected:
+
+    GdkEventButton *m_LastEventButton;
+    panel_locationType m_panelLocation;
+
+
+    virtual bool on_button_press_event(GdkEventButton *event);
+    virtual bool on_button_release_event(GdkEventButton *event);
+    virtual bool on_motion_notify_event(GdkEventMotion*event);
+    //http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
+
+    virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
+    virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
+
+private:
+    
+    WnckScreen *wnckscreen;
+    
+    // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm
+    double last_time;
+    int frames;
+    float _curFPS;
+    int fps;
+    Glib::Timer m_fpstimer;
+
+
+    //callback slot
+    void on_popup_menu_position(int& x, int& y, bool& push_in);
+    void on_popup_homemenu_position(int& x, int& y, bool& push_in);
+    
+    void get_FramesPerSecond();
+
+    //https://git.gnome.org/browse/gtkmm/tree/demos/gtk-demo/example_pixbufs.cc?h=gtkmm-2-24#n127
+    sigc::connection m_TimeoutConnection;
+
+    
 };
 
 

@@ -22,7 +22,7 @@
 #include "Utilities.h"
 #include <gtk-3.0/gtk/gtkwindow.h>
 /*
- * 
+ * http://web.mit.edu/ghudson/dev/nokrb/third/libwnck/libwnck/test-wnck.c
  * constructor 
  * set the window transparence
  */
@@ -31,9 +31,12 @@ AppWindow::AppWindow()
     add_events(Gdk::BUTTON_PRESS_MASK);
     set_app_paintable(true);
 
+    WnckScreen *wnckscreen;
     GdkScreen *screen;
     GdkVisual *visual;
 
+    wnckscreen = wnck_screen_get(0);
+    
     gtk_widget_set_app_paintable(GTK_WIDGET(gobj()), TRUE);
     screen = gdk_screen_get_default();
     visual = gdk_screen_get_rgba_visual(screen);
@@ -42,9 +45,15 @@ AppWindow::AppWindow()
         gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
         //gtk_widget_set_visual(win, visual);
     }
-   
+    
+    // needed for "configure-event"
+    this->add_events( Gdk::STRUCTURE_MASK );
+    
+  //  g_signal_connect (G_OBJECT (wnckscreen), "window_opened",
+  //                  G_CALLBACK (window_opened_callback),NULL);
+    
+    
 }
-
 /*
  * 
  * reserve screen space and dock the window
@@ -54,7 +63,10 @@ int AppWindow::Init(panel_locationType location)
 {
     int height = DEF_PANELHIGHT;
     this->m_dockpanel.setPanelLocation(location);
-
+    
+   // g_signal_connect (G_OBJECT (this), "geometry_changed",
+   //                  G_CALLBACK (window_geometry_changed_callback),NULL);
+     
     // Retrieves the Gdk::Rectangle representing the size and position of the 
     // individual monitor within the entire screen area. 
     // Monitor numbers start at 0. To obtain the number of monitors of screen, 
@@ -64,12 +76,20 @@ int AppWindow::Init(panel_locationType location)
     
     gint dm = gdk_screen_get_primary_monitor (defaultscreen);
     screen->get_monitor_geometry(dm, this->m_dockpanel.monitor_geo);
-
     this->set_default_size(this->m_dockpanel.monitor_geo.get_width(), height);
 
+    this->set_title("DockLight");
+    this->set_focus_on_map(false);
+    this->set_skip_taskbar_hint(true);
+    this->set_skip_pager_hint(true);
+    this->set_gravity(Gdk::GRAVITY_SOUTH);
+    this->set_accept_focus(false);
+    this->set_focus_visible(false);
+    this->set_realized(false);
     this->set_decorated(false);
     this->set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DOCK);
-
+    //g_signal_connect(G_OBJECT(this), "configure-event", G_CALLBACK(configureCallback), NULL);
+    
     // Add the dock panel
     this->add(this->m_dockpanel);
     
@@ -127,9 +147,39 @@ int AppWindow::Init(panel_locationType location)
     
     
 
+    
      
     return 0;
 }
+
+
+void AppWindow::window_opened_callback(WnckScreen    *screen,WnckWindow    *window, gpointer       data)
+{
+         g_print ("Window '%s' opened (pid = %d session_id = %s)\n",
+           wnck_window_get_name (window),
+           wnck_window_get_pid (window),
+           wnck_window_get_session_id (window) ?
+           wnck_window_get_session_id (window) : "none");
+         
+          g_signal_connect (G_OBJECT (window), "geometry_changed",
+                    G_CALLBACK (window_geometry_changed_callback),
+                    NULL);
+          
+           
+}
+
+
+void AppWindow::window_geometry_changed_callback (WnckWindow *window, gpointer    user_data)
+{
+    g_print("\nwindow_geometry_changed_callback\n");
+    
+}
+
+void AppWindow::configureCallback(GtkWindow* parentWindow, GdkEvent* event, gpointer data)
+{
+    // do something...
+}
+
 
 AppWindow::~AppWindow()
 {
