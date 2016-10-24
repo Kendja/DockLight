@@ -22,6 +22,8 @@
 
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
+
+
 #include <libwnck/libwnck.h>
 #include <gtkmm.h> 
 
@@ -36,6 +38,11 @@ public:
     virtual ~AppWindow();
 private:
     DockPanel m_dockpanel;
+    
+    static void configureCallback(GtkWindow* parentWindow, GdkEvent* event, gpointer data);
+    static void window_opened_callback(WnckScreen    *screen,WnckWindow    *window, gpointer data);
+    static void window_geometry_changed_callback (WnckWindow *window, gpointer user_data);
+    
 };
 
 #endif	/* APPWINDOW_H */

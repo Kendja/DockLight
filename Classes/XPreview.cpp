@@ -357,6 +357,18 @@ bool XPreview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
         GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
                 0, 0, real_coordinates.width, real_coordinates.height);
 
+        /*
+         let [width, height] = windowTexture.get_size();
+            let scale = Math.min(1.0, THUMBNAIL_DEFAULT_SIZE / width, THUMBNAIL_DEFAULT_SIZE / height);
+            this.thumbnail = new Clutter.Clone ({ source: windowTexture,
+                                                  reactive: true,
+                                                  width: width * scale,
+                                                  height: height * scale });
+         * 
+         * 
+         */
+        
+        //https://developer.gnome.org/gdk-pixbuf/unstable/gdk-pixbuf-Scaling.html#gdk-pixbuf-scale
         GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
                 DEF_PREVIEW_PIXBUF_WIDTH,
                 DEF_PREVIEW_PIXBUF_HEIGHT,
