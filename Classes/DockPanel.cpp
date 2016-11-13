@@ -520,13 +520,9 @@ void DockPanel::LaunchApplication(const DockItem * item)
     std::string lowerGrpName = Utilities::stringToLower(groupname.c_str());
     std::string lowerAppName = Utilities::stringToLower(appname.c_str());
     std::string lowerrealgroupname = Utilities::stringToLower(item->m_realgroupname.c_str());
-
-    /*
-        g_print("lowerNameInstanceName--->%s\n", lowerNameInstanceName.c_str());
-        g_print("lowerGrpName--->%s\n", lowerGrpName.c_str());
-        g_print("lowerAppName--->%s\n", lowerAppName.c_str());
-        g_print("lowerrealgroupname--->%s\n", lowerrealgroupname.c_str());
-     */
+    
+    lowerrealgroupname = Utilities::removeExtension(lowerrealgroupname, extensions);
+    
     // wine handling
     if (strcmp(item->m_realgroupname.c_str(), "Wine") == 0) {
         sprintf(command, "%s &", instancename.c_str());
@@ -543,6 +539,17 @@ void DockPanel::LaunchApplication(const DockItem * item)
         if (result == 0)
             return;
     }
+    
+    sprintf(command, "\"%s\" &", lowerrealgroupname.c_str());
+    result = std::system(command);
+    if (result == 0)
+        return;
+   
+    sprintf(command, "\"%s\" &", instancename.c_str());
+    result = std::system(command);
+    if (result == 0)
+        return;
+    
     
     sprintf(command, "gtk-launch %s", lowerrealgroupname.c_str());
     result = std::system(command);
@@ -585,15 +592,7 @@ void DockPanel::LaunchApplication(const DockItem * item)
         return;
    
    
-    sprintf(command, "\"%s\" &", instancename.c_str());
-    result = std::system(command);
-    if (result == 0)
-        return;
-    
-    sprintf(command, "%s &", lowerrealgroupname.c_str());
-    result = std::system(command);
-    if (result == 0)
-        return;
+   
 
       
    
@@ -1030,7 +1029,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->fill_preserve();
     cr->close_path();
     cr->stroke();
-    cr->restore();
+  //  cr->restore();
 
     if ((m_currentMoveIndex != -1 && m_mouseIn) ||
             (m_currentMoveIndex == m_selectedIndex &&
