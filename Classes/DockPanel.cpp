@@ -502,7 +502,8 @@ void DockPanel::LaunchApplication(const DockItem * item)
 {
     char command[200];
     int result = 0;
-
+    *command = 0;
+    
     std::string instancename = item->m_instancename;
     std::string groupname = item->m_groupname;
     std::string appname = item->m_appname;
@@ -511,9 +512,6 @@ void DockPanel::LaunchApplication(const DockItem * item)
     instancename = Utilities::removeExtension(instancename, extensions);
     groupname = Utilities::removeExtension(groupname, extensions);
     appname = Utilities::removeExtension(appname, extensions);
-    // 
-    
-      
     
     // lower case 
     std::string lowerNameInstanceName = Utilities::stringToLower(instancename.c_str());
@@ -530,27 +528,17 @@ void DockPanel::LaunchApplication(const DockItem * item)
         if (result == 0)
             return;
     }
-    // netbeans handling - assumes there is a path to the netbeans executable    
-    // e.g /usr/local/netbeans-8.1/bin  )
+    
+    // netbeans handling - assumes there is a desktop file named "netbeans.desktop"   
+    ///usr/local/netbeans-8.1/bin/netbeans is not a plain file is a script  )
     char * found = strstr((char*) lowerrealgroupname.c_str(), "netbeans");
     if (found != NULL) {
-        sprintf(command, "%s &", "netbeans");
-        result = std::system(command);
-        if (result == 0)
-            return;
+        lowerrealgroupname = "netbeans";
     }
     
-    sprintf(command, "\"%s\" &", lowerrealgroupname.c_str());
-    result = std::system(command);
-    if (result == 0)
-        return;
    
-    sprintf(command, "\"%s\" &", instancename.c_str());
-    result = std::system(command);
-    if (result == 0)
-        return;
-    
-    
+    // /usr/share/applications Desktop files
+    // https://developer.gnome.org/integration-guide/stable/desktop-files.html.en
     sprintf(command, "gtk-launch %s", lowerrealgroupname.c_str());
     result = std::system(command);
     if (result == 0)
@@ -592,7 +580,15 @@ void DockPanel::LaunchApplication(const DockItem * item)
         return;
    
    
+    sprintf(command, "\"%s\" &", lowerrealgroupname.c_str());
+    result = std::system(command);
+    if (result == 0)
+        return;
    
+    sprintf(command, "\"%s\" &", instancename.c_str());
+    result = std::system(command);
+    if (result == 0)
+        return;
 
       
    
