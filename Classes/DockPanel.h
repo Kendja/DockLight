@@ -93,7 +93,8 @@ public:
     Gtk::MenuItem MenuItemCloseAll;
     // Gtk::MenuItem MenuItemUnPin;
     Gtk::MenuItem MenuItemRemoveFromDock;
-
+    Gtk::MenuItem MenuItemMinimizedAll;
+    
     Gtk::SeparatorMenuItem m_separatorMenuItem;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
     Gtk::SeparatorMenuItem m_separatorMenuItem3;
@@ -103,11 +104,13 @@ public:
     Gtk::MenuItem m_CloseAllWindowsMenuItem;
 
 
+
     // Signal handlers (run when a popup item is clicked)
     void on_QuitMenu_event();
     void on_menuNew_event();
     void on_Pin_event();
     void on_CloseAll_event();
+    void on_MinimieAll_event();
     void on_CloseAllWindows_event();
     
     // void on_UnPin_event();

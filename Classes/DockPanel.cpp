@@ -35,8 +35,7 @@
 // the static collection
 std::vector<DockItem*>*DockPanel::_itemsvector;
 
-DockPanel::DockPanel()
-{
+DockPanel::DockPanel() {
 
     //GtkWidget *toplevel = gtk_widget_get_toplevel(GTK_WIDGET(this->gobj()));
     // GdkWindow *gdk_window = gtk_widget_get_window(toplevel);
@@ -54,7 +53,7 @@ DockPanel::DockPanel()
     m_fpstimer.start();
     frames = 0;
     last_time = 0;
-    
+
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
             Gdk::BUTTON_RELEASE_MASK |
@@ -83,16 +82,16 @@ DockPanel::DockPanel()
 
 
     // Set X Window signals
-   // 
+    // 
     //wnckscreen = wnck_screen_get_default();
-    wnckscreen = wnck_screen_get(0);//_default();
-    
+    wnckscreen = wnck_screen_get(0); //_default();
+
     g_signal_connect(G_OBJECT(wnckscreen), "window-opened",
             G_CALLBACK(DockPanel::on_window_opened), NULL);
-    
+
     g_signal_connect(wnckscreen, "window_closed",
             G_CALLBACK(DockPanel::on_window_closed), NULL);
-    
+
     g_signal_connect(wnckscreen, "active-window-changed",
             G_CALLBACK(DockPanel::on_active_window_changed), NULL);
 
@@ -119,6 +118,9 @@ DockPanel::DockPanel()
     // Add a separator
     m_Menu_Popup.append(m_separatorMenuItem2);
 
+    MenuItemMinimizedAll.set_label("Minimize all");
+    MenuItemMinimizedAll.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_MinimieAll_event));
+    m_Menu_Popup.append(MenuItemMinimizedAll);
 
     MenuItemCloseAll.set_label("Close all");
     MenuItemCloseAll.signal_activate().connect(sigc::mem_fun(*this, &DockPanel::on_CloseAll_event));
@@ -148,22 +150,19 @@ DockPanel::DockPanel()
     m_HomeMenu_Popup.accelerate(*this);
 }
 
-void DockPanel::setPanelLocation(panel_locationType panelLocation)
-{
+void DockPanel::setPanelLocation(panel_locationType panelLocation) {
     this->m_panelLocation = panelLocation;
     m_preview->setPanelLocation(this->m_panelLocation);
 }
 
-void DockPanel::on_menuNew_event()
-{
+void DockPanel::on_menuNew_event() {
     if (m_currentMoveIndex < 1)
         return;
 
     LaunchApplication(_itemsvector->at(m_currentMoveIndex));
 }
 
-void DockPanel::on_Pin_event()
-{
+void DockPanel::on_Pin_event() {
     if (m_currentMoveIndex < 1)
         return;
 
@@ -188,17 +187,15 @@ void DockPanel::on_Pin_event()
 
 }
 
-void DockPanel::on_QuitMenu_event()
-{
+void DockPanel::on_QuitMenu_event() {
     //FIXME: segmentation fault...
     wnck_shutdown();
     //Gtk::Main::quit();
     exit(1);
-  //  Gtk::Application::DestroyNotify();
+    //  Gtk::Application::DestroyNotify();
 }
 
-void DockPanel::on_CloseAllWindows_event()
-{
+void DockPanel::on_CloseAllWindows_event() {
     WnckScreen *screen;
     GList *window_l;
 
@@ -206,25 +203,25 @@ void DockPanel::on_CloseAllWindows_event()
     wnck_screen_force_update(screen);
 
     for (window_l = wnck_screen_get_windows(screen); window_l != NULL; window_l = window_l->next) {
-        
+
         WnckWindow *window = WNCK_WINDOW(window_l->data);
         if (window == NULL /*|| strcmp(instancename,"docklight") == 0*/)
             continue;
-        
-        
+
+
         //const char* instancename = wnck_window_get_class_instance_name(window);
-        
+
         WnckWindowType wt = wnck_window_get_window_type(window);
 
         if (wt == WNCK_WINDOW_DESKTOP ||
-            wt == WNCK_WINDOW_DOCK ||
-            wt == WNCK_WINDOW_TOOLBAR ||
-            wt == WNCK_WINDOW_MENU ) {
-        continue;
-    }
-         
-        
-    
+                wt == WNCK_WINDOW_DOCK ||
+                wt == WNCK_WINDOW_TOOLBAR ||
+                wt == WNCK_WINDOW_MENU) {
+            continue;
+        }
+
+
+
         int ct = gtk_get_current_event_time();
         wnck_window_close(window, (guint32) ct);
 
@@ -234,8 +231,7 @@ void DockPanel::on_CloseAllWindows_event()
 
 }
 
-void DockPanel::on_RemoveFromDock_event()
-{
+void DockPanel::on_RemoveFromDock_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -262,8 +258,7 @@ void DockPanel::on_RemoveFromDock_event()
     _itemsvector->erase(_itemsvector->begin() + m_currentMoveIndex);
 }
 
-void DockPanel::on_CloseAll_event()
-{
+void DockPanel::on_CloseAll_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -279,8 +274,25 @@ void DockPanel::on_CloseAll_event()
     }
 }
 
-void DockPanel::readPinItems(const char* path)
-{
+void DockPanel::on_MinimieAll_event() {
+    if (m_currentMoveIndex < 0)
+        return;
+
+    DockItem *dockitem = _itemsvector->at(m_currentMoveIndex);
+    for (auto item : *dockitem->m_items) {
+
+        WnckWindow *window = item->m_window;
+        if (window == NULL)
+            continue;
+
+      //  if (wnck_window_is_minimized(window) == false)
+            wnck_window_minimize(window);
+
+    }
+
+}
+
+void DockPanel::readPinItems(const char* path) {
     DIR* dirFile = opendir(path);
     struct dirent* hFile;
     errno = 0;
@@ -322,8 +334,7 @@ void DockPanel::readPinItems(const char* path)
     closedir(dirFile);
 }
 
-DockPanel::~DockPanel()
-{
+DockPanel::~DockPanel() {
     // TODO: free pointers
     //Will probably happen anyway, in the destructor.
     m_TimeoutConnection.disconnect();
@@ -335,8 +346,7 @@ DockPanel::~DockPanel()
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
-{
+bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event) {
     m_mouseIn = true;
     return true;
 }
@@ -347,8 +357,7 @@ bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
-{
+bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event) {
     m_mouseIn = false;
     return true;
 }
@@ -359,8 +368,7 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_motion_notify_event(GdkEventMotion *event)
-{
+bool DockPanel::on_motion_notify_event(GdkEventMotion *event) {
     m_currentMoveIndex = getIndex(event->x, event->y);
 
     if (m_preview->m_active && m_selectedIndex != m_currentMoveIndex) {
@@ -378,8 +386,7 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion *event)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_button_release_event(GdkEventButton *event)
-{
+bool DockPanel::on_button_release_event(GdkEventButton *event) {
     m_LastEventButton = event;
 
     if (m_mouseLeftButtonDown) {
@@ -429,8 +436,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     return false;
 }
 
-void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
-{
+void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in) {
 
     int center = (this->monitor_geo.get_width() / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
@@ -442,8 +448,7 @@ void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 
 }
 
-void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
-{
+void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in) {
     int center = (this->monitor_geo.get_width() / 2) -
             (m_Menu_Popup.get_allocated_width() / 2);
 
@@ -458,8 +463,7 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_button_press_event(GdkEventButton *event)
-{
+bool DockPanel::on_button_press_event(GdkEventButton *event) {
     m_currentMoveIndex = getIndex(event->x, event->y);
     if ((event->type == GDK_BUTTON_PRESS)) {
         // Check if the event is a left button click.
@@ -482,8 +486,7 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 
 // obsolete
 
-void DockPanel::ShowPreview(int index, GdkEventButton *event)
-{
+void DockPanel::ShowPreview(int index, GdkEventButton *event) {
     if (index < 1)
         return;
 
@@ -498,12 +501,11 @@ void DockPanel::ShowPreview(int index, GdkEventButton *event)
  * If called with more than one argument, the rest of them besides the application name 
  * are considered URI locations and are passed as arguments to the launched application.
  */
-void DockPanel::LaunchApplication(const DockItem * item)
-{
+void DockPanel::LaunchApplication(const DockItem * item) {
     char command[200];
     int result = 0;
     *command = 0;
-    
+
     std::string instancename = item->m_instancename;
     std::string groupname = item->m_groupname;
     std::string appname = item->m_appname;
@@ -512,15 +514,15 @@ void DockPanel::LaunchApplication(const DockItem * item)
     instancename = Utilities::removeExtension(instancename, extensions);
     groupname = Utilities::removeExtension(groupname, extensions);
     appname = Utilities::removeExtension(appname, extensions);
-    
+
     // lower case 
     std::string lowerNameInstanceName = Utilities::stringToLower(instancename.c_str());
     std::string lowerGrpName = Utilities::stringToLower(groupname.c_str());
     std::string lowerAppName = Utilities::stringToLower(appname.c_str());
     std::string lowerrealgroupname = Utilities::stringToLower(item->m_realgroupname.c_str());
-    
+
     lowerrealgroupname = Utilities::removeExtension(lowerrealgroupname, extensions);
-    
+
     // wine handling
     if (strcmp(item->m_realgroupname.c_str(), "Wine") == 0) {
         sprintf(command, "%s &", instancename.c_str());
@@ -528,15 +530,15 @@ void DockPanel::LaunchApplication(const DockItem * item)
         if (result == 0)
             return;
     }
-    
+
     // netbeans handling - assumes there is a desktop file named "netbeans.desktop"   
     ///usr/local/netbeans-8.1/bin/netbeans is not a plain file is a script  )
     char * found = strstr((char*) lowerrealgroupname.c_str(), "netbeans");
     if (found != NULL) {
         lowerrealgroupname = "netbeans";
     }
-    
-   
+
+
     // /usr/share/applications Desktop files
     // https://developer.gnome.org/integration-guide/stable/desktop-files.html.en
     sprintf(command, "gtk-launch %s", lowerrealgroupname.c_str());
@@ -578,20 +580,20 @@ void DockPanel::LaunchApplication(const DockItem * item)
     result = std::system(command);
     if (result == 0)
         return;
-   
-   
+
+
     sprintf(command, "\"%s\" &", lowerrealgroupname.c_str());
     result = std::system(command);
     if (result == 0)
         return;
-   
+
     sprintf(command, "\"%s\" &", instancename.c_str());
     result = std::system(command);
     if (result == 0)
         return;
 
-      
-   
+
+
 }
 
 ///////////////////////////////////////////////////////////////
@@ -599,8 +601,7 @@ void DockPanel::LaunchApplication(const DockItem * item)
 /// \param event
 ///////////////////////////////////////////////////////////////
 
-void DockPanel::SelectWindow(int index, GdkEventButton * event)
-{
+void DockPanel::SelectWindow(int index, GdkEventButton * event) {
 
     if (index < 1)
         return;
@@ -639,8 +640,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
  * handles the mouse scroll . 
  * 
  */
-bool DockPanel::on_scroll_event(GdkEventScroll * e)
-{
+bool DockPanel::on_scroll_event(GdkEventScroll * e) {
     int index = m_currentMoveIndex;
     if (index == -1 || index == 0)
         return true;
@@ -667,8 +667,7 @@ bool DockPanel::on_scroll_event(GdkEventScroll * e)
  * force to redraw the entire content.
  * 
  */
-bool DockPanel::on_timeoutDraw()
-{
+bool DockPanel::on_timeoutDraw() {
     /*
     auto win = this->get_window();
     if (win) {
@@ -687,8 +686,7 @@ bool DockPanel::on_timeoutDraw()
  * get the item index from mouse coordinates.
  * 
  */
-int DockPanel::getIndex(int x, int y)
-{
+int DockPanel::getIndex(int x, int y) {
     if (!m_mouseIn)
         return -1;
 
@@ -719,8 +717,7 @@ int DockPanel::getIndex(int x, int y)
  * count all items where m_image are not null
  * 
  */
-int DockPanel::getCountItems()
-{
+int DockPanel::getCountItems() {
     int count = 0;
     for (auto item : *_itemsvector) {
         if (item->m_image == (Glib::RefPtr<Gdk::Pixbuf>)NULL)
@@ -737,9 +734,8 @@ int DockPanel::getCountItems()
  * Update the items and handle the X Window events window_close and window_open.
  * 
  */
-void DockPanel::Update(WnckWindow* window, bool mode)
-{
-   
+void DockPanel::Update(WnckWindow* window, bool mode) {
+
     //  WNCK_WINDOW_NORMAL,       /* document/app window */
     //  WNCK_WINDOW_DESKTOP,      /* desktop background */
     //  WNCK_WINDOW_DOCK,         /* panel */
@@ -764,68 +760,68 @@ void DockPanel::Update(WnckWindow* window, bool mode)
     const char* realgroupname = wnck_window_get_class_group_name(window);
     const char* appname = wnck_window_get_name(window);
     const char* instancename = wnck_window_get_class_instance_name(window);
-    
+
 
     if (groupname == NULL || realgroupname == NULL ||
             appname == NULL || instancename == NULL) {
-        
-//        g_print("Invalid names for this window\n");
-//        return;
-        
-        if( groupname != NULL){
-            if( realgroupname == NULL )
+
+        //        g_print("Invalid names for this window\n");
+        //        return;
+
+        if (groupname != NULL) {
+            if (realgroupname == NULL)
                 realgroupname = groupname;
-            
-            if( appname == NULL )
+
+            if (appname == NULL)
                 appname = groupname;
-            
-            if( instancename == NULL )
+
+            if (instancename == NULL)
                 instancename = groupname;
         }
-       
-        
-        if( realgroupname != NULL){
-            if( groupname == NULL )
+
+
+        if (realgroupname != NULL) {
+            if (groupname == NULL)
                 groupname = realgroupname;
-            
-            if( appname == NULL )
+
+            if (appname == NULL)
                 appname = realgroupname;
-            
-            if( instancename == NULL )
+
+            if (instancename == NULL)
                 instancename = realgroupname;
-            
-                
+
+
         }
-  
-        if( appname != NULL){
-            if( groupname == NULL )
+
+        if (appname != NULL) {
+            if (groupname == NULL)
                 groupname = appname;
-            
-            if( realgroupname == NULL )
+
+            if (realgroupname == NULL)
                 realgroupname = appname;
-            
-            if( instancename == NULL )
+
+            if (instancename == NULL)
                 instancename = appname;
-            
-                
+
+
         }
-        
-        
-        if( instancename != NULL){
-            if( groupname == NULL )
+
+
+        if (instancename != NULL) {
+            if (groupname == NULL)
                 groupname = instancename;
-            
-            if( appname == NULL )
+
+            if (appname == NULL)
                 appname = instancename;
-            
-            if( realgroupname == NULL )
+
+            if (realgroupname == NULL)
                 realgroupname = instancename;
-            
-                
+
+
         }
     }
 
-    
+
     // handle window_open event
     if (mode == 1) {
         // Handles special case with wine
@@ -833,12 +829,12 @@ void DockPanel::Update(WnckWindow* window, bool mode)
             groupname = instancename;
         }
 
-          
-       // don't use this NULL reference error   
-       // auto appIcon = DockPanel::GetWindowIcon(window);
-        
-        
-        auto appIcon =  PixbufConvert(wnck_window_get_icon(window));
+
+        // don't use this NULL reference error   
+        // auto appIcon = DockPanel::GetWindowIcon(window);
+
+
+        auto appIcon = PixbufConvert(wnck_window_get_icon(window));
         appIcon = appIcon->scale_simple(DEF_ICONSIZE,
                 DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
         // handle DockItems groups
@@ -942,8 +938,7 @@ void DockPanel::Update(WnckWindow* window, bool mode)
  * calculates Frames Per Second
  * 
  */
-void DockPanel::get_FramesPerSecond()
-{
+void DockPanel::get_FramesPerSecond() {
     ++frames;
     last_time += m_fpstimer.elapsed();
 
@@ -964,8 +959,7 @@ void DockPanel::get_FramesPerSecond()
  */
 //#define DEBUG
 
-bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
+bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     Glib::RefPtr<Gdk::Pixbuf> icon;
 
     /*
@@ -1025,7 +1019,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->fill_preserve();
     cr->close_path();
     cr->stroke();
-  //  cr->restore();
+    //  cr->restore();
 
     if ((m_currentMoveIndex != -1 && m_mouseIn) ||
             (m_currentMoveIndex == m_selectedIndex &&
@@ -1117,17 +1111,16 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
  * Get the window icons as Gdk::Pixbuf.
  * 
  */
-Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window)
-{
+Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window) {
     Glib::RefPtr<Gdk::Pixbuf> result;
     GdkPixbuf *icon = NULL;
     GError *error = NULL;
 
     //std::string iconname = wnck_window_get_class_instance_name(window);
-    std::string iconname =  wnck_window_get_icon_name(window);
-    
-//    if (iconname.empty())
-//        iconname = wnck_window_get_icon_name(window);
+    std::string iconname = wnck_window_get_icon_name(window);
+
+    //    if (iconname.empty())
+    //        iconname = wnck_window_get_icon_name(window);
 
     if (iconname.empty())
         return Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico"), //TODO:: load an empty icon
@@ -1160,8 +1153,7 @@ Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window)
 
 }
 
-Glib::RefPtr<Gdk::Pixbuf> DockPanel::PixbufConvert(GdkPixbuf * icon)
-{
+Glib::RefPtr<Gdk::Pixbuf> DockPanel::PixbufConvert(GdkPixbuf * icon) {
     Glib::RefPtr<Gdk::Pixbuf> result;
 
     int width = gdk_pixbuf_get_width(icon);
@@ -1182,8 +1174,7 @@ Glib::RefPtr<Gdk::Pixbuf> DockPanel::PixbufConvert(GdkPixbuf * icon)
 }
 
 /* borrowed from libwnck selector.c */
-GdkPixbuf * DockPanel::dimm_icon(GdkPixbuf * pixbuf)
-{
+GdkPixbuf * DockPanel::dimm_icon(GdkPixbuf * pixbuf) {
     int x, y, pixel_stride, row_stride;
     guchar *row, *pixels;
     int w, h;
@@ -1219,8 +1210,7 @@ GdkPixbuf * DockPanel::dimm_icon(GdkPixbuf * pixbuf)
  * Focus the Window. 
  * 
  */
-void DockPanel::FocusWindow(WnckWindow * window)
-{
+void DockPanel::FocusWindow(WnckWindow * window) {
     WnckScreen *screen = wnck_screen_get_default();
     WnckWorkspace *active_workpace;
     WnckWorkspace *screen_workpace;
