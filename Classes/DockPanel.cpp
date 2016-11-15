@@ -273,6 +273,28 @@ void DockPanel::on_CloseAll_event() {
     }
 }
 
+bool DockPanel::isExitstMaximizedWindows()
+{
+    if (m_currentMoveIndex < 0)
+        return false;
+
+    bool result = false;
+    DockItem *dockitem = _itemsvector->at(m_currentMoveIndex);
+    for (auto item : *dockitem->m_items) {
+
+        WnckWindow *window = item->m_window;
+        if (window == NULL)
+            continue;
+        
+         if (wnck_window_is_minimized(window)==FALSE){
+             result = true;
+             break;
+         }
+        
+    }    
+    
+    return result;
+}
 void DockPanel::on_MinimieAll_event() {
     if (m_currentMoveIndex < 0)
         return;
@@ -284,7 +306,7 @@ void DockPanel::on_MinimieAll_event() {
         if (window == NULL)
             continue;
 
-      //  if (wnck_window_is_minimized(window) == false)
+       if (wnck_window_is_minimized(window) == false)
             wnck_window_minimize(window);
 
     }
@@ -405,6 +427,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event) {
 
         if (m_currentMoveIndex > 0) {
             DockItem *dockitem = _itemsvector->at(m_currentMoveIndex);
+            bool maximizedexistst = isExitstMaximizedWindows();
+            MenuItemMinimizedAll.set_sensitive(dockitem->m_items->size() > 0 && maximizedexistst);
+                
 
             MenuItemCloseAll.set_sensitive(dockitem->m_items->size() > 0);
             MenuItemPin.set_sensitive(dockitem->m_isFixed != 1);

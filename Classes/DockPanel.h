@@ -44,7 +44,7 @@ public:
     void SelectWindow(int index, GdkEventButton *event);
     void ShowPreview(int index, GdkEventButton *event);
 
-
+    bool isExitstMaximizedWindows();
     bool on_scroll_event(GdkEventScroll *e);
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
     bool on_timeoutDraw();
