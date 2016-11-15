@@ -129,7 +129,6 @@ DockPanel::DockPanel() {
     m_Menu_Popup.show_all(); // Show the menu
     m_Menu_Popup.accelerate(*this); // Connect the menu to this Widget
 
-
     Gdk::RGBA color;
     color.set_rgba(1.0, 1.0, 1.0, 1.0);
     m_Menu_Popup.override_background_color(color, Gtk::STATE_FLAG_NORMAL);
