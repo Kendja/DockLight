@@ -23,6 +23,9 @@
 
 // Enum constants must be carefully named to avoid name collisions 
 
+
+
+
 typedef enum panel_location_t
 {
     TOP,

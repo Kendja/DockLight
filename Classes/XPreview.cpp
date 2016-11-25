@@ -151,6 +151,10 @@ bool XPreview::on_button_press_event(GdkEventButton *event) {
                 return true;
             }
 
+            // wnck_window_activate(item->m_window, (guint32) ct);
+            
+            
+            
             if (!wnck_window_is_active(item->m_window)) {
                 wnck_window_activate(item->m_window, (guint32) ct);
             } else {

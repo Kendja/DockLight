@@ -32,6 +32,12 @@
 #include "XPreview.h"
 #include <gdk/gdkx.h>
 
+#include <iostream>
+using namespace std;
+
+typedef std::function<void(std::string)> tdCallback;
+//void Launch10( std::string );
+
 class DockPanel : public Gtk::DrawingArea
 {
 public:
@@ -39,7 +45,11 @@ public:
     virtual ~DockPanel();
 
 
+    std::string applicationpath;
+     
     XPreview* m_preview;
+    std::map<std::string,tdCallback> laucherMap;
+    
 
     void SelectWindow(int index, GdkEventButton *event);
     void ShowPreview(int index, GdkEventButton *event);
@@ -51,8 +61,10 @@ public:
     int getCountItems();
     int getIndex(int x, int y);
     void FocusWindow(WnckWindow *window);
+    
     void LaunchApplication(const DockItem *dockitem);
-
+    
+ 
     static std::string removeExtension(std::string text, const char* extension);
     static std::string removeExtension(std::string text, const std::string extensions[]);
 

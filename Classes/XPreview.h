@@ -33,6 +33,11 @@
 #include <pango/pangocairo.h> 
 #include "Utilities.h"
 
+
+typedef std::function<void(std::string)> tdCallback;
+
+
+
 class XPreview : public Gtk::Window
 {
 public:
@@ -48,6 +53,9 @@ public:
     void setXid(DockItem* item);
     int getIndex(int x, int y);
     virtual ~XPreview();
+   
+    
+    
     void setPanelLocation(panel_locationType panelLocation);
 protected:
 
