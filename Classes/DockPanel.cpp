@@ -75,7 +75,7 @@ DockPanel::DockPanel() {
 
     _itemsvector->push_back(dockItem);
 
-    this->applicationpath  = Utilities::getExecPath();
+    this->applicationpath = Utilities::getExecPath();
 
     g_print("\nPATH=%s\n", applicationpath.c_str());
     readPinItems(applicationpath.c_str());
@@ -262,22 +262,22 @@ void DockPanel::on_RemoveFromDock_event() {
     //    std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
 
 
-    
+
 
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
-    
+
     sprintf(filename, "%s//%s.png", applicationpath.c_str(), s.c_str());
 
     g_print(" Remove path\n");
-    g_print( applicationpath.c_str());
-    
+    g_print(applicationpath.c_str());
+
     if (remove(filename) != 0) {
         g_print("\non_UnPin_event. ERROR remove file. ");
         return;
     }
 
-   
+
     _itemsvector->erase(_itemsvector->begin() + m_currentMoveIndex);
 }
 
@@ -470,7 +470,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event) {
 
             MenuItemCloseAll.set_sensitive(dockitem->m_items->size() > 0);
             MenuItemPin.set_sensitive(dockitem->m_isFixed != 1);
-            MenuItemRemoveFromDock.set_sensitive(dockitem->m_isFixed == 1  && dockitem->m_items->size() == 0 );
+            MenuItemRemoveFromDock.set_sensitive(dockitem->m_isFixed == 1 && dockitem->m_items->size() == 0);
 
             if (!m_Menu_Popup.get_attach_widget())
                 m_Menu_Popup.attach_to_widget(*this);
@@ -624,23 +624,24 @@ void DockPanel::LaunchApplication(const DockItem * item) {
         return;
     }
 
-
-
-    // wine handling
-    if (strcmp(item->m_realgroupname.c_str(), "Wine") == 0) {
-        sprintf(command, "%s &", instancename.c_str());
-        result = std::system(command);
-        if (result == 0)
-            return;
-    }
-
+    // Extract first token for a desktop file.
+    std::size_t foundspace = lowerrealgroupname.find(" ");
+    if(foundspace > 0 )
+        lowerrealgroupname = lowerrealgroupname.substr(0,foundspace); 
+    //haystack.substr(0,found+1); 
+    
+    
     // netbeans handling - assumes there is a desktop file named "netbeans.desktop"   
     ///usr/local/netbeans-8.1/bin/netbeans is not a plain file is a script  )
-    char * found = strstr((char*) lowerrealgroupname.c_str(), "netbeans");
-    if (found != NULL) {
-        lowerrealgroupname = "netbeans";
-    }
-
+//    char * found = strstr((char*) lowerrealgroupname.c_str(), "netbeans");
+//    if (found != NULL) {
+//        lowerrealgroupname = "netbeans";
+//    }
+//
+//    char * found2 = strstr((char*) lowerrealgroupname.c_str(), "popcorn");
+//    if (found2 != NULL) {
+//        lowerrealgroupname = "popcorn";
+//    }
 
     // /usr/share/applications Desktop files
     // https://developer.gnome.org/integration-guide/stable/desktop-files.html.en
@@ -661,49 +662,49 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     }
 
 
-/*
-    sprintf(command, "gtk-launch %s ", instancename.c_str());
-    result = std::system(command);
-    if (result == 0) {
-        g_print("run 3\n");
-        return;
-    }
+    /*
+        sprintf(command, "gtk-launch %s ", instancename.c_str());
+        result = std::system(command);
+        if (result == 0) {
+            g_print("run 3\n");
+            return;
+        }
 
-    sprintf(command, "gtk-launch %s", lowerNameInstanceName.c_str());
-    result = std::system(command);
-    if (result == 0) {
-        g_print("run 4\n");
-        return;
-    }
+        sprintf(command, "gtk-launch %s", lowerNameInstanceName.c_str());
+        result = std::system(command);
+        if (result == 0) {
+            g_print("run 4\n");
+            return;
+        }
 
-    sprintf(command, "gtk-launch %s", groupname.c_str());
-    result = std::system(command);
-    if (result == 0) {
-        g_print("run 5\n");
-        return;
-    }
+        sprintf(command, "gtk-launch %s", groupname.c_str());
+        result = std::system(command);
+        if (result == 0) {
+            g_print("run 5\n");
+            return;
+        }
 
-    sprintf(command, "gtk-launch %s", lowerGrpName.c_str());
-    result = std::system(command);
-    if (result == 0) {
-        g_print("run 6\n");
-        return;
-    }
-    sprintf(command, "gtk-launch %s", appname.c_str());
-    result = std::system(command);
-    if (result == 0) {
-        g_print("run 8\n");
-        return;
-    }
+        sprintf(command, "gtk-launch %s", lowerGrpName.c_str());
+        result = std::system(command);
+        if (result == 0) {
+            g_print("run 6\n");
+            return;
+        }
+        sprintf(command, "gtk-launch %s", appname.c_str());
+        result = std::system(command);
+        if (result == 0) {
+            g_print("run 8\n");
+            return;
+        }
 
-    sprintf(command, "gtk-launch %s", lowerAppName.c_str());
-    result = std::system(command);
-    if (result == 0) {
-        g_print("run 9\n");
-        return;
-    }
+        sprintf(command, "gtk-launch %s", lowerAppName.c_str());
+        result = std::system(command);
+        if (result == 0) {
+            g_print("run 9\n");
+            return;
+        }
 
-*/
+     */
 
     sprintf(command, "\"%s\" &", lowerrealgroupname.c_str());
     result = std::system(command);
@@ -889,99 +890,137 @@ void DockPanel::Update(WnckWindow* window, bool mode) {
         return;
     }
 
-    const char* groupname = wnck_window_get_class_group_name(window);
-    const char* realgroupname = wnck_window_get_class_group_name(window);
-    const char* appname = wnck_window_get_name(window);
-    const char* instancename = wnck_window_get_class_instance_name(window);
-
-
-    if (groupname == NULL || realgroupname == NULL ||
-            appname == NULL || instancename == NULL) {
-
-        //        g_print("Invalid names for this window\n");
-        //        return;
-
-        if (groupname != NULL) {
-            if (realgroupname == NULL)
-                realgroupname = groupname;
-
-            if (appname == NULL)
-                appname = groupname;
-
-            if (instancename == NULL)
-                instancename = groupname;
-        }
-
-
-        if (realgroupname != NULL) {
-            if (groupname == NULL)
-                groupname = realgroupname;
-
-            if (appname == NULL)
-                appname = realgroupname;
-
-            if (instancename == NULL)
-                instancename = realgroupname;
-
-
-        }
-
-        if (appname != NULL) {
-            if (groupname == NULL)
-                groupname = appname;
-
-            if (realgroupname == NULL)
-                realgroupname = appname;
-
-            if (instancename == NULL)
-                instancename = appname;
-
-
-        }
-
-
-        if (instancename != NULL) {
-            if (groupname == NULL)
-                groupname = instancename;
-
-            if (appname == NULL)
-                appname = instancename;
-
-            if (realgroupname == NULL)
-                realgroupname = instancename;
-
-
-        }
+    const char* _appname = wnck_window_get_name(window);
+    if (_appname == NULL) {
+        g_print("Update: No Application name....\n");
+        return;
     }
+    std::string appname(_appname);
+
+    const char* _groupname1 = wnck_window_get_class_group_name(window);
+    if (_groupname1 == NULL) {
+        _groupname1 = _appname;
+    }
+    std::string groupname(_groupname1);
+
+    const char* _realgroupname = wnck_window_get_class_group_name(window);
+    if (_realgroupname == NULL) {
+        _realgroupname = _appname;
+    }
+
+    std::string realgroupname(_realgroupname);
+
+
+
+    const char* _instancename = wnck_window_get_class_instance_name(window);
+    if (_instancename == NULL) {
+        _instancename = _appname;
+    }
+
+    std::string instancename(_instancename);
+
+
+
+    //    if (groupname.empty() || realgroupname.empty() ||
+    //            appname.empty() || instancename.empty()) {
+    //
+    //        //        g_print("Invalid names for this window\n");
+    //        //        return;
+    //
+    //        if (groupname.empty()) {
+    //            if (realgroupname.empty())
+    //                realgroupname = groupname;
+    //
+    //            if (appname.empty())
+    //                appname = groupname;
+    //
+    //            if (instancename.empty())
+    //                instancename = groupname;
+    //        }
+    //
+    //
+    //        if (realgroupname.empty()) {
+    //            if (groupname.empty())
+    //                groupname = realgroupname;
+    //
+    //            if (appname.empty())
+    //                appname = realgroupname;
+    //
+    //            if (instancename.empty())
+    //                instancename = realgroupname;
+    //
+    //
+    //        }
+    //
+    //        if (appname.empty()) {
+    //            if (groupname.empty())
+    //                groupname = appname;
+    //
+    //            if (realgroupname.empty())
+    //                realgroupname = appname;
+    //
+    //            if (instancename.empty())
+    //                instancename = appname;
+    //
+    //
+    //        }
+    //
+    //
+    //        if (instancename.empty()) {
+    //            if (groupname.empty())
+    //                groupname = instancename;
+    //
+    //            if (appname.empty())
+    //                appname = instancename;
+    //
+    //            if (realgroupname.empty())
+    //                realgroupname = instancename;
+    //
+    //
+    //        }
+    //    }
 
 
     // handle window_open event
     if (mode == 1) {
         // Handles special case with wine
-        if (std::strncmp(groupname, "Wine", 4) == 0) {
-            groupname = instancename;
+        if (groupname == "Wine") {
+
+            const std::string extensions[] = {".py", ".exe"};
+            std::string s = Utilities::removeExtension(instancename, extensions);
+
+            realgroupname = s; //=appname;
+            //
+            //            char * found = strstr((char*) instancename.c_str(), "Notepad++");
+            //            if (found != NULL) {
+            //                realgroupname = "Notepad++";
+            //            }
+
         }
 
 
+
         // don't use this NULL reference error   
-       auto appIcon = DockPanel::GetWindowIcon(window);
-     //  auto appIcon = PixbufConvert(wnck_window_get_icon(window));
-        
+        auto appIcon = DockPanel::GetWindowIcon(window);
+        //  auto appIcon = PixbufConvert(wnck_window_get_icon(window));
+
         appIcon = appIcon->scale_simple(DEF_ICONSIZE,
                 DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
-        
-        
+
+
         // handle DockItems groups
         for (auto item : *_itemsvector) {
             //if (std::strcmp(groupname, item->m_groupname.c_str() ) == 0) {
-            if (std::strcmp(realgroupname, item->m_realgroupname.c_str()) == 0) {
+            if (std::strcmp(realgroupname.c_str(), item->m_realgroupname.c_str()) == 0) {
 
 
                 DockItem* newItem = new DockItem();
+
                 newItem->m_groupname = groupname;
                 newItem->m_realgroupname = realgroupname;
                 newItem->m_appname = appname;
                 newItem->m_instancename = instancename;
+
                 newItem->m_isDirty = false;
                 newItem->m_window = window;
                 newItem->m_xid = wnck_window_get_xid(window);
@@ -1007,6 +1046,7 @@ void DockPanel::Update(WnckWindow* window, bool mode) {
         item->m_realgroupname = realgroupname;
         item->m_appname = appname;
         item->m_instancename = instancename;
+
         item->m_window = window;
         item->m_xid = wnck_window_get_xid(window);
         item->m_image = appIcon;
@@ -1263,38 +1303,35 @@ Glib::RefPtr<Gdk::Pixbuf> DockPanel::GetWindowIcon(WnckWindow * window) {
         return Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico"), //TODO:: load an empty icon
             DEF_CELLSIZE, DEF_CELLSIZE, true);
 
-   // const std::string extensions[] = {".py", ".exe"};
-   // iconname = Utilities::removeExtension(iconname, extensions);
-   std::string lowerName = Utilities::stringToLower(iconname.c_str());
-    
-    // FIX ME!
-    if( lowerName ==  "remote desktop viewer" ) // Vinagre
-        lowerName ="preferences-desktop-remote-desktop";
-    
-   try
-   {
-    GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
-    if (icon_theme!= NULL && gtk_icon_theme_has_icon(icon_theme,  lowerName.c_str())) {
+    // const std::string extensions[] = {".py", ".exe"};
+    // iconname = Utilities::removeExtension(iconname, extensions);
+    std::string lowerName = Utilities::stringToLower(iconname.c_str());
 
-        icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
-                64,
-                GTK_ICON_LOOKUP_GENERIC_FALLBACK, &error);
-    } else {
-        // give the icon with lower resolution.
-        icon = wnck_window_get_icon(window);
+    // FIX ME!
+    if (lowerName == "remote desktop viewer") // Vinagre
+        lowerName = "preferences-desktop-remote-desktop";
+
+    try {
+        GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
+        if (icon_theme != NULL && gtk_icon_theme_has_icon(icon_theme, lowerName.c_str())) {
+
+            icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
+                    64,
+                    GTK_ICON_LOOKUP_GENERIC_FALLBACK, &error);
+        } else {
+            // give the icon with lower resolution.
+            icon = wnck_window_get_icon(window);
+        }
+    } catch (int e) {
+        cout << "GetWindowIcon An exception occurred. Exception Nr. " << e << '\n';
     }
-   }
-   catch(int e)
-   {
-        cout << "GetWindowIcon An exception occurred. Exception Nr. " << e << '\n';   
-   }
     if (icon == NULL)
         return Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico"), //TODO:: load an empty icon
             DEF_CELLSIZE, DEF_CELLSIZE, true);
 
     result = PixbufConvert(icon);
 
-    g_object_unref(icon);
+    //  g_object_unref(icon);
     return result;
 
 }
