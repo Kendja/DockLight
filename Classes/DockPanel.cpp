@@ -625,11 +625,33 @@ void DockPanel::LaunchApplication(const DockItem * item) {
     }
 
     // Extract first token for a desktop file.
-    std::size_t foundspace = lowerrealgroupname.find(" ");
-    if(foundspace > 0 )
-        lowerrealgroupname = lowerrealgroupname.substr(0,foundspace); 
+   
+//    std::size_t foundspace = lowerrealgroupname.find(" ");
+//    if(foundspace > 0 )
+//        lowerrealgroupname = lowerrealgroupname.substr(0,foundspace); 
     //haystack.substr(0,found+1); 
     
+    std::size_t foundspace = lowerrealgroupname.find(" ");
+    if(foundspace > 0 ){
+        
+        std::string s = lowerrealgroupname;
+        std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
+        std::string msg = "Expected Desktop file : \n" + s+ "\n"; 
+        g_print(msg.c_str());
+        
+        
+        
+        lowerrealgroupname = s;
+        
+        
+    }
+    
+//    
+//     std::string s = dockitem->m_realgroupname;
+//    std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
+//    sprintf(filename, "%s/%s.png", Utilities::getExecPath().c_str(), s.c_str());
+//
+//    
     
     // netbeans handling - assumes there is a desktop file named "netbeans.desktop"   
     ///usr/local/netbeans-8.1/bin/netbeans is not a plain file is a script  )
