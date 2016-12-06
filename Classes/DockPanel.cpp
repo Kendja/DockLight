@@ -905,13 +905,15 @@ void DockPanel::Update(WnckWindow* window, bool mode) {
 
     if (wt == WNCK_WINDOW_DESKTOP ||
             wt == WNCK_WINDOW_DOCK ||
-            wt == WNCK_WINDOW_TOOLBAR ||
+          //  wt == WNCK_WINDOW_TOOLBAR ||
             wt == WNCK_WINDOW_MENU ||
-            wt == WNCK_WINDOW_UTILITY ||
+         //   wt == WNCK_WINDOW_UTILITY ||
             wt == WNCK_WINDOW_SPLASHSCREEN) {
         return;
     }
 
+    
+    
     const char* _appname = wnck_window_get_name(window);
     if (_appname == NULL) {
         g_print("Update: No Application name....\n");
@@ -1161,6 +1163,7 @@ void DockPanel::get_FramesPerSecond() {
 bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     Glib::RefPtr<Gdk::Pixbuf> icon;
 
+    
     /*
     auto screen = Gdk::Screen::get_default();
     GdkScreen *defaultscreen = gdk_screen_get_default ();
@@ -1280,7 +1283,9 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
             //http://www.lucidarme.me/?p=4828
         }
 
-
+        //cr->set_operator (Cairo::OPERATOR_ADD);
+        
+        
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_OFFSE_TOP);
         cr->paint();
 
