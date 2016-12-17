@@ -43,7 +43,7 @@ Utilities::~Utilities()
 std::string Utilities::getExecPath()
 {
     char result[ PATH_MAX ];
-    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+   // ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
     std::string path = result;
     std::size_t found = path.find_last_of("/\\");
     path = path.substr(0, found);
@@ -124,7 +124,7 @@ std::string Utilities::removeExtension(std::string text, const char* extension)
 std::string Utilities::removeExtension(std::string text, const std::string extensions[])
 {
     // find extensions
-    for (int i = 0; i < extensions->size() - 1; i++) {
+    for (int i = 0; i < (int)extensions->size() - 1; i++) {
         std::string e = extensions[i];
         std::size_t found = text.find(e);
         if (found != std::string::npos) {

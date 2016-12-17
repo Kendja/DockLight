@@ -25,7 +25,7 @@ namespace Launcher
         char command[PATH_MAX];
         *command = 0;
 
-        GDesktopAppInfo *desktop_info;
+       // GDesktopAppInfo *desktop_info;
         GError *error = NULL;
         GAppLaunchContext *context;
         GAppInfo *app_info;

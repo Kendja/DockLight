@@ -76,7 +76,9 @@ namespace IconLoader
         // Get the icon name from wnck_window_get_icon_name(window) are far from perfect ;o(
         // We trying here to get the icon name that can be found in the theme.
         const char* _bettername = wnck_window_get_class_group_name(window);
+        //const char* _bettername = wnck_window_get_class_instance_name(window);
         if (_bettername != NULL) {
+          
             std::string bettername(Utilities::stringToLower(_bettername));
             std::size_t foundspace = lowerName.find(" ");
             if (foundspace > 0 && bettername != "wine") {

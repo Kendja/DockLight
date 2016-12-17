@@ -22,19 +22,20 @@
 #include "MonitorGeometry.h"
 #include "IconLoader.h"
 
-// the static collection
+//static members
 std::vector<DockItem*> DockPanel::m_dockitems;
+int DockPanel::m_currentMoveIndex;
 
 DockPanel::DockPanel() :
 m_frames(0),
 m_last_time(0),
 m_mouseIn(FALSE),
-m_currentMoveIndex(-1),
 m_mouseLeftButtonDown(FALSE),
 m_mouseRightButtonDown(FALSE),
 m_applicationpath(Utilities::getExecPath())
 {
 
+    m_currentMoveIndex = -1;
 
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
@@ -79,6 +80,9 @@ int DockPanel::init(Gtk::Window* window)
 
     g_signal_connect(wnckscreen, "window_closed",
             G_CALLBACK(DockPanel::on_window_closed), NULL);
+
+    g_signal_connect(wnckscreen, "active_window_changed",
+            G_CALLBACK(DockPanel::on_active_window_changed_callback), NULL);
 
     // Menus
     // Home Menu items
@@ -154,8 +158,8 @@ DockPanel::~DockPanel()
  */
 int DockPanel::getIndex(int x, int y)
 {
-//    if (!m_mouseIn)
-//        return -1;
+    //    if (!m_mouseIn)
+    //        return -1;
 
     int center = MonitorGeometry::getGeometry().width / 2;
     Gdk::Point mouse(x, y);
@@ -163,8 +167,8 @@ int DockPanel::getIndex(int x, int y)
     int idx = 0;
     int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
 
-   
-    
+
+
     for (auto item : m_dockitems) {
         if (item->m_image == NULLPB)
             continue;
@@ -177,7 +181,7 @@ int DockPanel::getIndex(int x, int y)
         idx++;
     }
 
-   
+
     return result;
 }
 
@@ -190,7 +194,7 @@ int DockPanel::getIndex(int x, int y)
  */
 bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
 {
-   // m_mouseIn = true;
+    m_mouseIn = true;
     return true;
 }
 
@@ -203,7 +207,7 @@ bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  */
 bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
-   // m_mouseIn = false;
+    m_mouseIn = false;
     return true;
 }
 
@@ -218,18 +222,18 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
 
-    m_mouseIn = m_currentMoveIndex != -1;
- g_print("FPS: %d %d %d\n", (int) m_curFPS,m_currentMoveIndex,(int)m_mouseIn);
+    //  m_mouseIn = m_currentMoveIndex != -1;
+    // g_print("FPS: %d %d %d\n", (int) m_curFPS,m_currentMoveIndex,(int)m_mouseIn);
     //    if (m_preview->m_active && m_selectedIndex != m_currentMoveIndex) {
     //        m_selectedIndex = -1;
     //        m_preview->m_mouseIn = true;
     //        m_preview->hideMe();
     //    }
 
- 
-  if( (int) event->y <= DEF_PANELBCKTOP)
-      m_mouseIn=false;
-      
+
+    // if( (int) event->y <= DEF_PANELBCKTOP)
+    //     m_mouseIn=false;
+
     return false;
 }
 
@@ -284,7 +288,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         // m_preview->m_mouseIn = true;
         //m_preview->hideMe();
 
-        
+
 
         m_mouseRightButtonDown = false;
 
@@ -567,6 +571,37 @@ void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointe
 }
 
 /**
+ * Emitted when the active window on screen has changed.
+ * @param screen
+ * @param previously_active_window
+ * @param user_data
+ */
+void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
+        WnckWindow *previously_active_window, gpointer user_data)
+{
+    WnckWindow *window = wnck_screen_get_active_window(screen);
+    int xid = wnck_window_get_xid(window);
+
+    int idx = 0;
+    bool found = false;
+    for (auto item : m_dockitems) {
+        for (auto chiditem : item->m_items) {
+            if (xid == chiditem->m_xid) {
+                m_currentMoveIndex = idx;
+                found = true;
+                break;
+            }
+        }
+        if(found)
+            break;
+        idx++;
+    }
+    
+    if( !found )
+        m_currentMoveIndex = -1;
+}
+
+/**
  * void DockPanel::Update(WnckWindow* window, bool mode)
  * Update the items and handle the X Window events window_close and window_open.
  * @param window
@@ -608,8 +643,11 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     std::string realgroupname(_realgroupname);
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
+    if( realgroupname =="Wine")
+        realgroupname = instancename;
+        
     //DEBUG
-    g_print("%s, %s, %s\n", appname.c_str(), instancename.c_str(), realgroupname.c_str());
+    g_print("appname: %s, %s, %s\n", appname.c_str(), instancename.c_str(), realgroupname.c_str());
 
     if (actiontype == Window_action::OPEN) {
 
@@ -673,7 +711,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
         int xid = wnck_window_get_xid(window);
         int i = 1;
         bool found = false;
-        for (; i < m_dockitems.size(); i++) {
+        for (; i < (int) m_dockitems.size(); i++) {
             for (auto ci : m_dockitems.at(i)->m_items) {
                 if (ci->m_xid == xid) {
                     found = true;
@@ -736,8 +774,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->fill();
 
     // Selector
-    if (m_currentMoveIndex != -1 && m_mouseIn) {
-        
+    if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
+
         pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex) - DEF_CELLSIZE / 2;
         cr->set_line_width(2);
         cr->set_source_rgba(1.0, 1.0, 1.0, 0.4); // partially translucent

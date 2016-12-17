@@ -29,7 +29,7 @@ DockItem* DockItem::GetCurrent()
     if (m_items.size() == 0)
         return nullptr;
 
-    if (m_index >= m_items.size())
+    if (m_index >= (int)m_items.size())
         m_index = 0;
 
     DockItem* result = m_items.at(m_index);
@@ -43,7 +43,7 @@ DockItem* DockItem::GetNext()
     if (m_items.size() == 0)
         return nullptr;
 
-    if (m_index >= m_items.size())
+    if (m_index >= (int)m_items.size())
         m_index = 0;
 
     DockItem* result = m_items.at(m_index);

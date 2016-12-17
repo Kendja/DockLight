@@ -57,7 +57,8 @@ private:
     Gtk::Window* m_AppWindow;
 
     static std::vector<DockItem*> m_dockitems;
-    int m_currentMoveIndex;
+    static int m_currentMoveIndex;
+    
     std::string m_applicationpath;
     sigc::connection m_TimeoutConnection;
 
@@ -108,6 +109,8 @@ private:
     static void Update(WnckWindow* window, Window_action actiontype);
     static void on_window_opened(WnckScreen *screen, WnckWindow *window, gpointer data);
     static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
+    static void on_active_window_changed_callback(WnckScreen *screen,
+                WnckWindow *previously_active_window,gpointer user_data);
     
     int getIndex(int x, int y); 
 
