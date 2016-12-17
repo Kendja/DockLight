@@ -41,7 +41,7 @@ public:
     static std::string removeExtension(std::string text, const char* extension);
     static std::string removeExtension(std::string text, const std::string extensions[]);
     static std::string stringToLower(const char* strp);
-    static int calculateMonitorX();
+    
     
     
 private:

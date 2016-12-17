@@ -21,10 +21,10 @@
 #ifndef DEFINES_H
 #define	DEFINES_H
 
-// Enum constants must be carefully named to avoid name collisions 
 
 
-
+#define APPNAME "DockLight"
+#define NULLPB (Glib::RefPtr<Gdk::Pixbuf>)NULL
 
 typedef enum panel_location_t
 {
@@ -49,10 +49,9 @@ typedef enum StrutsPosition_t
 } strutsPosition;
 
 
-
 #define	DEF_ICONSIZE 48
-#define	DEF_CELLSIZE 58//48
-#define	DEF_PANELHIGHT 72 //68
+#define	DEF_CELLSIZE 58
+#define	DEF_PANELHIGHT 72 
 #define	DEF_PANELBCKHIGHT 62 
 #define	DEF_PANELBCKTOP 6 
 #define	DEF_OFFSE_TOP 10

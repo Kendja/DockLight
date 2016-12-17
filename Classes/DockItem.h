@@ -31,21 +31,17 @@ class DockItem
 public:
     DockItem();
     virtual ~DockItem();
-
     Glib::RefPtr<Gdk::Pixbuf> m_image;
-
     DockItem* GetCurrent();
     DockItem* GetNext();
     WnckWindow *m_window;
     std::string m_appname;
-    std::string m_groupname;
     std::string m_realgroupname;
     std::string m_instancename;
-        
-    std::vector<DockItem*>* m_items;
+    std::vector<DockItem*> m_items;
     int m_xid;
     int m_index = 0;
-    int m_isFixed = 0;
+    bool m_isAttached = false;
     bool m_isDirty = false;
     bool visible = true;
 private:

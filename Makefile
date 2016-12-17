@@ -11,10 +11,11 @@ BINDIR = bin
 OBJS =  \
  Utilities.o \
  AppWindow.o \
+ MonitorGeometry.o \
  DockPanel.o \
  DockItem.o \
- XPreview.o \
-TitleWindow.o \
+ IconLoader.o \
+ Launcher.o \
  main.o \
  $(NULL)
 
@@ -33,18 +34,25 @@ main.o: proj.linux/main.cpp
 AppWindow.o: Classes/AppWindow.o
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/AppWindow.cpp
 
-DockPanel.o: Classes/DockPanel.o
-	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/DockPanel.cpp
-	
-DockItem.o: Classes/DockItem.o
-	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/DockItem.cpp	
-
-XPreview.o: Classes/XPreview.o
-	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/XPreview.cpp	
-
 Utilities.o: Classes/Utilities.o
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/Utilities.cpp	
 
 TitleWindow.o: Classes/TitleWindow.o
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/TitleWindow.cpp	
+
+MonitorGeometry.o: Classes/MonitorGeometry.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/MonitorGeometry.cpp	
+
+DockPanel.o: Classes/DockPanel.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/DockPanel.cpp	
+	
+DockItem.o: Classes/DockItem.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/DockItem.cpp	
+		
+IconLoader.o: Classes/IconLoader.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/IconLoader.cpp	
+
+Launcher.o: Classes/Launcher.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/Launcher.cpp
+
 

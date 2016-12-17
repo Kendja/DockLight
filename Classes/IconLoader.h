@@ -1,7 +1,7 @@
 //*****************************************************************
 //
-//  Copyright (C) 2015 Juan R. Gonzalez
-//  Created on November 20, 2015, 12:17 PM 
+//  Copyright (C) 2016 Juan R. Gonzalez
+//  Created on December, 2016 
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,35 +18,21 @@
 //
 //****************************************************************
 
-#include <algorithm>
-#include <string>
+#ifndef ICONLOADER_H
+#define ICONLOADER_H
 
-#include <gtk/gtk.h> 	
-#include <gtkmm.h> 	
-#include <gtkmm/application.h>
-#include <gtkmm/window.h>
-#include "Utilities.h"
-#include <gtkmm/application.h>
+#define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
-#include "AppWindow.h"
+#include <libwnck/libwnck.h>
+#include <gtkmm.h>
 
-/*
- * The Entry Point.
- *
- */
-int main(int argc, char *argv[])
+namespace IconLoader
 {
-   
-    Glib::RefPtr<Gtk::Application> app = 
-            Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
-    
-    AppWindow win;
-    int r = win.Init(panel_locationType::BOTTOM); 
-    if( r != 0 )
-    {
-        exit(r);
-    }
-    
-    return app->run(win);
-   
+    Glib::RefPtr<Gdk::Pixbuf> GetWindowIcon(WnckWindow* window);
+    Glib::RefPtr<Gdk::Pixbuf> GetWindowIcon(WnckWindow* window,GdkPixbuf *icon);
+    Glib::RefPtr<Gdk::Pixbuf> GetWindowIconFromDesktopFile(WnckWindow* window,GdkPixbuf *icon);
+    Glib::RefPtr<Gdk::Pixbuf> PixbufConvert(GdkPixbuf* icon);
 }
+
+#endif /* ICONLOADER_H */
+

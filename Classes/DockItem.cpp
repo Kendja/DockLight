@@ -21,21 +21,18 @@
 
 DockItem::DockItem()
 {
-    this->m_image = (Glib::RefPtr<Gdk::Pixbuf>)NULL;
-    this->m_items = new std::vector<DockItem*>();
-
-
+    this->m_image = NULLPB;
 }
 
 DockItem* DockItem::GetCurrent()
 {
-    if (m_items->size() == 0)
-        return NULL;
-    
-    if (m_index >= m_items->size())
+    if (m_items.size() == 0)
+        return nullptr;
+
+    if (m_index >= m_items.size())
         m_index = 0;
 
-    DockItem* result = m_items->at(m_index);
+    DockItem* result = m_items.at(m_index);
 
     return result;
 
@@ -43,13 +40,13 @@ DockItem* DockItem::GetCurrent()
 
 DockItem* DockItem::GetNext()
 {
-    if (m_items->size() == 0)
-        return NULL;
-        
-    if (m_index >= m_items->size())
+    if (m_items.size() == 0)
+        return nullptr;
+
+    if (m_index >= m_items.size())
         m_index = 0;
 
-    DockItem* result = m_items->at(m_index);
+    DockItem* result = m_items.at(m_index);
     m_index++;
 
     return result;
@@ -58,5 +55,10 @@ DockItem* DockItem::GetNext()
 
 DockItem::~DockItem()
 {
+    for (auto itemtorelease : m_items)
+        delete(itemtorelease);
+
+    m_items.clear();
+
 }
 

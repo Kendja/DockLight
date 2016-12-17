@@ -1,7 +1,7 @@
 //*****************************************************************
 //
 //  Copyright (C) 2015 Juan R. Gonzalez
-//  Created on November 20, 2015, 12:17 PM 
+//  Created on November 20, 2016
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,194 +18,119 @@
 //
 //****************************************************************
 #ifndef DOCKPANEL_H
-#define	DOCKPANEL_H
+#define DOCKPANEL_H
 
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
 #include <libwnck/libwnck.h>
 #include <glibmm/timer.h>
-#include <gtkmm.h> 	
+#include <gtkmm.h>  
 #include "Defines.h"
 #include "DockItem.h"
 #include <cmath>
-
-#include "XPreview.h"
 #include <gdk/gdkx.h>
-
 #include <iostream>
+#include <vector>
+
+#include "Launcher.h"
+
 using namespace std;
 
-typedef std::function<void(std::string)> tdCallback;
-//void Launch10( std::string );
 
 class DockPanel : public Gtk::DrawingArea
 {
 public:
+
+    enum Window_action
+    {
+        OPEN,
+        CLOSE
+    };
+
+
     DockPanel();
+    int init(Gtk::Window* window);
     virtual ~DockPanel();
+    std::string getApplicationPath();
 
+private:
+    Gtk::Window* m_AppWindow;
 
-    std::string applicationpath;
-     
-    XPreview* m_preview;
-    std::map<std::string,tdCallback> laucherMap;
-    
-
-    void SelectWindow(int index, GdkEventButton *event);
-    void ShowPreview(int index, GdkEventButton *event);
-
-    bool isExitstMaximizedWindows();
-    bool on_scroll_event(GdkEventScroll *e);
-    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-    bool on_timeoutDraw();
-    int getCountItems();
-    int getIndex(int x, int y);
-    void FocusWindow(WnckWindow *window);
-    
-    void LaunchApplication(const DockItem *dockitem);
-    
- 
-    static std::string removeExtension(std::string text, const char* extension);
-    static std::string removeExtension(std::string text, const std::string extensions[]);
-
-
-
-    static void Update(WnckWindow* window, bool mode);
-    static Glib::RefPtr<Gdk::Pixbuf> GetWindowIcon(WnckWindow* window);
-    static Glib::RefPtr<Gdk::Pixbuf> PixbufConvert(GdkPixbuf* buf);
-    static GdkPixbuf* dimm_icon(GdkPixbuf *pixbuf);
-    static std::string stringToLower(const char* strp);
-
-    void readPinItems(const char* path);
-    std::string getexepath();
-    std::string getFilePath(const std::string filename);
-
-    Gdk::Rectangle monitor_geo;
-
-
-    bool m_mouseLeftButtonDown;
-    bool m_mouseRightButtonDown;
-    bool m_mouseLeftDoubleClickButtonDown;
-
-    void setPanelLocation(panel_locationType m_panelLocation);
-
-
-    bool m_mouseIn;
-    //int m_currentIndex;
+    static std::vector<DockItem*> m_dockitems;
     int m_currentMoveIndex;
-    int m_selectedIndex;
+    std::string m_applicationpath;
+    sigc::connection m_TimeoutConnection;
 
-    static std::vector<DockItem*>*_itemsvector;
-    // www.lugod.org/presentations/gtkmm/menus.html
-    // Popup menu and submenus
-    Gtk::Menu m_Menu_Popup;
-
-    Gtk::MenuItem MenuItemNewApp;
-    Gtk::MenuItem MenuItemPin;
-    Gtk::MenuItem MenuItemCloseAll;
-    // Gtk::MenuItem MenuItemUnPin;
-    Gtk::MenuItem MenuItemRemoveFromDock;
-    Gtk::MenuItem MenuItemMinimizedAll;
+    double m_last_time;
+    gint m_frames;
+    float m_curFPS;
+    gint m_fps;
+    Glib::Timer m_fpstimer;
     
-    Gtk::SeparatorMenuItem m_separatorMenuItem;
-    Gtk::SeparatorMenuItem m_separatorMenuItem2;
-    Gtk::SeparatorMenuItem m_separatorMenuItem3;
-
-    Gtk::Menu m_HomeMenu_Popup;
-    Gtk::MenuItem m_QuitMenuItem;
-    Gtk::MenuItem m_CloseAllWindowsMenuItem;
-
-
-
-    // Signal handlers (run when a popup item is clicked)
+    void loadAttachedItems();
+    void SelectWindow(int index, GdkEventButton * event);
+    bool isExitstMaximizedWindows();
+        
     void on_QuitMenu_event();
     void on_menuNew_event();
-    void on_Pin_event();
+    void on_DetachFromDock_event();
+    void on_AttachToDock_event();
     void on_CloseAll_event();
     void on_MinimieAll_event();
     void on_CloseAllWindows_event();
+
+
+    // Mome menu 
+    Gtk::Menu m_HomeMenu_Popup;
+    Gtk::MenuItem m_QuitMenuItem;
+
+    // Item menu
+    Gtk::Menu m_Menu_Popup;
+    Gtk::MenuItem m_MenuItemNewApp;
+    Gtk::MenuItem m_MenuItemAttach;
+    Gtk::MenuItem m_MenuItemDetach;
+    Gtk::MenuItem m_MenuItemCloseAll;
+    Gtk::MenuItem m_MenuItemMinimizedAll;
+    Gtk::MenuItem m_CloseAllWindowsMenuItem;
     
-    // void on_UnPin_event();
-    void on_RemoveFromDock_event();
+    Gtk::SeparatorMenuItem m_separatorMenuItem1;
+    Gtk::SeparatorMenuItem m_separatorMenuItem2;
+    Gtk::SeparatorMenuItem m_separatorMenuItem3;
 
+    gboolean m_mouseLeftButtonDown;
+    gboolean m_mouseRightButtonDown;
+    gboolean m_mouseIn;
     
-    static void on_window_opened(WnckScreen *screen, WnckWindow *window,
-            gpointer data)
-    {
-        /* Note: when this event is emitted while screen is initialized, there is no
-         * active window yet. */
-#ifdef DEBUG
-        g_print("---------------->%s\n", wnck_window_get_name(window));
-#endif
+    //callback slot
+    void on_popup_homemenu_position(int& x, int& y, bool& push_in);
+    void on_popup_menu_position(int& x, int& y, bool& push_in);
 
-        Update(window, 1);
+    static void Update(WnckWindow* window, Window_action actiontype);
+    static void on_window_opened(WnckScreen *screen, WnckWindow *window, gpointer data);
+    static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
+    
+    int getIndex(int x, int y); 
 
-    }
-
-    static void on_window_closed(WnckScreen *screen, WnckWindow *window,
-            gpointer data)
-    {
-#ifdef DEBUG
-        g_print("window closed %s\n", wnck_window_get_name(window));
-#endif
-        Update(window, 0);
-    }
-
-    static void on_active_window_changed(WnckScreen *screen,
-            WnckWindow *previously_active_window,
-            gpointer data)
-    {
-        //WnckWindow *active_window;
-
-       // active_window = wnck_screen_get_active_window(screen);
-#ifdef DEBUG
-        if (active_window)
-            g_print("active: %s\n", wnck_window_get_name(active_window));
-        else
-            g_print("no active window\n");
-#endif
-    }
 protected:
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+    bool on_timeoutDraw();
 
-    GdkEventButton *m_LastEventButton;
-    panel_locationType m_panelLocation;
-
-
+    // Mouse handlers
+    // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
     virtual bool on_button_press_event(GdkEventButton *event);
     virtual bool on_button_release_event(GdkEventButton *event);
     virtual bool on_motion_notify_event(GdkEventMotion*event);
-    //http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
-
     virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
-
-private:
-    
-    WnckScreen *wnckscreen;
-    
-    // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm
-    double last_time;
-    int frames;
-    float _curFPS;
-    int fps;
-    Glib::Timer m_fpstimer;
+    virtual bool on_scroll_event(GdkEventScroll* e);
 
 
-    //callback slot
-    void on_popup_menu_position(int& x, int& y, bool& push_in);
-    void on_popup_homemenu_position(int& x, int& y, bool& push_in);
-    
-    void get_FramesPerSecond();
 
-    //https://git.gnome.org/browse/gtkmm/tree/demos/gtk-demo/example_pixbufs.cc?h=gtkmm-2-24#n127
-    sigc::connection m_TimeoutConnection;
 
-    
+
 };
 
 
 
-
-
-#endif	/* DOCKPANEL_H */
+#endif /* DOCKPANEL_H */
 

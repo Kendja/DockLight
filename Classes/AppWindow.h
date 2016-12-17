@@ -1,7 +1,7 @@
 //*****************************************************************
 //
 //  Copyright (C) 2015 Juan R. Gonzalez
-//  Created on November 20, 2015, 12:17 PM 
+//  Created on November 20, 2016
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
-
-
 #include <libwnck/libwnck.h>
 #include <gtkmm.h> 
 
@@ -40,9 +38,11 @@ private:
     DockPanel m_dockpanel;
     
     static void configureCallback(GtkWindow* parentWindow, GdkEvent* event, gpointer data);
-    static void window_opened_callback(WnckScreen    *screen,WnckWindow    *window, gpointer data);
+    static void window_opened_callback(WnckScreen* screen,WnckWindow* window, gpointer data);
+    static void application_opened_callback (WnckScreen *screen, WnckApplication *app);
     static void window_geometry_changed_callback (WnckWindow *window, gpointer user_data);
-    
+    static void monitor_size_changed_callback(GdkScreen *screen, gpointer user_data);
+   
 };
 
 #endif	/* APPWINDOW_H */
