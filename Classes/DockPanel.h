@@ -33,6 +33,8 @@
 #include <vector>
 
 #include "Launcher.h"
+#include "TitleWindow.h"
+
 
 using namespace std;
 
@@ -55,9 +57,11 @@ public:
 
 private:
     Gtk::Window* m_AppWindow;
+    TitleWindow m_titlewindow;
 
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
+    static void setItemImdexFromActiveWindow(WnckWindow *window);
     
     std::string m_applicationpath;
     sigc::connection m_TimeoutConnection;
@@ -68,9 +72,17 @@ private:
     gint m_fps;
     Glib::Timer m_fpstimer;
     
+    // Timer for showing the title window
+    Glib::Timer m_titleTimer;
+    gdouble m_titleElapsedSeconds;
+    int m_titleItemOldindex = 0;
+    bool m_titleShow  = false;
+
+    
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);
     bool isExitstMaximizedWindows();
+    
         
     void on_QuitMenu_event();
     void on_menuNew_event();
@@ -101,6 +113,7 @@ private:
     gboolean m_mouseLeftButtonDown;
     gboolean m_mouseRightButtonDown;
     gboolean m_mouseIn;
+    gboolean m_mouseRightClick;
     
     //callback slot
     void on_popup_homemenu_position(int& x, int& y, bool& push_in);

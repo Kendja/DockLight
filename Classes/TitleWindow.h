@@ -21,8 +21,6 @@
 #ifndef TITLEWINDOW_H
 #define	TITLEWINDOW_H
 
-
-
 #include <gtkmm.h>
 
 class TitleWindow : public Gtk::Window
@@ -30,21 +28,10 @@ class TitleWindow : public Gtk::Window
 public:
     TitleWindow();
     virtual ~TitleWindow();
-    
     void setText(const Glib::ustring text);
-    void setPosition(int x, int y);
     int getCurrentWidth();
-    
-    bool m_active;
-    protected:
-        /*
-        //Override default signal handler:
-        bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
-        bool on_timeout();
-         */ 
         
 private:
-    
     int m_Width;
     
     //Child widgets:

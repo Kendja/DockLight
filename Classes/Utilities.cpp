@@ -43,7 +43,10 @@ Utilities::~Utilities()
 std::string Utilities::getExecPath()
 {
     char result[ PATH_MAX ];
-   // ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+    if( count == -1 )
+        return "";
+    
     std::string path = result;
     std::size_t found = path.find_last_of("/\\");
     path = path.substr(0, found);

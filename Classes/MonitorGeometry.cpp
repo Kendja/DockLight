@@ -45,6 +45,7 @@ namespace MonitorGeometry
         
         // GdkRectangle to be filled with the monitor geometry
         gdk_monitor_get_geometry(monitor, &geometry);
+        geometry.height =  Gdk::screen_height();
         // set the new size
         //window->set_gravity(Gdk::Gravity::GRAVITY_SOUTH_WEST);
         window->resize(geometry.width, height);

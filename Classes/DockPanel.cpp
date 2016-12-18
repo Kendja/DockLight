@@ -22,6 +22,7 @@
 #include "MonitorGeometry.h"
 #include "IconLoader.h"
 
+
 //static members
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
@@ -29,7 +30,9 @@ int DockPanel::m_currentMoveIndex;
 DockPanel::DockPanel() :
 m_frames(0),
 m_last_time(0),
+m_titleElapsedSeconds(0),
 m_mouseIn(FALSE),
+m_mouseRightClick(FALSE),
 m_mouseLeftButtonDown(FALSE),
 m_mouseRightButtonDown(FALSE),
 m_applicationpath(Utilities::getExecPath())
@@ -48,6 +51,10 @@ m_applicationpath(Utilities::getExecPath())
             Gdk::ENTER_NOTIFY_MASK |
             Gdk::LEAVE_NOTIFY_MASK |
             Gdk::POINTER_MOTION_MASK);
+
+
+
+
 }
 
 int DockPanel::init(Gtk::Window* window)
@@ -66,10 +73,16 @@ int DockPanel::init(Gtk::Window* window)
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico").c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
 
+    dockItem->m_appname = "Home";
+    dockItem->m_realgroupname = "Home";
     m_dockitems.push_back(dockItem);
+
+
     loadAttachedItems();
 
     m_fpstimer.start();
+    // m_titleTimer.start();
+
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
             &DockPanel::on_timeoutDraw), 1000 / 60);
 
@@ -141,6 +154,9 @@ int DockPanel::init(Gtk::Window* window)
 
 DockPanel::~DockPanel()
 {
+
+    m_titlewindow.close();
+
     for (auto item : m_dockitems)
         delete(item);
 
@@ -207,7 +223,25 @@ bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  */
 bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
+
     m_mouseIn = false;
+    m_titlewindow.hide();
+
+
+    if (m_mouseRightClick) {
+        m_mouseRightClick = false;
+        return true;
+    }
+
+    WnckScreen *wnckscreen = wnck_screen_get(0);
+    WnckWindow *window = wnck_screen_get_active_window(wnckscreen);
+    if (window == NULL) {
+        m_currentMoveIndex = -1;
+        return true;
+    }
+
+    DockPanel::setItemImdexFromActiveWindow(window);
+
     return true;
 }
 
@@ -221,19 +255,6 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
-
-    //  m_mouseIn = m_currentMoveIndex != -1;
-    // g_print("FPS: %d %d %d\n", (int) m_curFPS,m_currentMoveIndex,(int)m_mouseIn);
-    //    if (m_preview->m_active && m_selectedIndex != m_currentMoveIndex) {
-    //        m_selectedIndex = -1;
-    //        m_preview->m_mouseIn = true;
-    //        m_preview->hideMe();
-    //    }
-
-
-    // if( (int) event->y <= DEF_PANELBCKTOP)
-    //     m_mouseIn=false;
-
     return false;
 }
 
@@ -247,6 +268,8 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 bool DockPanel::on_button_press_event(GdkEventButton *event)
 {
     if ((event->type == GDK_BUTTON_PRESS)) {
+
+        m_mouseRightClick = false;
 
         // Check if the event is a left button click.
         if (event->button == 1 && !m_mouseLeftButtonDown) {
@@ -289,7 +312,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         //m_preview->hideMe();
 
 
-
+        m_mouseRightClick = true;
         m_mouseRightButtonDown = false;
 
 
@@ -580,6 +603,16 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
     WnckWindow *window = wnck_screen_get_active_window(screen);
+    if (window == NULL) {
+        m_currentMoveIndex = -1;
+        return;
+    }
+
+    DockPanel::setItemImdexFromActiveWindow(window);
+}
+
+void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
+{
     int xid = wnck_window_get_xid(window);
 
     int idx = 0;
@@ -592,12 +625,12 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
                 break;
             }
         }
-        if(found)
+        if (found)
             break;
         idx++;
     }
-    
-    if( !found )
+
+    if (!found)
         m_currentMoveIndex = -1;
 }
 
@@ -643,9 +676,9 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     std::string realgroupname(_realgroupname);
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
-    if( realgroupname =="Wine")
+    if (realgroupname == "Wine")
         realgroupname = instancename;
-        
+
     //DEBUG
     g_print("appname: %s, %s, %s\n", appname.c_str(), instancename.c_str(), realgroupname.c_str());
 
@@ -765,6 +798,44 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int center = MonitorGeometry::getGeometry().width / 2;
     int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
     int pos_x = col = center - ((m_dockitems.size() * DEF_CELLSIZE) / 2);
+
+    // Timer control for the title Window
+    if (m_mouseIn && m_currentMoveIndex == -1)
+        m_titlewindow.hide();
+
+    if (m_mouseIn && m_currentMoveIndex != -1) {
+        if (m_titleItemOldindex != m_currentMoveIndex) {
+            m_titleItemOldindex = m_currentMoveIndex;
+            m_titleElapsedSeconds = 0;
+            m_titleTimer.start();
+            m_titleShow = false;
+
+            m_titlewindow.hide();
+        }
+
+        if (m_titleItemOldindex == m_currentMoveIndex) {
+            if (m_titleElapsedSeconds > 0.5 && m_titleShow == false) {
+
+                DockItem* item = m_dockitems.at(m_currentMoveIndex);
+                m_titlewindow.setText(item->m_realgroupname);
+
+                int centerpos = MonitorGeometry::getGeometry().x +
+                        col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
+                centerpos -= m_titlewindow.getCurrentWidth() / 2;
+
+                m_titlewindow.move(centerpos,
+                        MonitorGeometry::getGeometry().height -
+                        (DEF_PANELBCKHIGHT + DEF_CELLSIZE - 16));
+
+                //g_print("SHOW%d\n", (int) m_currentMoveIndex);
+                m_titleShow = true;
+
+            }
+
+            m_titleElapsedSeconds = m_titleTimer.elapsed();
+            //g_print("%d\n", (int) m_titleElapsedSeconds);
+        }
+    }
 
     // background
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.2); // partially translucent
