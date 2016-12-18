@@ -1,5 +1,5 @@
 # DockLight
-Linux Gtkmm Dock Panel with window Preview. 
+This programm shows a simple Dock Panel with window preview.
 
 Docklight is a easy Linux dock application for opening common applications.
 Is written in c++ with gtk+ 3.0 and libwnck. Still in development but usable...
