@@ -17,36 +17,25 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //****************************************************************
-
-#include <algorithm>
-#include <string>
-
-#include <gtk/gtk.h> 	
-#include <gtkmm.h> 	
 #include <gtkmm/application.h>
-#include <gtkmm/window.h>
-#include "Utilities.h"
-#include <gtkmm/application.h>
-
 #include "AppWindow.h"
 
-/*
+/**
  * The Entry Point.
- *
+ * @param argc
+ * @param argv
+ * @return exit code
  */
 int main(int argc, char *argv[])
 {
-   
-    Glib::RefPtr<Gtk::Application> app = 
+    Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
     
     AppWindow win;
-    int r = win.Init(panel_locationType::BOTTOM); 
-    if( r != 0 )
-    {
+    int r = win.Init(panel_locationType::BOTTOM);
+    if (r != 0) {
         exit(r);
     }
-    
+
     return app->run(win);
-   
 }

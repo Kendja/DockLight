@@ -35,9 +35,12 @@
 #include "Launcher.h"
 #include "TitleWindow.h"
 
+// This is fix for a BUG! in  Gtk::Menu.
+// The position don't work on resolution smaller or equal then 768 height.
+#define HOME_POPUPMENU_Y_768_REPOSITION  30    // Modify this value depend of the menu children count
+#define ITEM_POPUPMENU_Y_768_REPOSITION  100   // Modify this value depend of the menu children count
 
 using namespace std;
-
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -62,7 +65,7 @@ private:
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
-    
+
     std::string m_applicationpath;
     sigc::connection m_TimeoutConnection;
 
@@ -71,19 +74,19 @@ private:
     float m_curFPS;
     gint m_fps;
     Glib::Timer m_fpstimer;
-    
+
     // Timer for showing the title window
     Glib::Timer m_titleTimer;
     gdouble m_titleElapsedSeconds;
     int m_titleItemOldindex = 0;
-    bool m_titleShow  = false;
+    bool m_titleShow = false;
 
-    
+
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);
     bool isExitstMaximizedWindows();
-    
-        
+
+
     void on_QuitMenu_event();
     void on_menuNew_event();
     void on_DetachFromDock_event();
@@ -105,7 +108,7 @@ private:
     Gtk::MenuItem m_MenuItemCloseAll;
     Gtk::MenuItem m_MenuItemMinimizedAll;
     Gtk::MenuItem m_CloseAllWindowsMenuItem;
-    
+
     Gtk::SeparatorMenuItem m_separatorMenuItem1;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
     Gtk::SeparatorMenuItem m_separatorMenuItem3;
@@ -114,7 +117,7 @@ private:
     gboolean m_mouseRightButtonDown;
     gboolean m_mouseIn;
     gboolean m_mouseRightClick;
-    
+
     //callback slot
     void on_popup_homemenu_position(int& x, int& y, bool& push_in);
     void on_popup_menu_position(int& x, int& y, bool& push_in);
@@ -123,9 +126,9 @@ private:
     static void on_window_opened(WnckScreen *screen, WnckWindow *window, gpointer data);
     static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
     static void on_active_window_changed_callback(WnckScreen *screen,
-                WnckWindow *previously_active_window,gpointer user_data);
-    
-    int getIndex(int x, int y); 
+            WnckWindow *previously_active_window, gpointer user_data);
+
+    int getIndex(int x, int y);
 
 protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

@@ -113,6 +113,7 @@ int DockPanel::init(Gtk::Window* window)
 
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
+    
 
     // Item Menu
     m_MenuItemNewApp.set_label("Open new");
@@ -328,6 +329,8 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             if (!m_Menu_Popup.get_attach_widget())
                 m_Menu_Popup.attach_to_widget(*this);
 
+            
+            m_HomeMenu_Popup.resize_children();
             m_Menu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             m_Menu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_menu_position), 1, event->time);
@@ -338,6 +341,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             if (!m_HomeMenu_Popup.get_attach_widget())
                 m_HomeMenu_Popup.attach_to_widget(*this);
 
+            m_HomeMenu_Popup.resize_children();
             m_HomeMenu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             m_HomeMenu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_homemenu_position), 1, event->time);
@@ -348,13 +352,6 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         // Propagate the event further.
         return false;
     }
-
-
-
-
-
-
-
 
     return false;
 }
@@ -373,7 +370,13 @@ void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
     int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
 
     x = MonitorGeometry::getGeometry().x + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-    y = MonitorGeometry::getGeometry().height - ((DEF_PANELBCKHIGHT + (DEF_PANELBCKTOP * 6)) * 1);
+    y = MonitorGeometry::getScreenHeight() - MonitorGeometry::getAppWindowHeight();
+    
+    // This is fix for a BUG! in  Gtk::Menu.
+    // The position don't work on resolution smaller or equal then 768 height.
+    if( MonitorGeometry::getGeometry().height <= 768) {
+      y-= HOME_POPUPMENU_Y_768_REPOSITION;      // Modify this value depend of the menu children count
+    }
 }
 
 void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
@@ -384,7 +387,13 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
     int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
 
     x = MonitorGeometry::getGeometry().x + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-    y = MonitorGeometry::getGeometry().height - ((DEF_PANELBCKHIGHT + (DEF_PANELBCKTOP * 6)) * 1);
+    y = MonitorGeometry::getScreenHeight() -  MonitorGeometry::getAppWindowHeight();
+
+    // This is fix for a BUG! in  Gtk::Menu.
+    // The position don't work on resolution smaller or equal then 768 height.
+    if( MonitorGeometry::getGeometry().height <= 768) {
+      y-= ITEM_POPUPMENU_Y_768_REPOSITION;      // Modify this value depend of the menu children count.
+    }
 }
 
 void DockPanel::on_QuitMenu_event()
@@ -824,7 +833,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 centerpos -= m_titlewindow.getCurrentWidth() / 2;
 
                 m_titlewindow.move(centerpos,
-                        MonitorGeometry::getGeometry().height -
+                        MonitorGeometry::getScreenHeight() -
                         (DEF_PANELBCKHIGHT + DEF_CELLSIZE - 16));
 
                 //g_print("SHOW%d\n", (int) m_currentMoveIndex);

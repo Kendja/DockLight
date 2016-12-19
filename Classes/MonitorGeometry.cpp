@@ -1,13 +1,33 @@
 #include "MonitorGeometry.h"
 #include "Defines.h"
+#include "AppWindow.h"
 
 namespace MonitorGeometry
 {
+
+    int ScreenHeight;
+    int ScreenWidth;
+    int AppWindowHeight;
     GdkRectangle geometry;
 
     GdkRectangle getGeometry()
     {
         return geometry;
+    }
+
+    int getScreenHeight()
+    {
+        return ScreenHeight;
+    }
+
+    int getScreenWidth()
+    {
+        return ScreenWidth;
+    }
+
+    int getAppWindowHeight()
+    {
+        return AppWindowHeight;
     }
 
     /**
@@ -17,7 +37,6 @@ namespace MonitorGeometry
     int update(Gtk::Window* window)
     {
         int result = 0;
-        int height = DEF_PANELHIGHT;
 
         if (window == NULL) {
             g_critical(" MonitorGeometry::update: window is null.");
@@ -42,24 +61,30 @@ namespace MonitorGeometry
             g_critical(" AppWindow::Init: there is no primary monitor configured by the user..");
             return -1;
         }
-        
+
         // GdkRectangle to be filled with the monitor geometry
         gdk_monitor_get_geometry(monitor, &geometry);
-        geometry.height =  Gdk::screen_height();
-        // set the new size
-        //window->set_gravity(Gdk::Gravity::GRAVITY_SOUTH_WEST);
-        window->resize(geometry.width, height);
+        ScreenHeight = Gdk::screen_height();
+        ScreenWidth = Gdk::screen_width();
+
+        // Resize the DOCK Window with 100 as height value. it must be 100.
+        AppWindowHeight = 100;/*magic number*/
+        window->resize(Gdk::screen_width(), AppWindowHeight);
+
+        // Debug
+        g_print("geometry: %d/%d\n", geometry.width, geometry.height);
+        g_print("screen: %d/%d\n", Gdk::screen_width(), Gdk::screen_height());
+        g_print("window height: %d\n", AppWindowHeight);
+
 
         // Position only for BOTTOM for now. 
         // A future implementation for TOP,LEFT,RIGHT may be a possibility.
         long insets[12] = {0};
         panel_locationType location = panel_locationType::BOTTOM;
         switch (location) {
-
             case panel_locationType::BOTTOM:
-              
-                window->move(geometry.x, Gdk::screen_height() - DEF_PANELHIGHT);   
-              
+                window->move(geometry.x, Gdk::screen_height() - DEF_PANELHIGHT);
+
                 insets[strutsPosition::Bottom] = (DEF_PANELHIGHT + (Gdk::screen_height() -
                         (geometry.y + geometry.height)));
                 insets[strutsPosition::BottomStart] = geometry.x;
@@ -69,7 +94,7 @@ namespace MonitorGeometry
             default:
                 break;
         }
- 
+
         // we set _NET_WM_STRUT, the older mechanism as well as _NET_WM_STRUT_PARTIAL
         gdk_property_change(gdk_window,
                 gdk_atom_intern("_NET_WM_STRUT_PARTIAL", FALSE),

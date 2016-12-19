@@ -23,10 +23,13 @@
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
 #include <libwnck/libwnck.h>
-#include <gtkmm.h> 
+#include <gtkmm/window.h>
+#include <gdkmm/screen.h>
 
 #include "DockPanel.h"
 #include "Defines.h"
+#include "AppWindow.h"
+#include "Utilities.h"
 
 class AppWindow : public Gtk::Window
 {

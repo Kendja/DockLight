@@ -17,10 +17,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //****************************************************************
+
 #include "AppWindow.h"
-#include <gdkmm/screen.h>
-#include "Utilities.h"
-#include <gtk-3.0/gtk/gtkwindow.h>
 #include "MonitorGeometry.h"
 
 /*
@@ -48,19 +46,27 @@ AppWindow::AppWindow()
 
 /**
  * initialize the window
+ * @param location
+ * @return 0 or -1 is an error
  */
 int AppWindow::Init(panel_locationType location)
 {
     this->set_title(APPNAME);
-
-    this->set_focus_on_map(false);
+//
+//    this->set_focus_on_map(false);
+   
+//    this->set_accept_focus(false);
+//    this->set_focus_visible(false);
+//    this->set_realized(false);
+//    this->set_decorated(false);
+    
+   // A window to implement a docking bar.
+   // Used for creating dock or panel.         
+    
     this->set_skip_taskbar_hint(true);
     this->set_skip_pager_hint(true);
-    this->set_accept_focus(false);
-    this->set_focus_visible(false);
-    this->set_realized(false);
-    this->set_decorated(false);
     this->set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DOCK);
+   
 
     // Add the dock panel
     this->add(m_dockpanel);
@@ -93,24 +99,28 @@ int AppWindow::Init(panel_locationType location)
 
     return m_dockpanel.init(this);
 }
-
+/**
+ * used for debug purposes..
+ * @param screen
+ * @param app
+ */
 void AppWindow::application_opened_callback(WnckScreen *screen, WnckApplication *app)
 {
-//    g_print("Application opened: ");
-//    const char* appname = wnck_application_get_name(app);
-//    if (appname != NULL) {
-//        g_print("%s\n", appname);
-//    }
-
-    
-
-    //queue_refill_model ();
 }
-
+/**
+ * used for debug purposes..
+ * @param screen
+ * @param window
+ * @param data
+ */
 void AppWindow::window_opened_callback(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
 }
-
+/**
+ * update the monitor geometry and struts 
+ * @param screen
+ * @param gtkwindow
+ */
 void AppWindow::monitor_size_changed_callback(GdkScreen *screen, gpointer gtkwindow)
 {
     g_info("Monitor settings changed\n");
@@ -118,17 +128,26 @@ void AppWindow::monitor_size_changed_callback(GdkScreen *screen, gpointer gtkwin
     MonitorGeometry::update((Gtk::Window*)gtkwindow);
 
 }
-
+/**
+ * used for debug purposes..
+ * @param window
+ * @param user_data
+ */
 void AppWindow::window_geometry_changed_callback(WnckWindow *window, gpointer user_data)
 {
-    g_print("\nwindow_geometry_changed_callback\n");
 }
-
+/**
+ * used for debug purposes..
+ * @param parentWindow
+ * @param event
+ * @param data
+ */
 void AppWindow::configureCallback(GtkWindow* parentWindow, GdkEvent* event, gpointer data)
 {
-    // do something...
 }
-
+/**
+ * dtor
+ */
 AppWindow::~AppWindow()
 {
 }
