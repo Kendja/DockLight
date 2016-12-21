@@ -5,7 +5,10 @@
 
 namespace Launcher
 {
-
+    /**
+     * Launch an application from a desktop file or from bash.
+     * @param DockItem* item
+     */
     void Launch(DockItem* item)
     {
         std::string lowerrealgroupname(Utilities::stringToLower(item->m_realgroupname.c_str()));
@@ -19,13 +22,12 @@ namespace Launcher
             g_print(msg.c_str());
 
             lowerrealgroupname = s;
-
         }
 
         char command[PATH_MAX];
         *command = 0;
 
-       // GDesktopAppInfo *desktop_info;
+        // GDesktopAppInfo *desktop_info;
         GError *error = NULL;
         GAppLaunchContext *context;
         GAppInfo *app_info;
@@ -53,6 +55,6 @@ namespace Launcher
         }
         g_object_unref(app_info);
         g_object_unref(context);
-        
+
     }
 }

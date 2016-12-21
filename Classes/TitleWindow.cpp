@@ -19,7 +19,9 @@
 //****************************************************************
 
 #include "TitleWindow.h"
-
+/**
+ * constructs a window POPUP for teh dock item  title.
+ */
 TitleWindow::TitleWindow() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_HBox(Gtk::ORIENTATION_HORIZONTAL, 5),
@@ -39,7 +41,9 @@ m_Label("", false)
     m_HBox.add(m_Label);
     
 }
-
+/**
+ * Hide the window on destroy
+ */
 TitleWindow::~TitleWindow()
 {
     hide();

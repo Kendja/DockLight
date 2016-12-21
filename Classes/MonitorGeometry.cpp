@@ -10,29 +10,47 @@ namespace MonitorGeometry
     int AppWindowHeight;
     GdkRectangle geometry;
 
+    /**
+     * Returns the Monitor geometry
+     * @return  GdkRectangle geometry
+     */
     GdkRectangle getGeometry()
     {
         return geometry;
     }
 
+    /**
+     * returns the Gdk::screen_height()
+     * @return Gdk::screen_height()
+     */
     int getScreenHeight()
     {
         return ScreenHeight;
     }
 
+     /**
+     * returns the Gdk::screen_width()
+     * @return Gdk::screen_width()
+     */
     int getScreenWidth()
     {
         return ScreenWidth;
     }
 
+    /**
+     * return the resize height from the App window
+     * @return int Height
+     */
     int getAppWindowHeight()
     {
         return AppWindowHeight;
     }
 
     /**
-     * reserve screen space and dock the window
-     * on location
+     * update the window position and store the monitor geometry
+     * Reserve screen (STRUT) space and dock the window
+     * @param window
+     * @return 0 = success or -1 error
      */
     int update(Gtk::Window* window)
     {
@@ -68,7 +86,7 @@ namespace MonitorGeometry
         ScreenWidth = Gdk::screen_width();
 
         // Resize the DOCK Window with 100 as height value. it must be 100.
-        AppWindowHeight = 100;/*magic number*/
+        AppWindowHeight = 100; /*magic number*/
         window->resize(Gdk::screen_width(), AppWindowHeight);
 
         // Debug

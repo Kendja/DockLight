@@ -20,33 +20,30 @@
 #ifndef UTILITIES_H
 #define	UTILITIES_H
 
-#include <string>
-#include <algorithm>
 #include <gtk/gtk.h> 	
 #include <gtkmm.h> 	
+
+
+#include <string>
+#include <algorithm>
 #include <math.h>
+#include <vector>
 
-class Utilities
+
+namespace Utilities
 {
-public:
-    Utilities();
-    Utilities(const Utilities& orig);
-    virtual ~Utilities();
 
-    static std::string getExecPath();
-    static std::string getExecPath(const std::string str);
-    static std::vector<std::string> split(const std::string &text, char sep);
-    static void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
+    std::string getExecPath();
+    std::string getExecPath(const std::string str);
+    std::vector<std::string> split(const std::string &text, char sep);
+    void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
             double x, double y, double width, double height, double radius);
-    static std::string removeExtension(std::string text, const char* extension);
-    static std::string removeExtension(std::string text, const std::string extensions[]);
-    static std::string stringToLower(const char* strp);
-    
-    
-    
-private:
+    std::string removeExtension(std::string text, const char* extension);
+    std::string removeExtension(std::string text, const std::string extensions[]);
+    std::string stringToLower(const char* strp);
 
-};
+
+}
 
 #endif	/* UTILITIES_H */
 

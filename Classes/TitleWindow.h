@@ -21,7 +21,9 @@
 #ifndef TITLEWINDOW_H
 #define	TITLEWINDOW_H
 
-#include <gtkmm.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
+#include <gtkmm/label.h>
 
 class TitleWindow : public Gtk::Window
 {

@@ -17,7 +17,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 //****************************************************************
+
 #include "DockPanel.h"
+
 #include "Utilities.h"
 #include "MonitorGeometry.h"
 #include "IconLoader.h"
@@ -26,6 +28,7 @@
 //static members
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
+bool DockPanel::m_previewWindowActive;
 
 DockPanel::DockPanel() :
 m_frames(0),
@@ -77,6 +80,8 @@ int DockPanel::init(Gtk::Window* window)
     dockItem->m_realgroupname = "Home";
     m_dockitems.push_back(dockItem);
 
+    m_previewWindowActive = false;
+    m_preview.setOwner(*this);
 
     loadAttachedItems();
 
@@ -113,7 +118,7 @@ int DockPanel::init(Gtk::Window* window)
 
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
-    
+
 
     // Item Menu
     m_MenuItemNewApp.set_label("Open new");
@@ -227,6 +232,8 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 
     m_mouseIn = false;
     m_titlewindow.hide();
+    // if(!m_preview.m_mouseIn )
+    //   m_preview.hide();
 
 
     if (m_mouseRightClick) {
@@ -234,16 +241,31 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
         return true;
     }
 
+    if (!m_previewWindowActive) {
+        WnckScreen *wnckscreen = wnck_screen_get(0);
+        WnckWindow *window = wnck_screen_get_active_window(wnckscreen);
+        if (window == NULL) {
+            m_currentMoveIndex = -1;
+            return true;
+        }
+
+
+        DockPanel::setItemImdexFromActiveWindow(window);
+    }
+    return true;
+}
+
+void DockPanel::previewWindowClosed()
+{
     WnckScreen *wnckscreen = wnck_screen_get(0);
     WnckWindow *window = wnck_screen_get_active_window(wnckscreen);
     if (window == NULL) {
         m_currentMoveIndex = -1;
-        return true;
+        return;
     }
 
-    DockPanel::setItemImdexFromActiveWindow(window);
 
-    return true;
+    DockPanel::setItemImdexFromActiveWindow(window);
 }
 
 /**
@@ -298,6 +320,9 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 bool DockPanel::on_button_release_event(GdkEventButton *event)
 {
 
+    if( !m_mouseIn)
+        return false;
+    
     if (m_mouseLeftButtonDown) {
 
         //  m_selectedIndex = m_currentMoveIndex;
@@ -329,7 +354,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             if (!m_Menu_Popup.get_attach_widget())
                 m_Menu_Popup.attach_to_widget(*this);
 
-            
+
             m_HomeMenu_Popup.resize_children();
             m_Menu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             m_Menu_Popup.popup(sigc::mem_fun(*this,
@@ -371,11 +396,11 @@ void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 
     x = MonitorGeometry::getGeometry().x + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
     y = MonitorGeometry::getScreenHeight() - MonitorGeometry::getAppWindowHeight();
-    
-    // This is fix for a BUG! in  Gtk::Menu.
+
+    // This is a fix for a BUG! in  Gtk::Menu.
     // The position don't work on resolution smaller or equal then 768 height.
-    if( MonitorGeometry::getGeometry().height <= 768) {
-      y-= HOME_POPUPMENU_Y_768_REPOSITION;      // Modify this value depend of the menu children count
+    if (MonitorGeometry::getGeometry().height <= 768) {
+        y -= HOME_POPUPMENU_Y_768_REPOSITION; // Modify this value depend of the menu children count
     }
 }
 
@@ -387,12 +412,12 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
     int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
 
     x = MonitorGeometry::getGeometry().x + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-    y = MonitorGeometry::getScreenHeight() -  MonitorGeometry::getAppWindowHeight();
+    y = MonitorGeometry::getScreenHeight() - MonitorGeometry::getAppWindowHeight();
 
-    // This is fix for a BUG! in  Gtk::Menu.
+    // This is a fix for a BUG! in  Gtk::Menu.
     // The position don't work on resolution smaller or equal then 768 height.
-    if( MonitorGeometry::getGeometry().height <= 768) {
-      y-= ITEM_POPUPMENU_Y_768_REPOSITION;      // Modify this value depend of the menu children count.
+    if (MonitorGeometry::getGeometry().height <= 768) {
+        y -= ITEM_POPUPMENU_Y_768_REPOSITION; // Modify this value depend of the menu children count.
     }
 }
 
@@ -611,6 +636,9 @@ void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointe
 void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
+    if (m_previewWindowActive)
+        return;
+
     WnckWindow *window = wnck_screen_get_active_window(screen);
     if (window == NULL) {
         m_currentMoveIndex = -1;
@@ -809,9 +837,12 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int pos_x = col = center - ((m_dockitems.size() * DEF_CELLSIZE) / 2);
 
     // Timer control for the title Window
-    if (m_mouseIn && m_currentMoveIndex == -1)
+    if (m_mouseIn && m_currentMoveIndex == -1) {
         m_titlewindow.hide();
 
+        if (m_previewWindowActive)
+            m_preview.hideMe();
+    }
     if (m_mouseIn && m_currentMoveIndex != -1) {
         if (m_titleItemOldindex != m_currentMoveIndex) {
             m_titleItemOldindex = m_currentMoveIndex;
@@ -820,17 +851,22 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             m_titleShow = false;
 
             m_titlewindow.hide();
+            if (m_previewWindowActive)
+                m_preview.hideMe();
+
         }
 
         if (m_titleItemOldindex == m_currentMoveIndex) {
-            if (m_titleElapsedSeconds > 0.5 && m_titleShow == false) {
+            if (m_titleElapsedSeconds > 0.5 && m_titleShow == false && !m_previewWindowActive) {
 
                 DockItem* item = m_dockitems.at(m_currentMoveIndex);
                 m_titlewindow.setText(item->m_realgroupname);
 
-                int centerpos = MonitorGeometry::getGeometry().x +
-                        col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-                centerpos -= m_titlewindow.getCurrentWidth() / 2;
+                int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
+                        m_dockitems.size(),
+                        m_currentMoveIndex,
+                        m_titlewindow.getCurrentWidth()
+                        );
 
                 m_titlewindow.move(centerpos,
                         MonitorGeometry::getScreenHeight() -
@@ -847,12 +883,15 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
     // background
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.2); // partially translucent
+//    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
+//    cr->paint();
+    
+    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
     Utilities::RoundedRectangle(cr, pos_x, DEF_PANELBCKTOP,
             (m_dockitems.size() * DEF_CELLSIZE),
             DEF_PANELBCKHIGHT, 2.0);
     cr->fill();
-
+   
     // Selector
     if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
 
@@ -923,24 +962,30 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     if (m_dockitems.at(index)->m_window == NULL)
         return;
-    /*
-        // calculate the preview postion. 
-        int width = (DEF_PREVIEW_WIDTH * dockitem->m_items->size() - 1) + 30;
-        m_preview->resize(width, DEF_PREVIEW_HEIGHT);
 
-        int center = (this->monitor_geo.get_width() / 2);
-        int col = center - (this->getCountItems() * DEF_CELLSIZE) / 2;
-        int leftpos = this->monitor_geo.get_x() + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
+    // calculate the preview position and resize the window. 
+    int width = (DEF_PREVIEW_WIDTH * dockitem->m_items.size() - 1) + 30;
+    m_preview.resize(width, DEF_PREVIEW_HEIGHT);
+    int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
+            m_dockitems.size(), index, width);
 
-        if (m_panelLocation == panel_locationType::TOP) {
-            m_preview->move(leftpos - (width / 2), DEF_PANELBCKHIGHT + 4);
-        } else {
-            m_preview->move(leftpos - (width / 2), monitor_geo.get_height() - (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 4));
-        }
-
-        m_preview->setXid(dockitem);
-        m_preview->present();
-     */
+    int maxwidth = centerpos + (dockitem->m_items.size() *  DEF_PREVIEW_WIDTH);
+    
+    if( maxwidth >= MonitorGeometry::getGeometry().width  )
+        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30; //DEF_PREVIEW_WIDTH;
+    
+    //g_print("max %d %d\n", maxwidth,MonitorGeometry::getGeometry().width);
+    
+    
+    m_previewWindowActive = true;
+    m_preview.setDockItem(dockitem);
+    
+    m_preview.show_now();
+    
+     m_preview.move(centerpos, MonitorGeometry::getScreenHeight() - 
+            (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 6));
+    
+    
 }
 
 bool DockPanel::isExitstMaximizedWindows()
