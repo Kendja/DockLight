@@ -22,8 +22,9 @@
 
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
-#include <gtkmm.h> 	
 #include <libwnck/libwnck.h>
+
+#include <gtkmm/window.h> 	
 #include "Defines.h"
 
 class DockItem

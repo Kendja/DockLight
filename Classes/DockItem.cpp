@@ -19,11 +19,18 @@
 //****************************************************************
 #include "DockItem.h"
 
+/**
+ * ctor
+ */
 DockItem::DockItem()
 {
     this->m_image = NULLPB;
 }
 
+/**
+ * get the current item from the items vector
+ * @return DockItem*
+ */
 DockItem* DockItem::GetCurrent()
 {
     if (m_items.size() == 0)
@@ -37,7 +44,10 @@ DockItem* DockItem::GetCurrent()
     return result;
 
 }
-
+/**
+ * get the next item from the items vector
+ * @return DockItem*
+ */
 DockItem* DockItem::GetNext()
 {
     if (m_items.size() == 0)
@@ -52,7 +62,10 @@ DockItem* DockItem::GetNext()
     return result;
 
 }
-
+/**
+ * dtor
+ * release memory
+ */
 DockItem::~DockItem()
 {
     for (auto itemtorelease : m_items)

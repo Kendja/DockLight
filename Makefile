@@ -19,6 +19,8 @@ OBJS =  \
  IconLoader.o \
  Launcher.o \
  TitleWindow.o \
+ Preview.o \
+ DockPosition.o \
  main.o \
  $(NULL)
 
@@ -58,4 +60,9 @@ IconLoader.o: Classes/IconLoader.o
 Launcher.o: Classes/Launcher.o
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/Launcher.cpp
 
+DockPosition.o: Classes/DockPosition.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/DockPosition.cpp
+
+Preview.o: Classes/Preview.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/Preview.cpp
 

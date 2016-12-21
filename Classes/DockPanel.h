@@ -24,18 +24,21 @@
 
 #include <libwnck/libwnck.h>
 #include <glibmm/timer.h>
-#include <gtkmm.h>  
-#include "Defines.h"
-#include "DockItem.h"
-#include <cmath>
-#include <gdk/gdkx.h>
-#include <iostream>
-#include <vector>
+#include <gtkmm.h> 
 
+#include <cmath>
+#include <limits>
+#include <iostream>
+
+
+#include "DockItem.h"
 #include "Launcher.h"
 #include "TitleWindow.h"
+#include "Preview.h"
+#include "DockPosition.h"
 
-// This is fix for a BUG! in  Gtk::Menu.
+
+// This is a fix for a BUG! in  Gtk::Menu.
 // The position don't work on resolution smaller or equal then 768 height.
 #define HOME_POPUPMENU_Y_768_REPOSITION  30    // Modify this value depend of the menu children count
 #define ITEM_POPUPMENU_Y_768_REPOSITION  100   // Modify this value depend of the menu children count
@@ -57,15 +60,21 @@ public:
     int init(Gtk::Window* window);
     virtual ~DockPanel();
     std::string getApplicationPath();
-
+    
+    static bool m_previewWindowActive;
+    void previewWindowClosed();
+    
+    int getCurrentIndex() { return m_currentMoveIndex; };
 private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
+    Preview m_preview;
 
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
-
+    
+    
     std::string m_applicationpath;
     sigc::connection m_TimeoutConnection;
 

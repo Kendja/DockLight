@@ -20,84 +20,75 @@
 
 #include "Utilities.h"
 
-Utilities::Utilities()
+namespace Utilities
 {
-}
 
-Utilities::Utilities(const Utilities& orig)
-{
-}
+    /*
+     * getExecPath()
+     *
+     * return the executable path.
+     * printf( getExecPath())
+     * output:
+     * /sample/path
+     */
+    std::string getExecPath()
+    {
+        char result[ PATH_MAX ];
+        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+        if (count == -1)
+            return "";
 
-Utilities::~Utilities()
-{
-}
+        std::string path = result;
+        std::size_t found = path.find_last_of("/\\");
+        path = path.substr(0, found);
 
-/*
- * getExecPath()
- *
- * return the executable path.
- * printf( getExecPath())
- * output:
- * /sample/path
- */
-std::string Utilities::getExecPath()
-{
-    char result[ PATH_MAX ];
-    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-    if( count == -1 )
-        return "";
-    
-    std::string path = result;
-    std::size_t found = path.find_last_of("/\\");
-    path = path.substr(0, found);
-
-    return path; 
-}
-
-/*
- * getExecPath(const std::string str)
- *
- * return the executable path and concatenate the given string.
- * printf( getExecPath("test.txt"))
- * output:
- * /sample/path/test.txt
- */
-std::string Utilities::getExecPath(const std::string str)
-{
-    char result[ PATH_MAX ];
-    sprintf(result,"%s/%s",Utilities::getExecPath().c_str(),str.c_str());
-    
-    return result;
-}
-
-/*
- * std::vector<std::string> 
- * split(const std::string &text, char sep)
- *
- * return the tokens by delimeter separator parameter.
- * split("this_is_a_test,"_"))
- * output:
- * this
- * is
- * a
- * test
- */
-std::vector<std::string> Utilities::split(const std::string &text, char sep)
-{
-    std::vector<std::string> tokens;
-    std::size_t start = 0, end = 0;
-    while ((end = text.find(sep, start)) != std::string::npos) {
-        tokens.push_back(text.substr(start, end - start));
-        start = end + 1;
+        return path;
     }
-    tokens.push_back(text.substr(start));
-    return tokens;
-}
 
-/*
- * RoundedRectangle helper
- */
-void Utilities::RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
+    /*
+     * getExecPath(const std::string str)
+     *
+     * return the executable path and concatenate the given string.
+     * printf( getExecPath("test.txt"))
+     * output:
+     * /sample/path/test.txt
+     */
+    std::string getExecPath(const std::string str)
+    {
+        std::string result( Utilities::getExecPath());
+        result+="/"+str;
+      
+        return result;
+    }
+
+    /*
+     * std::vector<std::string> 
+     * split(const std::string &text, char sep)
+     *
+     * return the tokens by delimeter separator parameter.
+     * split("this_is_a_test,"_"))
+     * output:
+     * this
+     * is
+     * a
+     * test
+     */
+    std::vector<std::string> split(const std::string &text, char sep)
+    {
+        std::vector<std::string> tokens;
+        std::size_t start = 0, end = 0;
+        while ((end = text.find(sep, start)) != std::string::npos) {
+            tokens.push_back(text.substr(start, end - start));
+            start = end + 1;
+        }
+        tokens.push_back(text.substr(start));
+        return tokens;
+    }
+
+    /*
+     * RoundedRectangle helper
+     */
+    void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
             double x, double y, double width, double height, double radius)
     {
         // radius can be no larger than half our height or width
@@ -110,46 +101,44 @@ void Utilities::RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,
 
     }
 
-
-
-std::string Utilities::removeExtension(std::string text, const char* extension)
-{
-    // find extension
-    std::size_t found = text.find(extension);
-    if (found != std::string::npos) {
-        // let's replace the extension with an empty string:
-        text.replace(text.find(extension),
-                text.length(), "");
-    }
-    return text;
-}
-
-std::string Utilities::removeExtension(std::string text, const std::string extensions[])
-{
-    // find extensions
-    for (int i = 0; i < (int)extensions->size() - 1; i++) {
-        std::string e = extensions[i];
-        std::size_t found = text.find(e);
+    std::string removeExtension(std::string text, const char* extension)
+    {
+        // find extension
+        std::size_t found = text.find(extension);
         if (found != std::string::npos) {
             // let's replace the extension with an empty string:
-            text.replace(text.find(e),
+            text.replace(text.find(extension),
                     text.length(), "");
         }
+        return text;
     }
-    return text;
+
+    std::string removeExtension(std::string text, const std::string extensions[])
+    {
+        // find extensions
+        for (int i = 0; i < (int) extensions->size() - 1; i++) {
+            std::string e = extensions[i];
+            std::size_t found = text.find(e);
+            if (found != std::string::npos) {
+                // let's replace the extension with an empty string:
+                text.replace(text.find(e),
+                        text.length(), "");
+            }
+        }
+        return text;
+    }
+
+    /*
+     * 
+     * stringToLower helper.
+     * 
+     */
+    std::string stringToLower(const char* strp)
+    {
+        std::string str = strp;
+        transform(str.begin(), str.end(), str.begin(), ::tolower);
+
+        return str;
+    }
+
 }
-
-
-/*
- * 
- * stringToLower helper.
- * 
- */
-std::string Utilities::stringToLower(const char* strp)
-{
-    std::string str = strp;
-    transform(str.begin(), str.end(), str.begin(), ::tolower);
-
-    return str;
-}
-
