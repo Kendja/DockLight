@@ -48,12 +48,12 @@ using namespace std;
 class DockPanel : public Gtk::DrawingArea
 {
 public:
-
-    enum Window_action
-    {
-        OPEN,
-        CLOSE
-    };
+//
+//    enum Window_action
+//    {
+//        OPEN,
+//        CLOSE
+//    };
 
 
     DockPanel();

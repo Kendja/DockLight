@@ -44,12 +44,15 @@ m_dockItemReference(nullptr)
 Preview::~Preview()
 {
 }
+int initialItemMax = 0;
 
 void Preview::setDockItem(DockItem* item)
 {
     m_currentIndex = 0;
     m_dockItemReference = item;
     m_isActive = true;
+
+    initialItemMax = m_dockItemReference->m_items.size();
 }
 
 bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
@@ -71,14 +74,14 @@ bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
 
 void Preview::hideMe()
 {
-    this->hide();
+    hide();
     m_mouseIn = false;
     m_dockpanelReference->m_previewWindowActive = false;
 }
 
 bool Preview::on_timeoutDraw()
 {
-    queue_draw();
+    Gtk::Widget::queue_draw();
     return true;
 }
 
@@ -177,37 +180,16 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                 wnck_window_close(item->m_window, (guint32) ct);
 
                 // delete the item. it is a pointer to the DockPanel m_dockitems
+                // we need to do this here otherwise the Draw method will crash.
                 delete( item);
                 m_dockItemReference->m_items.erase(m_dockItemReference->m_items.begin() + m_currentIndex);
 
-                hideMe();
-                /*
-                int width = (DEF_PREVIEW_WIDTH * m_dockItemReference->m_items.size() - 1) + 30;
-                this->resize(width, DEF_PREVIEW_HEIGHT);
-                
-                int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
-                        m_dockItemReference->m_items.size() , m_dockpanelReference->getCurrentIndex(), width);
-                
-                g_print("current,%d\n",m_dockpanelReference->getCurrentIndex());
-                
-                move(centerpos, MonitorGeometry::getScreenHeight() - 
-                (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 6));
-                */
-               
-
-                
-                
-                
-
+                if (m_dockItemReference->m_items.size() < 1)
+                    this->hideMe();
                 return true;
             }
-
-            if (!wnck_window_is_active(item->m_window)) {
-                wnck_window_activate(item->m_window, (guint32) ct);
-            } else {
-                wnck_window_minimize(item->m_window);
-            }
-
+            
+            wnck_window_activate(item->m_window, ct);
             // The event has been handled.
             return true;
         }
@@ -248,13 +230,23 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int idx = 0;
 
+    for (int i = 0; i < initialItemMax; i++) {
+
+        cr->set_line_width(1);
+        cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
+        Utilities::RoundedRectangle(cr, 14 + (DEF_PREVIEW_WIDTH * i), 16, DEF_PREVIEW_WIDTH + 1, DEF_PREVIEW_HEIGHT - 30, 2.0);
+        cr->fill();
+
+
+    }
+    //return true;
     for (DockItem* item : m_dockItemReference->m_items) {
         if (item->m_window == NULL || item->m_xid == 0)
             continue;
 
         int pos_x = 20 + (DEF_PREVIEW_WIDTH * idx);
         int pos_y = 16;
-        int pos_width = DEF_PREVIEW_WIDTH - 30;
+        int pos_width = DEF_PREVIEW_WIDTH - 14;
         int pos_height = 20;
 
         // draw title the clipping rectangle

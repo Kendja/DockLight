@@ -292,6 +292,8 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 {
     if ((event->type == GDK_BUTTON_PRESS)) {
 
+        m_currentMoveIndex = getIndex(event->x, event->y);
+         
         m_mouseRightClick = false;
 
         // Check if the event is a left button click.
