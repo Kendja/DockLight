@@ -970,21 +970,21 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     m_preview.resize(width, DEF_PREVIEW_HEIGHT);
     int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
             m_dockitems.size(), index, width);
-
+     
     int maxwidth = centerpos + (dockitem->m_items.size() *  DEF_PREVIEW_WIDTH);
-    
+    maxwidth-=MonitorGeometry::getGeometry().x;
+        
     if( maxwidth >= MonitorGeometry::getGeometry().width  )
-        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30; //DEF_PREVIEW_WIDTH;
+        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30; 
     
+    // Debug
     //g_print("max %d %d\n", maxwidth,MonitorGeometry::getGeometry().width);
     
     
     m_previewWindowActive = true;
     m_preview.setDockItem(dockitem);
-    
     m_preview.show_now();
-    
-     m_preview.move(centerpos, MonitorGeometry::getScreenHeight() - 
+    m_preview.move(centerpos, MonitorGeometry::getScreenHeight() - 
             (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 6));
     
     
