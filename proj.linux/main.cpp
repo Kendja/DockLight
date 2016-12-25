@@ -2,6 +2,7 @@
 //
 //  Copyright (C) 2015 Juan R. Gonzalez
 //  Created on November 20, 2015, 12:17 PM 
+//  j-gonzalez@email.de
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by

@@ -1,3 +1,22 @@
+//*****************************************************************
+//
+//  Copyright (C) 2015 Juan R. Gonzalez
+//  Created on December 22, 2015
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//****************************************************************
 #include "Preview.h"
 #include "Defines.h"
 #include "Utilities.h"
@@ -11,11 +30,15 @@
 // Static members
 std::vector<DockItem*> Preview::m_previewtems;
 bool Preview::m_isActive;
-
+/**
+ * Handles the Preview 
+ * ctor
+ */
 Preview::Preview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_mouseIn(false),
-m_currentIndex(0)
+m_currentIndex(0),
+m_initialItemMax(0)
 {
     m_isActive = false;
 
@@ -51,11 +74,18 @@ m_currentIndex(0)
 
 }
 
+/**
+ * dtor
+ */
 Preview::~Preview()
 {
 }
-int initialItemMax = 0;
 
+
+/**
+ * Sets the caller pointer 
+ * @param DockItem* item
+ */
 void Preview::setDockItem(DockItem* item)
 {
     m_previewtems.clear();
@@ -75,17 +105,30 @@ void Preview::setDockItem(DockItem* item)
     m_currentIndex = 0;
     m_isActive = true;
 
-    initialItemMax = m_previewtems.size();
+    m_initialItemMax = m_previewtems.size();
 }
 
+/**
+ * handles on_enter_notify_event 
+ * true to stop other handlers from being invoked for the event.
+ * false to propagate the event further. 
+ * @param crossing_event
+ * @return 
+ */
 bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
 {
-
     m_mouseIn = true;
     m_dockpanelReference->m_previewWindowActive = true;
     return true;
 }
 
+/**
+ * handles on_leave_notify_event 
+ * true to stop other handlers from being invoked for the event.
+ * false to propagate the event further. 
+ * @param crossing_event
+ * @return 
+ */
 bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
     m_isActive = false;
@@ -95,6 +138,9 @@ bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
     return true;
 }
 
+/**
+ * Hide the window and reset values;
+ */
 void Preview::hideMe()
 {
     hide();
@@ -103,6 +149,10 @@ void Preview::hideMe()
     m_previewtems.clear();
 }
 
+/**
+ * Timeout handler to regenerate the frame. 
+ * force to redraw the entire content.
+ */
 bool Preview::on_timeoutDraw()
 {
     Gtk::Widget::queue_draw();
@@ -282,7 +332,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int idx = 0;
 
-    for (int i = 0; i < initialItemMax; i++) {
+    for (int i = 0; i < m_initialItemMax; i++) {
 
         cr->set_line_width(1);
         cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
@@ -355,15 +405,26 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
                 gdk_display_get_default(), item->m_xid);
 
-        GdkRectangle real_coordinates;
-        gdk_window_get_frame_extents(wm_window, &real_coordinates);
+        // Obtains the bounding box of the window, including window manager 
+        // titlebar/borders if any.
+        GdkRectangle boundingbox;
+        gdk_window_get_frame_extents(wm_window, &boundingbox);
+        
         // create the image
         GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
-                0, 0, real_coordinates.width, real_coordinates.height);
+                0, 0, boundingbox.width, boundingbox.height-20);
 
+        // FIXME: Scale don't work well
+        int scale_heght = DEF_PREVIEW_PIXBUF_HEIGHT;
+        int windowheight = gdk_window_get_height (wm_window);
+        if( windowheight < 200){
+
+            scale_heght = DEF_PREVIEW_PIXBUF_HEIGHT/2;
+        }
+                
         GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
                 DEF_PREVIEW_PIXBUF_WIDTH,
-                DEF_PREVIEW_PIXBUF_HEIGHT,
+                scale_heght,
                 GDK_INTERP_BILINEAR);
 
         Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
