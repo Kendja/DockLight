@@ -293,7 +293,7 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
     if ((event->type == GDK_BUTTON_PRESS)) {
 
         m_currentMoveIndex = getIndex(event->x, event->y);
-         
+
         m_mouseRightClick = false;
 
         // Check if the event is a left button click.
@@ -322,9 +322,9 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 bool DockPanel::on_button_release_event(GdkEventButton *event)
 {
 
-    if( !m_mouseIn)
+    if (!m_mouseIn)
         return false;
-    
+
     if (m_mouseLeftButtonDown) {
 
         //  m_selectedIndex = m_currentMoveIndex;
@@ -490,8 +490,15 @@ void DockPanel::on_DetachFromDock_event()
         return;
     }
 
+    int idx = m_currentMoveIndex;
+    WnckWindow *window = dockitem->m_window;
+    setItemImdexFromActiveWindow(window);
+
     delete(dockitem);
-    m_dockitems.erase(m_dockitems.begin() + m_currentMoveIndex);
+    m_dockitems.erase(m_dockitems.begin() + idx);
+
+
+
 }
 
 void DockPanel::on_CloseAll_event()
@@ -806,8 +813,12 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
                 }
 
                 // remove this item
-                // delete(item);
+                delete( item->m_items.at(0));
                 m_dockitems.erase(m_dockitems.begin() + i);
+
+                // if is not attached then it is at the end on the list.
+                // we need to reset the index.
+                m_currentMoveIndex = -1;
                 return;
             } else {
                 // search for the xid and remove the item
@@ -885,15 +896,15 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
     // background
-//    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
-//    cr->paint();
-    
+    //    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
+    //    cr->paint();
+
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
     Utilities::RoundedRectangle(cr, pos_x, DEF_PANELBCKTOP,
             (m_dockitems.size() * DEF_CELLSIZE),
             DEF_PANELBCKHIGHT, 2.0);
     cr->fill();
-   
+
     // Selector
     if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
 
@@ -970,24 +981,24 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     m_preview.resize(width, DEF_PREVIEW_HEIGHT);
     int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
             m_dockitems.size(), index, width);
-     
-    int maxwidth = centerpos + (dockitem->m_items.size() *  DEF_PREVIEW_WIDTH);
-    maxwidth-=MonitorGeometry::getGeometry().x;
-        
-    if( maxwidth >= MonitorGeometry::getGeometry().width  )
-        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30; 
-    
+
+    int maxwidth = centerpos + (dockitem->m_items.size() * DEF_PREVIEW_WIDTH);
+    maxwidth -= MonitorGeometry::getGeometry().x;
+
+    if (maxwidth >= MonitorGeometry::getGeometry().width)
+        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30;
+
     // Debug
     //g_print("max %d %d\n", maxwidth,MonitorGeometry::getGeometry().width);
-    
-    
+
+
     m_previewWindowActive = true;
     m_preview.setDockItem(dockitem);
     m_preview.show_now();
-    m_preview.move(centerpos, MonitorGeometry::getScreenHeight() - 
+    m_preview.move(centerpos, MonitorGeometry::getScreenHeight() -
             (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 6));
-    
-    
+
+
 }
 
 bool DockPanel::isExitstMaximizedWindows()

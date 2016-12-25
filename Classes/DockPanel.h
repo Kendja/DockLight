@@ -48,19 +48,11 @@ using namespace std;
 class DockPanel : public Gtk::DrawingArea
 {
 public:
-//
-//    enum Window_action
-//    {
-//        OPEN,
-//        CLOSE
-//    };
-
 
     DockPanel();
     int init(Gtk::Window* window);
     virtual ~DockPanel();
     std::string getApplicationPath();
-    
     static bool m_previewWindowActive;
     void previewWindowClosed();
     

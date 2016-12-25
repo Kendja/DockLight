@@ -33,15 +33,22 @@ protected:
     bool on_scroll_event(GdkEventScroll *event);
     bool on_button_press_event(GdkEventButton *event);
     
-
+   
    
 private:
+    
+    static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
+
+     
     bool m_mouseIn;
-    bool m_isActive;
+    static bool m_isActive;
     int m_currentIndex;
     std::string m_title;
     DockPanel* m_dockpanelReference;
-    DockItem* m_dockItemReference;
+    
+    //DockItem* m_dockItemReference;
+    static std::vector<DockItem*> m_previewtems;
+    
     Glib::Timer m_timer;
     Pango::FontDescription font;
 

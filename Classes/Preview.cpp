@@ -7,13 +7,18 @@
 
 #include <gdk/gdkx.h>
 
+
+// Static members
+std::vector<DockItem*> Preview::m_previewtems;
+bool Preview::m_isActive;
+
 Preview::Preview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_mouseIn(false),
-m_isActive(false),
-m_currentIndex(0),
-m_dockItemReference(nullptr)
+m_currentIndex(0)
 {
+    m_isActive = false;
+
     // Set up the top-level window.
     set_title("DockPreview");
     set_decorated(false);
@@ -37,6 +42,11 @@ m_dockItemReference(nullptr)
     Glib::signal_timeout().
             connect(sigc::mem_fun(*this, &Preview::on_timeoutDraw), 1000 / 60);
 
+    WnckScreen *wnckscreen = wnck_screen_get_default();
+
+    g_signal_connect(wnckscreen, "window_closed",
+            G_CALLBACK(Preview::on_window_closed), NULL);
+
     m_timer.start();
 
 }
@@ -48,11 +58,24 @@ int initialItemMax = 0;
 
 void Preview::setDockItem(DockItem* item)
 {
+    m_previewtems.clear();
+    for (DockItem* child : item->m_items) {
+
+        if (child->m_window == NULL || child->m_xid == 0)
+            continue;
+
+        DockItem* newchild = new DockItem();
+       
+        newchild->m_window = child->m_window;
+        newchild->m_xid = child->m_xid;
+
+        m_previewtems.push_back(newchild);
+    }
+
     m_currentIndex = 0;
-    m_dockItemReference = item;
     m_isActive = true;
 
-    initialItemMax = m_dockItemReference->m_items.size();
+    initialItemMax = m_previewtems.size();
 }
 
 bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
@@ -77,6 +100,7 @@ void Preview::hideMe()
     hide();
     m_mouseIn = false;
     m_dockpanelReference->m_previewWindowActive = false;
+    m_previewtems.clear();
 }
 
 bool Preview::on_timeoutDraw()
@@ -93,14 +117,11 @@ bool Preview::on_timeoutDraw()
  */
 int Preview::getIndex(int x, int y)
 {
-    if (m_dockItemReference == nullptr) {
-        return -1;
-    }
 
     int col = 0;
     int idx = 0;
 
-    for (DockItem* item : m_dockItemReference->m_items) {
+    for (DockItem* item : m_previewtems) {
         if (item->m_window == NULL)
             continue;
 
@@ -121,10 +142,8 @@ int Preview::getIndex(int x, int y)
  */
 bool Preview::on_scroll_event(GdkEventScroll * event)
 {
-    if (this->m_dockItemReference == nullptr)
-        return false;
 
-    int count = this->m_dockItemReference->m_items.size();
+    int count = m_previewtems.size();
     if (count == 0)
         return false;
 
@@ -145,11 +164,34 @@ bool Preview::on_scroll_event(GdkEventScroll * event)
 
     m_currentIndex = index;
 
-    itemWindow = m_dockItemReference->m_items.at(m_currentIndex)->m_window;
+    itemWindow = m_previewtems.at(m_currentIndex)->m_window;
     wnck_window_activate(itemWindow, gtk_get_current_event_time());
 
     // Event has been handled
     return true;
+}
+
+/**
+ * Handles window close.
+ * 
+ * @param WnckScreen screen
+ * @param WnckWindow window
+ * @param gpointer data
+ */
+void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
+{
+    m_isActive = false;
+    int idx = 0;
+    for (DockItem* item : m_previewtems) {
+        int cxid = wnck_window_get_xid(window);
+        if (cxid == item->m_xid) {
+            m_previewtems.erase(m_previewtems.begin() + idx);
+            break;
+        }
+        idx++;
+    }
+
+    m_isActive = true;
 }
 
 /**
@@ -169,7 +211,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
             if (m_currentIndex < 0)
                 return true;
 
-            DockItem *item = m_dockItemReference->m_items.at(m_currentIndex);
+            DockItem *item = m_previewtems.at(m_currentIndex);
             int ct = gtk_get_current_event_time();
 
             // Handle close preview window
@@ -178,17 +220,15 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                     event->y >= 19 && event->y <= 19 + 14) {
 
                 wnck_window_close(item->m_window, (guint32) ct);
+                m_isActive = false;
 
-                // delete the item. it is a pointer to the DockPanel m_dockitems
-                // we need to do this here otherwise the Draw method will crash.
-                delete( item);
-                m_dockItemReference->m_items.erase(m_dockItemReference->m_items.begin() + m_currentIndex);
+                // delete the item here, so the Draw method can't paint it anymore
+                m_previewtems.erase(m_previewtems.begin() + m_currentIndex);
+                m_currentIndex = getIndex(event->x, event->y);
 
-                if (m_dockItemReference->m_items.size() < 1)
-                    this->hideMe();
                 return true;
             }
-            
+
             wnck_window_activate(item->m_window, ct);
             // The event has been handled.
             return true;
@@ -213,11 +253,23 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
     return true;
 }
 
+/**
+ * Render the Preview
+ * @param Cairo::Context cr
+ * @return Gtk::Window::on_draw(cr)
+ */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
     if (!m_isActive)
-        return false;
+        return Gtk::Window::on_draw(cr);
 
+
+    if (m_previewtems.size() < 1) {
+        this->hideMe();
+        return Gtk::Window::on_draw(cr);
+    }
+
+    // debug
     //g_print("Draw %d \n", (int) m_timer.elapsed());
 
     cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
@@ -240,8 +292,8 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     }
     //return true;
-    for (DockItem* item : m_dockItemReference->m_items) {
-        if (item->m_window == NULL || item->m_xid == 0)
+    for (DockItem* item : m_previewtems) {
+        if (item->m_window == NULL || item->m_xid == 0 || !item->visible)
             continue;
 
         int pos_x = 20 + (DEF_PREVIEW_WIDTH * idx);
@@ -296,10 +348,10 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             cr->move_to(pos_x + 3, 30);
             cr->show_text("X");
 
-            //g_print("%s\n",t->m_appname.c_str());    
         }
 
-        // get the preview for window.
+
+        // get the preview for the window.
         GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
                 gdk_display_get_default(), item->m_xid);
 
@@ -319,6 +371,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 20, DEF_PREVIEW_PIXBUF_TOP);
         cr->paint();
 
+        // unreferenced release memory. 
         g_object_unref(scaledpb);
         g_object_unref(pb);
 
