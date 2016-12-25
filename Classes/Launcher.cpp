@@ -5,6 +5,7 @@
 
 namespace Launcher
 {
+
     /**
      * Launch an application from a desktop file or from bash.
      * @param DockItem* item
@@ -29,32 +30,46 @@ namespace Launcher
 
         // GDesktopAppInfo *desktop_info;
         GError *error = NULL;
-        GAppLaunchContext *context;
-        GAppInfo *app_info;
+        GAppLaunchContext *context = NULL;
+        GAppInfo *app_info = NULL;
 
         sprintf(command, "%s.desktop", lowerrealgroupname.c_str());
         app_info = (GAppInfo*) g_desktop_app_info_new(command);
         if (app_info == NULL) {
-            g_warning("Launcher could not locate: %s\n", command);
+            g_warning("Launcher could not locate desktop file : %s\n", command);
             sprintf(command, "\"%s\"", lowerrealgroupname.c_str());
-            if (g_spawn_command_line_async(command, &error) == FALSE) {
-                if (error) {
-                    g_warning("Launcher could not execute: %s: Error: %s\n", command, error->message);
-                    g_error_free(error);
-                }
+            // Launch from command line
+            if (g_spawn_command_line_async(command, &error)){
+                return;
             }
-            return;
-        }
 
-        GdkDisplay *display = gdk_display_get_default();
-        context = (GAppLaunchContext*) gdk_display_get_app_launch_context(display);
-        g_app_info_launch(app_info, NULL, context, &error);
-        if (error) {
-            g_warning("Failed to launch %s: Error: %s", command, error->message);
-            g_error_free(error);
+            if (error) {
+                g_warning("Launcher could not execute: %s: Error: %s\n", command, error->message);
+                g_error_free(error);
+                error = NULL;
+            }
+
+        } else {
+            // Launch desktop file
+            GdkDisplay *display = gdk_display_get_default();
+            context = (GAppLaunchContext*) gdk_display_get_app_launch_context(display);
+            if (g_app_info_launch(app_info, NULL, context, &error)) {
+
+                g_object_unref(app_info);
+                g_object_unref(context);
+
+                return;
+            }
+            if (error) {
+                g_warning("Failed to launch desktop file %s: Error: %s", command, error->message);
+                g_error_free(error);
+                error = NULL;
+            }
+
+            g_object_unref(app_info);
+            if (context != NULL)
+                g_object_unref(context);
         }
-        g_object_unref(app_info);
-        g_object_unref(context);
 
     }
 }
