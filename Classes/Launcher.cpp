@@ -2,10 +2,11 @@
 #include "Launcher.h"
 #include "DockItem.h"
 #include "gio/gdesktopappinfo.h"
+#include <map>
 
 namespace Launcher
 {
-
+    std::map<std::string,std::string> dictionary;
     /**
      * Launch an application from a desktop file or from bash.
      * @param DockItem* item
@@ -39,7 +40,7 @@ namespace Launcher
             g_warning("Launcher could not locate desktop file : %s\n", command);
             sprintf(command, "\"%s\"", lowerrealgroupname.c_str());
             // Launch from command line
-            if (g_spawn_command_line_async(command, &error)){
+            if (g_spawn_command_line_async(command, &error)) {
                 return;
             }
 
@@ -71,5 +72,55 @@ namespace Launcher
                 g_object_unref(context);
         }
 
+    }
+
+    std::string getTitleNameFromDesktopFile(std::string desktopfile)
+    {
+        if( desktopfile == "untitled window")
+            return "";
+        
+        if( desktopfile == "wine")
+            return "";
+        
+        if( dictionary.count(desktopfile) == 1 ) {
+            return dictionary.at(desktopfile);
+        }
+        
+        // build the desktop file path 
+        char filepath[PATH_MAX];
+        sprintf(filepath, "/usr/share/applications/%s.desktop",
+                desktopfile.c_str());
+        // check if the file exists
+        GError *error = NULL;
+        GKeyFile *key_file = g_key_file_new();
+
+        gboolean found = g_key_file_load_from_file(key_file,
+                filepath, GKeyFileFlags::G_KEY_FILE_NONE, &error);
+        if (!found) {
+            if (error) {
+                g_warning("Desktop file not found  %s %s",
+                        desktopfile.c_str(), error->message);
+                g_error_free(error);
+                error = NULL;
+            }
+
+            return "";
+        }
+
+        // check if the Icon Desktop Entry name exists
+        gchar* titlename = g_key_file_get_string(key_file,
+                "Desktop Entry", "Name", &error);
+
+        if (titlename == NULL) {
+            if (error) {
+                g_warning("Name Desktop Entry found: %s %s", titlename, error->message);
+                g_error_free(error);
+                error = NULL;
+            }
+            return "";
+        }
+        
+        dictionary[desktopfile] = titlename;
+        return titlename;
     }
 }

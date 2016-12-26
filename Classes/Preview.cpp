@@ -412,7 +412,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         
         // create the image
         GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
-                0, 0, boundingbox.width, boundingbox.height-20);
+                0, 0, boundingbox.width-10, boundingbox.height-24);
 
         // FIXME: Scale don't work well
         int scale_heght = DEF_PREVIEW_PIXBUF_HEIGHT;

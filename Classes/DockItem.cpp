@@ -18,6 +18,10 @@
 //
 //****************************************************************
 #include "DockItem.h"
+#include <string>
+#include <iostream>
+
+using namespace std;
 
 /**
  * ctor
@@ -75,3 +79,11 @@ DockItem::~DockItem()
 
 }
 
+
+std::string DockItem::getTitle()
+{
+    if( !m_titlename.empty() )
+        return m_titlename;
+    
+    return m_realgroupname;
+}

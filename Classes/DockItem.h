@@ -36,6 +36,7 @@ public:
     DockItem* GetCurrent();
     DockItem* GetNext();
     WnckWindow *m_window;
+    std::string m_titlename;
     std::string m_appname;
     std::string m_realgroupname;
     std::string m_instancename;
@@ -45,6 +46,8 @@ public:
     bool m_isAttached = false;
     bool m_isDirty = false;
     bool visible = true;
+    
+    std::string getTitle();
 private:
     //TODO: setters getters
 

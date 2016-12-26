@@ -722,11 +722,18 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     std::string realgroupname(_realgroupname);
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
+    std::string titlename = Utilities::stringToLower(realgroupname.c_str());
+    titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
+            
     if (realgroupname == "Wine")
         realgroupname = instancename;
 
+    
     //DEBUG
-    g_print("appname: %s, %s, %s\n", appname.c_str(), instancename.c_str(), realgroupname.c_str());
+    g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
+            instancename.c_str(), 
+            realgroupname.c_str(),
+            titlename.c_str());
 
     if (actiontype == Window_action::OPEN) {
 
@@ -742,6 +749,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
                 DockItem* childItem = new DockItem();
                 childItem->m_realgroupname = realgroupname;
                 childItem->m_appname = appname;
+                childItem->m_titlename = titlename;
                 childItem->m_instancename = instancename;
                 childItem->m_isDirty = false;
                 childItem->m_window = window;
@@ -767,6 +775,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
         // Create a new Item
         DockItem* dockItem = new DockItem();
         dockItem->m_appname = appname;
+        dockItem->m_titlename = titlename;
         dockItem->m_realgroupname = realgroupname;
         dockItem->m_instancename = instancename;
         dockItem->m_window = window;
@@ -776,6 +785,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
         // Create a child items
         DockItem* childItem = new DockItem();
         childItem->m_appname = dockItem->m_appname;
+        childItem->m_titlename = titlename;
         childItem->m_realgroupname = dockItem->m_realgroupname;
         childItem->m_instancename = dockItem->m_instancename;
         childItem->m_window = dockItem->m_window;
@@ -873,7 +883,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             if (m_titleElapsedSeconds > 0.5 && m_titleShow == false && !m_previewWindowActive) {
 
                 DockItem* item = m_dockitems.at(m_currentMoveIndex);
-                m_titlewindow.setText(item->m_realgroupname);
+                m_titlewindow.setText(item->getTitle());
 
                 int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
                         m_dockitems.size(),
@@ -1050,10 +1060,16 @@ void DockPanel::loadAttachedItems()
             std::string appname = filename.substr(0, found);
             std::replace(appname.begin(), appname.end(), '_', ' ');
 
+            
+            std::string titlename = Utilities::stringToLower(appname.c_str());
+            titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
+           
+                    
             DockItem* item = new DockItem();
             item->m_appname = appname;
             item->m_instancename = Utilities::stringToLower(appname.c_str());
             item->m_realgroupname = appname;
+            item->m_titlename = titlename;
             item->m_window = NULL;
             item->m_xid = 0;
             item->m_image = item->m_image->create_from_file(imageFilePath);
