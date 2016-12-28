@@ -19,9 +19,21 @@
 //****************************************************************
 
 #include "Utilities.h"
+#include <gtk/gtk.h>
 
 namespace Utilities
 {
+    
+    std::string getGtkVersion()
+    {
+        char buff[PATH_MAX];
+        guint maxv = gtk_get_major_version ();
+        guint minv = gtk_get_minor_version ();
+        sprintf(buff,"%d.%d",maxv,minv);
+        
+        std::string result( buff );
+        return result;
+    }
 
     /*
      * getExecPath()

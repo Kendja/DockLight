@@ -2,6 +2,8 @@
 #include "Defines.h"
 #include "AppWindow.h"
 
+//#define GTKDEPRECATED 1
+
 namespace MonitorGeometry
 {
 
@@ -28,7 +30,7 @@ namespace MonitorGeometry
         return ScreenHeight;
     }
 
-     /**
+    /**
      * returns the Gdk::screen_width()
      * @return Gdk::screen_width()
      */
@@ -67,21 +69,35 @@ namespace MonitorGeometry
             return -1;
         }
 
-        // Retrieves the Gdk::Rectangle representing the size and position of the 
-        // individual monitor within the entire screen area. 
-        GdkDisplay *defaultdisplay = gdk_display_get_default();
-        if (defaultdisplay == NULL) {
-            g_critical(" AppWindow::Init: there is no default display.");
-            return -1;
-        }
-        GdkMonitor *monitor = gdk_display_get_primary_monitor(defaultdisplay);
-        if (monitor == NULL) {
-            g_critical(" AppWindow::Init: there is no primary monitor configured by the user..");
-            return -1;
-        }
+#ifdef GTKDEPRECATED
+            Gdk::Rectangle monitor_geo;
+            auto screen = Gdk::Screen::get_default();
+            GdkScreen *defaultscreen = gdk_screen_get_default();
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
+            gint dm = gdk_screen_get_primary_monitor(defaultscreen);
+            screen->get_monitor_geometry(dm, monitor_geo);
 
-        // GdkRectangle to be filled with the monitor geometry
-        gdk_monitor_get_geometry(monitor, &geometry);
+            geometry.x = monitor_geo.get_x();
+            geometry.y = monitor_geo.get_y();
+            geometry.width = monitor_geo.get_width();
+            geometry.height = monitor_geo.get_height();
+#else
+            // Retrieves the Gdk::Rectangle representing the size and position of the 
+            // individual monitor within the entire screen area. 
+            GdkDisplay *defaultdisplay = gdk_display_get_default();
+            if (defaultdisplay == NULL) {
+                g_critical(" AppWindow::Init: there is no default display.");
+                return -1;
+            }
+            GdkMonitor *monitor = gdk_display_get_primary_monitor(defaultdisplay);
+            if (monitor == NULL) {
+                g_critical(" AppWindow::Init: there is no primary monitor configured by the user..");
+                return -1;
+            }
+
+            // GdkRectangle to be filled with the monitor geometry
+            gdk_monitor_get_geometry(monitor, &geometry);
+#endif
         ScreenHeight = Gdk::screen_height();
         ScreenWidth = Gdk::screen_width();
 

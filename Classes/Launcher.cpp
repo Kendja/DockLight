@@ -6,7 +6,8 @@
 
 namespace Launcher
 {
-    std::map<std::string,std::string> dictionary;
+    std::map<std::string, std::string> dictionary;
+
     /**
      * Launch an application from a desktop file or from bash.
      * @param DockItem* item
@@ -21,6 +22,7 @@ namespace Launcher
             std::string s = lowerrealgroupname;
             std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
             std::string msg = "Expected Desktop file : \n" + s + "\n";
+#pragma GCC diagnostic ignored "-Wformat-security"
             g_print(msg.c_str());
 
             lowerrealgroupname = s;
@@ -76,16 +78,16 @@ namespace Launcher
 
     std::string getTitleNameFromDesktopFile(std::string desktopfile)
     {
-        if( desktopfile == "untitled window")
+        if (desktopfile == "untitled window")
             return "";
-        
-        if( desktopfile == "wine")
+
+        if (desktopfile == "wine")
             return "";
-        
-        if( dictionary.count(desktopfile) == 1 ) {
+
+        if (dictionary.count(desktopfile) == 1) {
             return dictionary.at(desktopfile);
         }
-        
+
         // build the desktop file path 
         char filepath[PATH_MAX];
         sprintf(filepath, "/usr/share/applications/%s.desktop",
@@ -119,7 +121,7 @@ namespace Launcher
             }
             return "";
         }
-        
+
         dictionary[desktopfile] = titlename;
         return titlename;
     }

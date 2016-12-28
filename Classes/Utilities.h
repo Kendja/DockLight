@@ -41,6 +41,7 @@ namespace Utilities
     std::string removeExtension(std::string text, const char* extension);
     std::string removeExtension(std::string text, const std::string extensions[]);
     std::string stringToLower(const char* strp);
+    std::string getGtkVersion();
 
 
 }
