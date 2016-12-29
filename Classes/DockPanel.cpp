@@ -23,6 +23,8 @@
 #include "Utilities.h"
 #include "MonitorGeometry.h"
 #include "IconLoader.h"
+#include "DockPosition.h"
+
 
 
 //static members
@@ -38,10 +40,15 @@ m_mouseIn(FALSE),
 m_mouseRightClick(FALSE),
 m_mouseLeftButtonDown(FALSE),
 m_mouseRightButtonDown(FALSE),
+m_cellwidth(DEF_CELLWIDTH),
+m_previousCellwidth(DEF_CELLWIDTH),
+m_iconsize(DEF_ICONSIZE),
+m_cellheight(DEF_CELLHIGHT),
 m_applicationpath(Utilities::getExecPath())
 {
 
     m_currentMoveIndex = -1;
+
 
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
@@ -59,8 +66,12 @@ m_applicationpath(Utilities::getExecPath())
 
 
 }
-
-int DockPanel::init(Gtk::Window* window)
+/**
+ * preInit load the attached icons and initializes variables.
+ * @param Gtk::Window*  window
+ * @return return 0 is success or -1 is an error found
+ */
+int DockPanel::preInit(Gtk::Window* window)
 {
     m_AppWindow = window;
 
@@ -85,23 +96,7 @@ int DockPanel::init(Gtk::Window* window)
 
     loadAttachedItems();
 
-    m_fpstimer.start();
-    // m_titleTimer.start();
-
-    m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &DockPanel::on_timeoutDraw), 1000 / 60);
-
-    WnckScreen *wnckscreen = wnck_screen_get(0); //_default();
-
-    g_signal_connect(G_OBJECT(wnckscreen), "window-opened",
-            G_CALLBACK(DockPanel::on_window_opened), NULL);
-
-    g_signal_connect(wnckscreen, "window_closed",
-            G_CALLBACK(DockPanel::on_window_closed), NULL);
-
-    g_signal_connect(wnckscreen, "active_window_changed",
-            G_CALLBACK(DockPanel::on_active_window_changed_callback), NULL);
-
+    
     // Menus
     // Home Menu items
     m_CloseAllWindowsMenuItem.set_label("Close all Windows");
@@ -158,6 +153,30 @@ int DockPanel::init(Gtk::Window* window)
     return 0;
 }
 
+/**
+ * PostInit sets the signals handlers
+ * @return 
+ */
+void DockPanel::postInit()
+{
+    m_fpstimer.start();
+    // m_titleTimer.start();
+
+    m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
+            &DockPanel::on_timeoutDraw), 1000 / 60);
+
+    WnckScreen *wnckscreen = wnck_screen_get(0); //_default();
+
+    g_signal_connect(G_OBJECT(wnckscreen), "window-opened",
+            G_CALLBACK(DockPanel::on_window_opened), NULL);
+
+    g_signal_connect(wnckscreen, "window_closed",
+            G_CALLBACK(DockPanel::on_window_closed), NULL);
+
+    g_signal_connect(wnckscreen, "active_window_changed",
+            G_CALLBACK(DockPanel::on_active_window_changed_callback), NULL);
+
+}
 DockPanel::~DockPanel()
 {
 
@@ -187,7 +206,7 @@ int DockPanel::getIndex(int x, int y)
     Gdk::Point mouse(x, y);
     int result = -1;
     int idx = 0;
-    int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
+    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
 
 
@@ -195,11 +214,11 @@ int DockPanel::getIndex(int x, int y)
         if (item->m_image == NULLPB)
             continue;
 
-        if (mouse.get_x() >= col && mouse.get_x() <= col + DEF_CELLSIZE) {
+        if (mouse.get_x() >= col && mouse.get_x() <= col + m_cellwidth) {
             return idx;
         }
 
-        col += DEF_CELLSIZE;
+        col += m_cellwidth;
         idx++;
     }
 
@@ -394,10 +413,10 @@ void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
 
-    int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
+    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
-    x = MonitorGeometry::getGeometry().x + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-    y = MonitorGeometry::getScreenHeight() - MonitorGeometry::getAppWindowHeight();
+    x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex);
+    y = MonitorGeometry::getAppWindowTopPosition();
 
     // This is a fix for a BUG! in  Gtk::Menu.
     // The position don't work on resolution smaller or equal then 768 height.
@@ -411,10 +430,10 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_Menu_Popup.get_allocated_width() / 2);
 
-    int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
+    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
-    x = MonitorGeometry::getGeometry().x + col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex);
-    y = MonitorGeometry::getScreenHeight() - MonitorGeometry::getAppWindowHeight();
+    x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex);
+    y = MonitorGeometry::getAppWindowTopPosition();
 
     // This is a fix for a BUG! in  Gtk::Menu.
     // The position don't work on resolution smaller or equal then 768 height.
@@ -591,12 +610,35 @@ bool DockPanel::on_scroll_event(GdkEventScroll * e)
     return true;
 }
 
+
+int m_oldcellsize = DEF_CELLWIDTH;
+
 /**
  * Timeout handler to regenerate the frame. 
  * force to redraw the entire content.
  */
 bool DockPanel::on_timeoutDraw()
 {
+
+    //    DockPosition::setItemsCount(m_dockitems.size());
+    //    m_cellwidth = DockPosition::getCellSize();
+    //    m_iconsize = DockPosition::getIconSize();
+    //
+    //   // g_print("Recal %d %d\n",m_cellwidth,(int)m_titleTimer.elapsed());
+    //    
+    //    if (m_cellwidth != m_oldcellsize) {
+    //        //g_print("Recal %d \n",(int)m_titleTimer.elapsed());
+    //        m_oldcellsize = m_cellwidth;
+    //        for (DockItem* item : m_dockitems) {
+    //
+    //            Glib::RefPtr<Gdk::Pixbuf> appIcon = item->m_image;
+    //            item->m_image = appIcon->scale_simple(m_iconsize,
+    //                    m_iconsize, Gdk::INTERP_BILINEAR);
+    //
+    //        }
+    //
+    //    }
+
     Gtk::Widget::queue_draw();
 
     ++m_frames;
@@ -724,14 +766,14 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
 
     std::string titlename = Utilities::stringToLower(realgroupname.c_str());
     titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
-            
+
     if (realgroupname == "Wine")
         realgroupname = instancename;
 
-    
+
     //DEBUG
     g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
-            instancename.c_str(), 
+            instancename.c_str(),
             realgroupname.c_str(),
             titlename.c_str());
 
@@ -855,9 +897,30 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
     Glib::RefPtr<Gdk::Pixbuf> icon = NULLPB;
 
+    DockPosition::getDockItemGeometry(m_dockitems.size(), m_cellwidth, m_iconsize);
+    bool resizeNeeded = m_cellwidth != DEF_CELLWIDTH;
+
+    if (m_cellwidth == DEF_CELLWIDTH)
+        m_cellheight = DEF_CELLHIGHT;
+
+    // compute the cell height if need to resized
+    if ((resizeNeeded && m_previousCellwidth != m_cellwidth)) {
+
+        int iconrestsapce = DEF_CELLHIGHT - (DEF_ICONSIZE + DEF_ICONTOPCELLMARGIN);
+        int substractpixels = (DEF_CELLHIGHT - (m_iconsize + DEF_ICONTOPCELLMARGIN)) - iconrestsapce;
+
+        m_cellheight = DEF_CELLHIGHT - substractpixels;
+        m_previousCellwidth = m_cellwidth;
+
+        MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels ) ;
+        
+        g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
+    }
+
+
     int center = MonitorGeometry::getGeometry().width / 2;
-    int col = center - (m_dockitems.size() * DEF_CELLSIZE) / 2;
-    int pos_x = col = center - ((m_dockitems.size() * DEF_CELLSIZE) / 2);
+    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
+    int pos_x = col = center - ((m_dockitems.size() * m_cellwidth) / 2);
 
     // Timer control for the title Window
     if (m_mouseIn && m_currentMoveIndex == -1) {
@@ -891,10 +954,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                         m_titlewindow.getCurrentWidth()
                         );
 
-                m_titlewindow.move(centerpos,
-                        MonitorGeometry::getScreenHeight() -
-                        (DEF_PANELBCKHIGHT + DEF_CELLSIZE - 16));
-
+                m_titlewindow.move(centerpos,MonitorGeometry::getAppWindowTopPosition()-30);
+                
                 //g_print("SHOW%d\n", (int) m_currentMoveIndex);
                 m_titleShow = true;
 
@@ -905,31 +966,34 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
     }
 
-    // background
-    //    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
-    //    cr->paint();
+    // uncomment for a Panel Background color;
+    //     cr->set_source_rgba(0.0, 0.0, 0.0, 1.0);
+    //     cr->paint();
 
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
-    Utilities::RoundedRectangle(cr, pos_x, DEF_PANELBCKTOP,
-            (m_dockitems.size() * DEF_CELLSIZE),
-            DEF_PANELBCKHIGHT, 2.0);
+    Utilities::RoundedRectangle(cr, pos_x,
+            DEF_CELLTOPMARGIN, (m_dockitems.size() * m_cellwidth),
+            m_cellheight, 2.0);
     cr->fill();
 
     // Selector
     if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
 
-        pos_x = col + (DEF_CELLSIZE / 2) + (DEF_CELLSIZE * m_currentMoveIndex) - DEF_CELLSIZE / 2;
+        pos_x = col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex) - m_cellwidth / 2;
         cr->set_line_width(2);
         cr->set_source_rgba(1.0, 1.0, 1.0, 0.4); // partially translucent
-        Utilities::RoundedRectangle(cr, pos_x, DEF_PANELBCKTOP, DEF_CELLSIZE - 1, DEF_PANELBCKHIGHT, 2.0);
+        Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN, m_cellwidth - 1, m_cellheight, 2.0);
         cr->fill();
 
         // rectangle border
         cr->set_source_rgba(1.0, 1.0, 1.0, 0.8); // partially translucent     
-        Utilities::RoundedRectangle(cr, pos_x, DEF_PANELBCKTOP,
-                DEF_CELLSIZE - 1, DEF_PANELBCKHIGHT, 2.0);
+        Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
+                m_cellwidth - 1, m_cellheight, 2.0);
         cr->stroke();
     }
+
+
+
 
     for (auto item : m_dockitems) {
         if (item->m_image == NULLPB)
@@ -938,27 +1002,36 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         // Draw circles
         cr->set_source_rgb(1.0, 1.0, 1.0);
         if (item->m_items.size() == 1) {
-            cr->arc(col + (DEF_CELLSIZE / 2), DEF_PANELBCKHIGHT, 2, 0, 2 * M_PI);
+            cr->arc(col + (m_cellwidth / 2), m_cellheight, 2, 0, 2 * M_PI);
         } else if (item->m_items.size() > 1) {
-            cr->arc((col + (DEF_CELLSIZE / 2)) - 4, DEF_PANELBCKHIGHT, 2, 0, 2 * M_PI);
-            cr->arc((col + (DEF_CELLSIZE / 2)) + 4, DEF_PANELBCKHIGHT, 2, 0, 2 * M_PI);
+            cr->arc((col + (m_cellwidth / 2)) - 4, m_cellheight, 2, 0, 2 * M_PI);
+            cr->arc((col + (m_cellwidth / 2)) + 4, m_cellheight, 2, 0, 2 * M_PI);
         }
         cr->fill();
 
         // Draw icons
         cr->save();
-        icon = item->m_image;
-        Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_OFFSE_TOP);
+        if (resizeNeeded) {
+            // scale_simple is very fast. 
+            // However this will not happen often.
+            icon = item->m_image->scale_simple(
+                    m_iconsize, m_iconsize, Gdk::INTERP_BILINEAR);
+
+        } else {
+            icon = item->m_image;
+        }
+        Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_ICONTOPMARGIN);
         cr->paint();
         cr->restore();
+
 
         // Draw Rectangles
         cr->set_source_rgba(1.0, 1.0, 1.0, 0.8); // partially translucent
         cr->set_line_width(0.7);
-        Utilities::RoundedRectangle(cr, col, DEF_PANELBCKTOP, DEF_CELLSIZE - 1, DEF_PANELBCKHIGHT, 2.0);
+        Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1, m_cellheight, 2.0);
         cr->stroke();
 
-        col += DEF_CELLSIZE;
+        col += m_cellwidth;
     }
 
     return true;
@@ -992,22 +1065,21 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
             m_dockitems.size(), index, width);
 
-    int maxwidth = centerpos + (dockitem->m_items.size() * DEF_PREVIEW_WIDTH);
-    maxwidth -= MonitorGeometry::getGeometry().x;
+    int maxwidth = centerpos + (dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
+    maxwidth -= MonitorGeometry::getGeometry().x ;
 
     if (maxwidth >= MonitorGeometry::getGeometry().width)
         centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30;
 
     // Debug
-    //g_print("max %d %d\n", maxwidth,MonitorGeometry::getGeometry().width);
+    g_print("max %d %d\n", maxwidth,MonitorGeometry::getGeometry().width);
 
 
     m_previewWindowActive = true;
     m_preview.setDockItem(dockitem);
     m_preview.show_now();
-    m_preview.move(centerpos, MonitorGeometry::getScreenHeight() -
-            (DEF_PREVIEW_HEIGHT + DEF_PANELBCKHIGHT + 6));
-
+    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - ( DEF_PREVIEW_HEIGHT));
+           
 
 }
 
@@ -1060,11 +1132,11 @@ void DockPanel::loadAttachedItems()
             std::string appname = filename.substr(0, found);
             std::replace(appname.begin(), appname.end(), '_', ' ');
 
-            
+
             std::string titlename = Utilities::stringToLower(appname.c_str());
             titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
-           
-                    
+
+
             DockItem* item = new DockItem();
             item->m_appname = appname;
             item->m_instancename = Utilities::stringToLower(appname.c_str());

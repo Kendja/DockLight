@@ -37,6 +37,7 @@ public:
     AppWindow();
     int Init(panel_locationType location);
     virtual ~AppWindow();
+    DockPanel* getDockPanelReference(){ return &m_dockpanel; }
 private:
     DockPanel m_dockpanel;
     

@@ -7,6 +7,8 @@ namespace DockPosition
 {
     int getCenterPosByCurrentDockItemIndex(int dockitemscount, 
             int currentindex,int targetwidth);
+ 
+    bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize);
 }
 
 #endif /* DOCKPOSITION_H */

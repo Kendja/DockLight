@@ -15,10 +15,13 @@
 namespace MonitorGeometry
 {    
     int update(Gtk::Window* window);
+    int updateStrut(Gtk::Window* window, int height);
     GdkRectangle getGeometry();
     int getScreenHeight();
     int getScreenWidth();
     int getAppWindowHeight();
+    int getStructHeight();
+    int getAppWindowTopPosition();
     
    
 }

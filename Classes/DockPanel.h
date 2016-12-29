@@ -40,8 +40,8 @@
 
 // This is a fix for a BUG! in  Gtk::Menu.
 // The position don't work on resolution smaller or equal then 768 height.
-#define HOME_POPUPMENU_Y_768_REPOSITION  30    // Modify this value depend of the menu children count
-#define ITEM_POPUPMENU_Y_768_REPOSITION  100   // Modify this value depend of the menu children count
+#define HOME_POPUPMENU_Y_768_REPOSITION  56    // Modify this value depend of the menu children count
+#define ITEM_POPUPMENU_Y_768_REPOSITION  128   // Modify this value depend of the menu children count
 
 using namespace std;
 
@@ -50,13 +50,19 @@ class DockPanel : public Gtk::DrawingArea
 public:
 
     DockPanel();
-    int init(Gtk::Window* window);
+    int preInit(Gtk::Window* window);
+    void postInit();
+
     virtual ~DockPanel();
     std::string getApplicationPath();
     static bool m_previewWindowActive;
     void previewWindowClosed();
-    
-    int getCurrentIndex() { return m_currentMoveIndex; };
+
+    int getCurrentIndex()
+    {
+        return m_currentMoveIndex;
+    };
+
 private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
@@ -65,8 +71,8 @@ private:
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
-    
-    
+
+
     std::string m_applicationpath;
     sigc::connection m_TimeoutConnection;
 
@@ -130,6 +136,14 @@ private:
             WnckWindow *previously_active_window, gpointer user_data);
 
     int getIndex(int x, int y);
+
+
+
+    int m_cellheight;
+    int m_cellwidth;
+    int m_previousCellwidth;
+    int m_iconsize;
+
 
 protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

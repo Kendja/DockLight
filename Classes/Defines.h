@@ -30,7 +30,7 @@ typedef enum Window_action_t
 {
     OPEN,
     CLOSE
-}Window_action;
+} Window_action;
 
 typedef enum panel_location_t
 {
@@ -55,12 +55,23 @@ typedef enum StrutsPosition_t
 } strutsPosition;
 
 
-#define DEF_ICONSIZE 48
-#define DEF_CELLSIZE 58
+#define DEF_CELLWIDTH 58                    // Cell Width
+#define DEF_CELLHIGHT 62                    // Cell Height
+#define DEF_CELLTOPMARGIN 6                 // Cell Top Position
+
+#define DEF_ICONSIZE 48                     // Icon Size Width and height
+#define DEF_ICONTOPMARGIN 10                // Icon top Margin from panel
+
+// Icon top Margin from the cell
+#define DEF_ICONTOPCELLMARGIN DEF_ICONTOPMARGIN -DEF_CELLTOPMARGIN                
+
+
+
 #define DEF_PANELHIGHT 72 
-#define DEF_PANELBCKHIGHT 62 
-#define DEF_PANELBCKTOP 6 
-#define DEF_OFFSE_TOP 10
+
+
+//#define DEF_OFFSE_TOP 10
+
 #define DEF_PREVIEW_WIDTH 220           // the preview popup window width
 #define DEF_PREVIEW_HEIGHT 200          // the preview popup window height
 #define DEF_PREVIEW_PIXBUF_WIDTH 210    // the image pixbuf width
