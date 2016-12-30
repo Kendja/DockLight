@@ -1,7 +1,7 @@
 //*****************************************************************
 //
-//  Copyright (C) 2015 Juan R. Gonzalez
-//  Created on December 22, 2015
+//  Copyright (C) 2016 Juan R. Gonzalez
+//  Created on December 22, 2016
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -35,8 +35,10 @@ public:
     {
         m_dockpanelReference = &dockpanel;
     };
-    void setDockItem(DockItem* item);
-
+    
+    void init(DockItem* item, int &width, int &height,int &windowWidth);
+   
+    
 protected:
     //Override default signal handler:
     // Signal handlers:
@@ -58,6 +60,8 @@ private:
     
     static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
 
+    int m_previewWidth;
+    int m_previewHeight;
      
     bool m_mouseIn;
     static bool m_isActive;

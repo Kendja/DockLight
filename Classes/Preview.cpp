@@ -1,7 +1,7 @@
 //*****************************************************************
 //
-//  Copyright (C) 2015 Juan R. Gonzalez
-//  Created on December 22, 2015
+//  Copyright (C) 2016 Juan R. Gonzalez
+//  Created on December 22, 2016
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ Preview::Preview() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_mouseIn(false),
 m_currentIndex(0),
-m_initialItemMax(0)
+m_initialItemMax(0),
+m_previewWidth(DEF_PREVIEW_WIDTH),
+m_previewHeight(DEF_PREVIEW_HEIGHT)
 {
     m_isActive = false;
 
@@ -81,12 +83,11 @@ Preview::~Preview()
 {
 }
 
-
 /**
  * Sets the caller pointer 
  * @param DockItem* item
  */
-void Preview::setDockItem(DockItem* item)
+void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
 {
     m_previewtems.clear();
     for (DockItem* child : item->m_items) {
@@ -101,11 +102,24 @@ void Preview::setDockItem(DockItem* item)
 
         m_previewtems.push_back(newchild);
     }
-
+      
     m_currentIndex = 0;
+    int itemsize = m_previewtems.size() ;
+    m_initialItemMax = itemsize;
+          
+    m_previewWidth = DEF_PREVIEW_WIDTH;
+    m_previewHeight = DEF_PREVIEW_HEIGHT;
+       
+    DockPosition::getPreviewItemGeometry(itemsize,m_previewWidth,m_previewHeight );
+    width = m_previewWidth;
+    height = m_previewHeight;
+    windowWidth = (m_previewWidth * itemsize ) + 30;
+    
+    //g_print("windowWidth %d\n ",windowWidth);
+    
+    resize(windowWidth, m_previewHeight);
+    
     m_isActive = true;
-
-    m_initialItemMax = m_previewtems.size();
 }
 
 /**
@@ -175,11 +189,11 @@ int Preview::getIndex(int x, int y)
         if (item->m_window == NULL)
             continue;
 
-        if (x > col && x <= col + (DEF_PREVIEW_WIDTH + 10))
+        if (x > col && x <= col + (m_previewWidth + 10))
             return idx;
 
         idx++;
-        col += DEF_PREVIEW_WIDTH;
+        col += m_previewWidth;
     }
 
     return -1;
@@ -265,7 +279,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
             int ct = gtk_get_current_event_time();
 
             // Handle close preview window
-            int pos_x = (DEF_PREVIEW_WIDTH - 5) + (DEF_PREVIEW_WIDTH * m_currentIndex);
+            int pos_x = (m_previewWidth - 5) + (m_previewWidth * m_currentIndex);
             if (event->x >= pos_x && event->x <= pos_x + 14 && // FIXTHIS: use rectangle instead.
                     event->y >= 19 && event->y <= 19 + 14) {
 
@@ -279,7 +293,13 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                 return true;
             }
 
+//            if( wnck_window_is_active( item->m_window )){
+//                wnck_window_minimize(item->m_window);
+//                return true;
+//            }
+                
             wnck_window_activate(item->m_window, ct);
+            
             // The event has been handled.
             return true;
         }
@@ -300,6 +320,9 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
     if (m_currentIndex < 1)
         return true;
 
+   // DockItem* item = m_previewtems.at(m_currentIndex);
+   // wnck_window_activate(item->m_window, gtk_get_current_event_time());
+            
     return true;
 }
 
@@ -310,6 +333,7 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
+   
     if (!m_isActive)
         return Gtk::Window::on_draw(cr);
 
@@ -333,22 +357,32 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     int idx = 0;
 
     for (int i = 0; i < m_initialItemMax; i++) {
+//
+//        cr->set_line_width(1);
+//        cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
+//        Utilities::RoundedRectangle(cr, 14 + (m_previewWidth * i), 16, m_previewWidth + 1, m_previewHeight - 30, 2.0);
+//        cr->fill();
 
+        
         cr->set_line_width(1);
         cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
-        Utilities::RoundedRectangle(cr, 14 + (DEF_PREVIEW_WIDTH * i), 16, DEF_PREVIEW_WIDTH + 1, DEF_PREVIEW_HEIGHT - 30, 2.0);
-        cr->fill();
-
+        Utilities::RoundedRectangle(cr,
+                DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * i), 
+                16, m_previewWidth,
+                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING , 2.0);
+        
+         cr->stroke();
+         
 
     }
-    //return true;
+  
     for (DockItem* item : m_previewtems) {
         if (item->m_window == NULL || item->m_xid == 0 || !item->visible)
             continue;
 
-        int pos_x = 20 + (DEF_PREVIEW_WIDTH * idx);
+        int pos_x = 20 + (m_previewWidth * idx);
         int pos_y = 16;
-        int pos_width = DEF_PREVIEW_WIDTH - 14;
+        int pos_width = m_previewWidth - DEF_PREVIEW_LEFT_MARGING;
         int pos_height = 20;
 
         // draw title the clipping rectangle
@@ -366,14 +400,14 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
 
-
+        // selector
         if (m_currentIndex >= 0) {
 
             // rectangle background selector
-            pos_x = 14 + (DEF_PREVIEW_WIDTH * m_currentIndex);
+            pos_x = DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * m_currentIndex);
             pos_y = 16;
-            pos_width = DEF_PREVIEW_WIDTH + 1;
-            pos_height = DEF_PREVIEW_HEIGHT - 30;
+            pos_width = m_previewWidth + 1;
+            pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
             cr->set_line_width(2);
             cr->set_source_rgba(1.0, 1.0, 1.8, 0.1);
@@ -385,22 +419,24 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
             cr->stroke();
 
+            
             // Close rectangle
             cr->set_source_rgba(1.0, 1.0, 1.0, 1);
             cr->set_source_rgba(0.337, 0.612, 0.117, 1.0); // green
-            pos_x = (DEF_PREVIEW_WIDTH - 5) + (DEF_PREVIEW_WIDTH * m_currentIndex);
-            cr->rectangle(pos_x, 19, 14, 14);
+            pos_x = (m_previewWidth - 5) + (m_previewWidth * m_currentIndex);
+            cr->rectangle(pos_x, 18, DEF_PREVIEW_LEFT_MARGING, DEF_PREVIEW_LEFT_MARGING);
             cr->fill();
             cr->stroke();
 
             // Close X text
             cr->set_source_rgba(1.0, 1.0, 1.0, 1); //white
-            cr->move_to(pos_x + 3, 30);
+            cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING-1);
             cr->show_text("X");
-
+              
         }
+          
 
-
+        
         // get the preview for the window.
         GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
                 gdk_display_get_default(), item->m_xid);
@@ -415,27 +451,30 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 0, 0, boundingbox.width-10, boundingbox.height-24);
 
         // FIXME: Scale don't work well
-        int scale_heght = DEF_PREVIEW_PIXBUF_HEIGHT;
+        int height = m_previewHeight - DEF_PREVIEW_SCALE_HEIGHT_OFFSET;
+        int width = m_previewWidth - DEF_PREVIEW_SCALE_WIDTH_OFFSET;
+        int scale_heght = height;
+        
         int windowheight = gdk_window_get_height (wm_window);
         if( windowheight < 200){
 
-            scale_heght = DEF_PREVIEW_PIXBUF_HEIGHT/2;
+            scale_heght = height/2;
         }
                 
         GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
-                DEF_PREVIEW_PIXBUF_WIDTH,
+                width,
                 scale_heght,
                 GDK_INTERP_BILINEAR);
 
         Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
-        Gdk::Cairo::set_source_pixbuf(cr, preview, (DEF_PREVIEW_WIDTH * idx) +
+        Gdk::Cairo::set_source_pixbuf(cr, preview, (m_previewWidth * idx) +
                 20, DEF_PREVIEW_PIXBUF_TOP);
         cr->paint();
 
         // unreferenced release memory. 
         g_object_unref(scaledpb);
         g_object_unref(pb);
-
+        
         idx++;
     }
 

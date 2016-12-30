@@ -106,6 +106,7 @@ namespace Launcher
                 error = NULL;
             }
 
+            dictionary[desktopfile] = "";
             return "";
         }
 
@@ -119,6 +120,7 @@ namespace Launcher
                 g_error_free(error);
                 error = NULL;
             }
+            dictionary[desktopfile] = "";
             return "";
         }
 

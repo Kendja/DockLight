@@ -54,6 +54,7 @@ typedef enum StrutsPosition_t
     BottomEnd = 11
 } strutsPosition;
 
+#define DEF_ICONFILE    "docklight.ico"
 
 #define DEF_CELLWIDTH 58                    // Cell Width
 #define DEF_CELLHIGHT 62                    // Cell Height
@@ -68,16 +69,14 @@ typedef enum StrutsPosition_t
 
 
 #define DEF_PANELHIGHT 72 
-
-
-//#define DEF_OFFSE_TOP 10
-
-#define DEF_PREVIEW_WIDTH 220           // the preview popup window width
-#define DEF_PREVIEW_HEIGHT 200          // the preview popup window height
-#define DEF_PREVIEW_PIXBUF_WIDTH 210    // the image pixbuf width
-#define DEF_PREVIEW_PIXBUF_HEIGHT 140   // the image pixbuf height
+#define DEF_PREVIEW_WIDTH 220               // the preview popup window width
+#define DEF_PREVIEW_HEIGHT 200              // the preview popup window height
+#define DEF_PREVIEW_LEFT_MARGING 14         // the preview left marging 
+#define DEF_PREVIEW_RIGHT_MARGING 30        // the preview right marging 
+#define DEF_PREVIEW_SCALE_WIDTH_OFFSET  12  // the offset for the scale method
+#define DEF_PREVIEW_SCALE_HEIGHT_OFFSET 54  // the offset for the scale method
 #define DEF_PREVIEW_PIXBUF_TOP 36       // the image pixbuf top
-#define DEF_UTF8MAX  512                // the max buff used by g_utf8_strncpy   
+
 
 #endif /* DEFINES_H */
 

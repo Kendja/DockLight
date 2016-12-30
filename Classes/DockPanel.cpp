@@ -66,8 +66,10 @@ m_applicationpath(Utilities::getExecPath())
 
 
 }
+
 /**
- * preInit load the attached icons and initializes variables.
+ * preInit load the attached icons and initializes variables, 
+ * and create the popup menus
  * @param Gtk::Window*  window
  * @return return 0 is success or -1 is an error found
  */
@@ -75,7 +77,7 @@ int DockPanel::preInit(Gtk::Window* window)
 {
     m_AppWindow = window;
 
-    std::string filename = Utilities::getExecPath("home.ico");
+    std::string filename = Utilities::getExecPath(DEF_ICONFILE);
     gboolean isexists = g_file_test(filename.c_str(), G_FILE_TEST_EXISTS);
     if (!isexists) {
         g_critical("init: home.ico could not be found!\n");
@@ -84,7 +86,7 @@ int DockPanel::preInit(Gtk::Window* window)
 
     // assumes that the home.ico exists.
     DockItem* dockItem = new DockItem();
-    dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath("home.ico").c_str(),
+    dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONFILE).c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
 
     dockItem->m_appname = "Home";
@@ -96,7 +98,7 @@ int DockPanel::preInit(Gtk::Window* window)
 
     loadAttachedItems();
 
-    
+
     // Menus
     // Home Menu items
     m_CloseAllWindowsMenuItem.set_label("Close all Windows");
@@ -177,6 +179,7 @@ void DockPanel::postInit()
             G_CALLBACK(DockPanel::on_active_window_changed_callback), NULL);
 
 }
+
 DockPanel::~DockPanel()
 {
 
@@ -355,10 +358,8 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     }
 
     if (m_mouseRightButtonDown) {
-        // m_preview->m_mouseIn = true;
-        //m_preview->hideMe();
-
-
+      
+        m_preview.hideMe();
         m_mouseRightClick = true;
         m_mouseRightButtonDown = false;
 
@@ -912,8 +913,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         m_cellheight = DEF_CELLHIGHT - substractpixels;
         m_previousCellwidth = m_cellwidth;
 
-        MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels ) ;
-        
+        MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels);
+
         g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
     }
 
@@ -954,8 +955,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                         m_titlewindow.getCurrentWidth()
                         );
 
-                m_titlewindow.move(centerpos,MonitorGeometry::getAppWindowTopPosition()-30);
-                
+                m_titlewindow.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - 30);
+
                 //g_print("SHOW%d\n", (int) m_currentMoveIndex);
                 m_titleShow = true;
 
@@ -1059,27 +1060,29 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (m_dockitems.at(index)->m_window == NULL)
         return;
 
-    // calculate the preview position and resize the window. 
-    int width = (DEF_PREVIEW_WIDTH * dockitem->m_items.size() - 1) + 30;
-    m_preview.resize(width, DEF_PREVIEW_HEIGHT);
-    int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
-            m_dockitems.size(), index, width);
 
-    int maxwidth = centerpos + (dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
-    maxwidth -= MonitorGeometry::getGeometry().x ;
+    int previewWidth = 0;
+    int previewHeight = 0;
+    int previewWindowWidth = 0;
+
+    
+    m_preview.init(dockitem, previewWidth, previewHeight, previewWindowWidth);
+
+    // calculate the preview position. 
+    int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
+            m_dockitems.size(), index, previewWindowWidth);
+
+    int maxwidth = centerpos + previewWindowWidth; //(dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
+    maxwidth -= MonitorGeometry::getGeometry().x;
 
     if (maxwidth >= MonitorGeometry::getGeometry().width)
-        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) + 30;
+        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) ;
 
     // Debug
-    g_print("max %d %d\n", maxwidth,MonitorGeometry::getGeometry().width);
-
-
+   // g_print("previewWindowWidth %d max %d %d\n", previewWindowWidth, maxwidth,MonitorGeometry::getGeometry().width);
     m_previewWindowActive = true;
-    m_preview.setDockItem(dockitem);
     m_preview.show_now();
-    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - ( DEF_PREVIEW_HEIGHT));
-           
+    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight );
 
 }
 
