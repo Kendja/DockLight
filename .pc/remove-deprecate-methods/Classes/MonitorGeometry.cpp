@@ -2,7 +2,7 @@
 #include "Defines.h"
 #include "AppWindow.h"
 
-// use deprecate MonitorGeometry methods for compatibility with older gtk-3 versions. 
+// use deprecate methods for compatibility with older gtk-3 versions. 
 #define GTKDEPRECATED 1
 
 namespace MonitorGeometry

@@ -1,0 +1,43 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ docklight-1.0 (1-1) unstable; urgency=medium
+ .
+   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+Author: yoo <yoo@unknown>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: 2017-01-01
+
+--- docklight-1.0-1.orig/Classes/MonitorGeometry.cpp
++++ docklight-1.0-1/Classes/MonitorGeometry.cpp
+@@ -3,7 +3,7 @@
+ #include "AppWindow.h"
+ 
+ // use deprecate methods for compatibility with older gtk-3 versions. 
+-#define GTKDEPRECATED 1
++//#define GTKDEPRECATED 1
+ 
+ namespace MonitorGeometry
+ {
+@@ -177,4 +177,4 @@ namespace MonitorGeometry
+ 
+         return 0;
+     }
+-}
+\ No newline at end of file
++}

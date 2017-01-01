@@ -10,4 +10,4 @@ Priority: extra
 Homepage: <insert the upstream URL, if relevant>
 Description: Debug symbols for docklight-1.0
 Auto-Built-Package: debug-symbols
-Build-Ids: 62e59a0d7f924836d09d7bbef48ad9c7210ac87e
+Build-Ids: bfc8b8a07635653856f5dcf9e915440c6c61e054

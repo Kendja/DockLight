@@ -1,0 +1,193 @@
+Description: <short summary of the patch>
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ docklight-1.0 (1-1) unstable; urgency=medium
+ .
+   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+Author: yoo <yoo@unknown>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: 2017-01-01
+
+--- docklight-1.0-1.orig/Classes/Defines.h
++++ docklight-1.0-1/Classes/Defines.h
+@@ -68,7 +68,7 @@ typedef enum StrutsPosition_t
+ 
+ 
+ 
+-#define DEF_PANELHIGHT 72 
++#define DEF_PANELHIGHT 72                   // the default panel height
+ #define DEF_PREVIEW_WIDTH 220               // the preview popup window width
+ #define DEF_PREVIEW_HEIGHT 200              // the preview popup window height
+ #define DEF_PREVIEW_LEFT_MARGING 14         // the preview left marging 
+--- docklight-1.0-1.orig/Classes/DockPanel.cpp
++++ docklight-1.0-1/Classes/DockPanel.cpp
+@@ -1074,11 +1074,19 @@ void DockPanel::SelectWindow(int index,
+     int maxwidth = centerpos + previewWindowWidth; //(dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
+     maxwidth -= MonitorGeometry::getGeometry().x;
+ 
+-    if (maxwidth >= MonitorGeometry::getGeometry().width)
++    if (maxwidth >= MonitorGeometry::getGeometry().width){
+         centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) ;
+-
++    }
++    
++    int leftpos = (centerpos - (itemscount/2)) - MonitorGeometry::getGeometry().x;
++    if( leftpos < 0 ) {
++        centerpos+=abs(leftpos);
++       // centerpos = (MonitorGeometry::getGeometry().width+ MonitorGeometry::getGeometry().x )/2;
++    }
++    //if( centerpos < MonitorGeometry::getGeometry().x)
++        
+     // Debug
+-   // g_print("previewWindowWidth %d max %d %d\n", previewWindowWidth, maxwidth,MonitorGeometry::getGeometry().width);
++    g_print("previewWindowWidth %d max %d %d Left: %d\n", previewWindowWidth, maxwidth,MonitorGeometry::getGeometry().width,leftpos);
+     m_previewWindowActive = true;
+     m_preview.show_now();
+     m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight );
+--- docklight-1.0-1.orig/Classes/MonitorGeometry.cpp
++++ docklight-1.0-1/Classes/MonitorGeometry.cpp
+@@ -3,7 +3,7 @@
+ #include "AppWindow.h"
+ 
+ // use deprecate methods for compatibility with older gtk-3 versions. 
+-#define GTKDEPRECATED 1
++//#define GTKDEPRECATED 1
+ 
+ namespace MonitorGeometry
+ {
+@@ -130,7 +130,7 @@ namespace MonitorGeometry
+ 
+     int updateStrut(Gtk::Window* window, int height)
+     {
+-
++        g_print("updateStrut %d Position: %d  \n",height,Gdk::screen_height() - height);
+         if (window == NULL) {
+             g_critical(" updateStrut::update: window is null.");
+             return -1;
+--- docklight-1.0-1.orig/Classes/Preview.cpp
++++ docklight-1.0-1/Classes/Preview.cpp
+@@ -113,7 +113,7 @@ void Preview::init(DockItem* item, int &
+     DockPosition::getPreviewItemGeometry(itemsize,m_previewWidth,m_previewHeight );
+     width = m_previewWidth;
+     height = m_previewHeight;
+-    windowWidth = (m_previewWidth * itemsize ) + 30;
++    windowWidth = (m_previewWidth * itemsize ) + DEF_PREVIEW_RIGHT_MARGING;
+     
+     //g_print("windowWidth %d\n ",windowWidth);
+     
+--- docklight-1.0-1.orig/nbproject/private/configurations.xml
++++ docklight-1.0-1/nbproject/private/configurations.xml
+@@ -34,6 +34,44 @@
+         <in>XPreview.h</in>
+       </df>
+       <df name="debian">
++        <df name=".debhelper">
++          <df name="docklight-1.0">
++            <df name="dbgsym-root">
++              <df name="DEBIAN">
++              </df>
++              <df name="usr">
++                <df name="lib">
++                  <df name="debug">
++                    <df name=".build-id">
++                      <df name="62">
++                      </df>
++                    </df>
++                  </df>
++                </df>
++                <df name="share">
++                  <df name="doc">
++                  </df>
++                </df>
++              </df>
++            </df>
++          </df>
++        </df>
++        <df name="docklight-1.0">
++          <df name="DEBIAN">
++          </df>
++          <df name="usr">
++            <df name="share">
++              <df name="applications">
++              </df>
++              <df name="doc">
++                <df name="docklight-1.0">
++                </df>
++              </df>
++              <df name="DockLight">
++              </df>
++            </df>
++          </df>
++        </df>
+         <df name="source">
+         </df>
+       </df>
+@@ -96,13 +134,13 @@
+       </toolsSet>
+       <compile>
+         <compiledirpicklist>
+-          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+           <compiledirpicklistitem>.</compiledirpicklistitem>
++          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+         </compiledirpicklist>
+         <compiledir>${AUTO_FOLDER}</compiledir>
+         <compilecommandpicklist>
+-          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+           <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
++          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+         </compilecommandpicklist>
+         <compilecommand>${AUTO_COMPILE}</compilecommand>
+       </compile>
+@@ -112,8 +150,6 @@
+         <gdb_interceptlist>
+           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+         </gdb_interceptlist>
+-        <gdb_signals>
+-        </gdb_signals>
+         <gdb_options>
+           <DebugOptions>
+           </DebugOptions>
+--- docklight-1.0-1.orig/nbproject/private/docklight.properties
++++ docklight-1.0-1/nbproject/private/docklight.properties
+@@ -1,11 +1 @@
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/proj.linux/main.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c proj.linux/main.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/IconLoader.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/IconLoader.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/TitleWindow.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/TitleWindow.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/DockPosition.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/DockPosition.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/Launcher.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/Launcher.cpp
+ /home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/MonitorGeometry.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/MonitorGeometry.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/DockPanel.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/DockPanel.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/Utilities.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/Utilities.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/AppWindow.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/AppWindow.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/DockItem.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/DockItem.cpp
+-/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/Preview.cpp=/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1#-IClasses -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk -g -Wall -Wno-reorder -std=c++11 -pthread -I/usr/include/gtkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gtkmm-3.0/include -I/usr/include/atkmm-1.6 -I/usr/include/gtk-3.0/unix-print -I/usr/include/gdkmm-3.0 -I/usr/lib/x86_64-linux-gnu/gdkmm-3.0/include -I/usr/include/giomm-2.4 -I/usr/lib/x86_64-linux-gnu/giomm-2.4/include -I/usr/include/pangomm-1.4 -I/usr/lib/x86_64-linux-gnu/pangomm-1.4/include -I/usr/include/glibmm-2.4 -I/usr/lib/x86_64-linux-gnu/glibmm-2.4/include -I/usr/include/cairomm-1.0 -I/usr/lib/x86_64-linux-gnu/cairomm-1.0/include -I/usr/include/sigc++-2.0 -I/usr/lib/x86_64-linux-gnu/sigc++-2.0/include -I/usr/include/libwnck-3.0 -I/usr/include/startup-notification-1.0 -I/usr/include/gtk-3.0 -I/usr/include/at-spi2-atk/2.0 -I/usr/include/at-spi-2.0 -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include -I/usr/include/gtk-3.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/libpng16 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -c Classes/Preview.cpp
+--- docklight-1.0-1.orig/nbproject/private/private.xml
++++ docklight-1.0-1/nbproject/private/private.xml
+@@ -9,11 +9,6 @@
+     </data>
+     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+-        <group>
+-            <file>file:/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/DockPanel.h</file>
+-            <file>file:/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/proj.linux/main.cpp</file>
+-            <file>file:/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Makefile</file>
+-            <file>file:/home/yoo/Develop/DockLightDev/sources/docklight-1.0-1/Classes/DockPanel.cpp</file>
+-        </group>
++        <group/>
+     </open-files>
+ </project-private>
