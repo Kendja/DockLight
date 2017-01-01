@@ -25,9 +25,7 @@
 #include "IconLoader.h"
 #include "DockPosition.h"
 
-
-
-//static members
+// static members
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
 bool DockPanel::m_previewWindowActive;
@@ -44,7 +42,8 @@ m_cellwidth(DEF_CELLWIDTH),
 m_previousCellwidth(DEF_CELLWIDTH),
 m_iconsize(DEF_ICONSIZE),
 m_cellheight(DEF_CELLHIGHT),
-m_applicationpath(Utilities::getExecPath())
+m_applicationpath(Utilities::getExecPath()),
+m_applicationDatapath(m_applicationpath+"/data")
 {
 
     m_currentMoveIndex = -1;
@@ -475,7 +474,7 @@ void DockPanel::on_AttachToDock_event()
     char filename[PATH_MAX];
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
-    sprintf(filename, "%s/%s.png", m_applicationpath.c_str(), s.c_str());
+    sprintf(filename, "%s/%s.png", m_applicationDatapath.c_str(), s.c_str());
 
     dockitem->m_image->save(filename, "png");
 
@@ -501,9 +500,9 @@ void DockPanel::on_DetachFromDock_event()
 
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
-    sprintf(filename, "%s//%s.png", m_applicationpath.c_str(), s.c_str());
+    sprintf(filename, "%s//%s.png", m_applicationDatapath.c_str(), s.c_str());
 
-    g_print(" Remove path %s n", m_applicationpath.c_str());
+    g_print(" Remove path %s n", m_applicationDatapath.c_str());
 
     if (remove(filename) != 0) {
         g_print("\non_UnPin_event. ERROR remove file. ");
@@ -1075,11 +1074,19 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     int maxwidth = centerpos + previewWindowWidth; //(dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
     maxwidth -= MonitorGeometry::getGeometry().x;
 
-    if (maxwidth >= MonitorGeometry::getGeometry().width)
+    if (maxwidth >= MonitorGeometry::getGeometry().width){
         centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) ;
-
+    }
+    
+    int leftpos = (centerpos - (itemscount/2)) - MonitorGeometry::getGeometry().x;
+    if( leftpos < 0 ) {
+        centerpos+=abs(leftpos);
+       // centerpos = (MonitorGeometry::getGeometry().width+ MonitorGeometry::getGeometry().x )/2;
+    }
+    //if( centerpos < MonitorGeometry::getGeometry().x)
+        
     // Debug
-   // g_print("previewWindowWidth %d max %d %d\n", previewWindowWidth, maxwidth,MonitorGeometry::getGeometry().width);
+    g_print("previewWindowWidth %d max %d %d Left: %d\n", previewWindowWidth, maxwidth,MonitorGeometry::getGeometry().width,leftpos);
     m_previewWindowActive = true;
     m_preview.show_now();
     m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight );
@@ -1111,7 +1118,8 @@ bool DockPanel::isExitstMaximizedWindows()
 
 void DockPanel::loadAttachedItems()
 {
-    DIR* dirFile = opendir(m_applicationpath.c_str());
+     
+    DIR* dirFile = opendir(m_applicationDatapath.c_str());
     struct dirent* hFile;
     errno = 0;
     while ((hFile = readdir(dirFile)) != NULL) {
@@ -1122,7 +1130,7 @@ void DockPanel::loadAttachedItems()
         if (strstr(hFile->d_name, ".png")) {
 
             std::string filename = hFile->d_name;
-            std::string imageFilePath = std::string(m_applicationpath) +
+            std::string imageFilePath = std::string(m_applicationDatapath) +
                     std::string("/") + filename;
 
             g_print("found an .png file: %s\n", imageFilePath.c_str());

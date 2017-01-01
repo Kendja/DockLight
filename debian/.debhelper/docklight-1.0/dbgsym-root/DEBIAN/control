@@ -1,0 +1,13 @@
+Package: docklight-1.0-dbgsym
+Source: docklight-1.0
+Version: 1-1
+Architecture: amd64
+Maintainer: Juan Gonzalez <j-gonzalez@email.de>
+Installed-Size: 785
+Depends: docklight-1.0 (= 1-1)
+Section: debug
+Priority: extra
+Homepage: <insert the upstream URL, if relevant>
+Description: Debug symbols for docklight-1.0
+Auto-Built-Package: debug-symbols
+Build-Ids: 62e59a0d7f924836d09d7bbef48ad9c7210ac87e

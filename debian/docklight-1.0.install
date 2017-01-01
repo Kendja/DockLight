@@ -1,0 +1,3 @@
+bin/docklight usr/share/DockLight
+bin/docklight.ico usr/share/DockLight
+debian/docklight.desktop usr/share/applications/

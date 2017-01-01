@@ -1,3 +1,11 @@
+prefix = /usr/local
+bindir = $(prefix)/bin
+sharedir = $(prefix)/share
+mandir = $(sharedir)/man
+man1dir = $(mandir)/man1
+
+
+
 CC = g++
 LDFLAGS =   -static-libstdc++ -lX11  -lxcb  `pkg-config  --cflags --libs gtkmm-3.0 libwnck-3.0 `
 CPPFLAGS =  -g -Wall -Wno-reorder -std=c++11 `pkg-config  --cflags gtkmm-3.0 libwnck-3.0`
@@ -7,7 +15,7 @@ CPPFLAGS =  -g -Wall -Wno-reorder -std=c++11 `pkg-config  --cflags gtkmm-3.0 lib
 #-DDEBUG=1
 
 APPNAME = docklight
-BINDIR = bin
+OUTPUTDIR = bin
 
 # Macro that uses the backslash to extend to multiple lines.
 OBJS =  \
@@ -28,10 +36,11 @@ OBJS =  \
 INCLUDE = Classes -I/usr/include/libwnck-3.0 -I/usr/include/gtk-3.0/gtk 
 
 all:	$(OBJS)
-	$(CC) $(CPPFLAGS) -o$(BINDIR)/$(APPNAME) $(OBJS) $(LDFLAGS) 
+	$(CC) $(CPPFLAGS) -o$(OUTPUTDIR)/$(APPNAME) $(OBJS) $(LDFLAGS) 
 clean:  
 	rm -f *.o
 	rm -f Classes/*.o
+	rm -f $(OUTPUTDIR)/$(APPNAME)
 
 main.o: proj.linux/main.cpp 
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c proj.linux/main.cpp

@@ -74,6 +74,8 @@ private:
 
 
     std::string m_applicationpath;
+    std::string m_applicationDatapath;
+    
     sigc::connection m_TimeoutConnection;
 
     double m_last_time;
