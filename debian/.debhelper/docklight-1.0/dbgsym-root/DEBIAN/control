@@ -10,4 +10,4 @@ Priority: extra
 Homepage: https://github.com/yoosamui/DockLight
 Description: Debug symbols for docklight-1.0
 Auto-Built-Package: debug-symbols
-Build-Ids: 46def395bebe7b856664bf901c806a3ab50833c9
+Build-Ids: 92e78ebe4b996c52b1510711db6288586202902b

@@ -44,8 +44,13 @@ namespace DockPosition
     bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize)
     {
         // avoid 0 division 
-        if( dockitemscount < 3 )
+        if( dockitemscount < 3 ) {
+            
+            m_cellwidth = cellsize = DEF_CELLWIDTH;
+            iconsize = DEF_ICONSIZE;
+            
             return false;
+        }
         
         int maxize = (dockitemscount + 2) * DEF_CELLWIDTH;
         int diff = maxize - MonitorGeometry::getGeometry().width;
