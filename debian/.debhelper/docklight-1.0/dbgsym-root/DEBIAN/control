@@ -1,0 +1,13 @@
+Package: docklight-1.0-dbgsym
+Source: docklight-1.0
+Version: 1-1
+Architecture: amd64
+Maintainer: Juan Gonzalez <j-gonzalez@email.de>
+Installed-Size: 785
+Depends: docklight-1.0 (= 1-1)
+Section: debug
+Priority: extra
+Homepage: https://github.com/yoosamui/DockLight
+Description: Debug symbols for docklight-1.0
+Auto-Built-Package: debug-symbols
+Build-Ids: 46def395bebe7b856664bf901c806a3ab50833c9
