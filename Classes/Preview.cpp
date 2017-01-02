@@ -113,7 +113,7 @@ void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
     DockPosition::getPreviewItemGeometry(itemsize,m_previewWidth,m_previewHeight );
     width = m_previewWidth;
     height = m_previewHeight;
-    windowWidth = (m_previewWidth * itemsize ) + DEF_PREVIEW_RIGHT_MARGING;
+    windowWidth = (m_previewWidth * itemsize ) + 30;
     
     //g_print("windowWidth %d\n ",windowWidth);
     

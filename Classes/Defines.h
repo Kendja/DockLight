@@ -59,8 +59,8 @@ typedef enum StrutsPosition_t
 #define DEF_CELLWIDTH 58                    // Cell Width
 #define DEF_CELLHIGHT 62                    // Cell Height
 #define DEF_CELLTOPMARGIN 6                 // Cell Top Position
-
 #define DEF_ICONSIZE 48                     // Icon Size Width and height
+#define DEF_MINCONSIZE 20                  // Minimun Icon Size allowed
 #define DEF_ICONTOPMARGIN 10                // Icon top Margin from panel
 
 // Icon top Margin from the cell
@@ -68,9 +68,10 @@ typedef enum StrutsPosition_t
 
 
 
-#define DEF_PANELHIGHT 72                   // the default panel height
+#define DEF_PANELHIGHT 72 
 #define DEF_PREVIEW_WIDTH 220               // the preview popup window width
 #define DEF_PREVIEW_HEIGHT 200              // the preview popup window height
+#define DEF_PREVIEW_MINHEIGHT 112           // the minimun preview height
 #define DEF_PREVIEW_LEFT_MARGING 14         // the preview left marging 
 #define DEF_PREVIEW_RIGHT_MARGING 30        // the preview right marging 
 #define DEF_PREVIEW_SCALE_WIDTH_OFFSET  12  // the offset for the scale method

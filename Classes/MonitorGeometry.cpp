@@ -2,7 +2,7 @@
 #include "Defines.h"
 #include "AppWindow.h"
 
-// use deprecate MonitorGeometry methods for compatibility with older gtk-3 versions. 
+// use deprecate methods for compatibility with older gtk-3 versions. 
 #define GTKDEPRECATED 1
 
 namespace MonitorGeometry
@@ -130,7 +130,7 @@ namespace MonitorGeometry
 
     int updateStrut(Gtk::Window* window, int height)
     {
-        g_print("updateStrut %d Position: %d  \n",height,Gdk::screen_height() - height);
+
         if (window == NULL) {
             g_critical(" updateStrut::update: window is null.");
             return -1;

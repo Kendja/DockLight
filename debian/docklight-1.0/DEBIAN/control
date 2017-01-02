@@ -6,6 +6,6 @@ Installed-Size: 1419
 Depends: libwnck-3-common, libwnck-3-dev, libc6-dev, libgtkmm-3.0-dev (>= 3.0)
 Section: Utility
 Priority: optional
-Homepage: <insert the upstream URL, if relevant>
+Homepage: https://github.com/yoosamui/DockLight
 Description: this programm shows a simple Dock Panel with window preview.
  Docklight is an easy Linux gnome dock application for opening common applications.

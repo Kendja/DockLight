@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Juan Gonzalez <j-gonzalez@email.de>
 Build-Depends: debhelper (>= 9), autotools-dev
 Standards-Version: 3.9.8
-Homepage: <insert the upstream URL, if relevant>
+Homepage: https://github.com/yoosamui/DockLight
 #Vcs-Git: https://anonscm.debian.org/collab-maint/docklight-1.0.git
 #Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/docklight-1.0.git
 

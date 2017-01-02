@@ -39,11 +39,11 @@ m_mouseRightClick(FALSE),
 m_mouseLeftButtonDown(FALSE),
 m_mouseRightButtonDown(FALSE),
 m_cellwidth(DEF_CELLWIDTH),
-m_previousCellwidth(DEF_CELLWIDTH),
 m_iconsize(DEF_ICONSIZE),
+m_previousCellwidth(DEF_CELLWIDTH),
 m_cellheight(DEF_CELLHIGHT),
 m_applicationpath(Utilities::getExecPath()),
-m_applicationDatapath(m_applicationpath+"/data")
+m_applicationDatapath(m_applicationpath + "/data")
 {
 
     m_currentMoveIndex = -1;
@@ -79,11 +79,11 @@ int DockPanel::preInit(Gtk::Window* window)
     std::string filename = Utilities::getExecPath(DEF_ICONFILE);
     gboolean isexists = g_file_test(filename.c_str(), G_FILE_TEST_EXISTS);
     if (!isexists) {
-        g_critical("init: home.ico could not be found!\n");
+        g_critical("init: docklight.ico could not be found!\n");
         return -1;
     }
 
-    // assumes that the home.ico exists.
+    // assumes that the docklight.ico exists.
     DockItem* dockItem = new DockItem();
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONFILE).c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
@@ -357,7 +357,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     }
 
     if (m_mouseRightButtonDown) {
-      
+
         m_preview.hideMe();
         m_mouseRightClick = true;
         m_mouseRightButtonDown = false;
@@ -731,6 +731,16 @@ void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
 void DockPanel::Update(WnckWindow* window, Window_action actiontype)
 {
 
+    int cw;
+    int iw;
+    DockPosition::getDockItemGeometry(m_dockitems.size() + 1, cw, iw);
+
+    if (iw < DEF_MINCONSIZE) {
+        g_warning("there are to many dock Items. Please close some windows and try again.");
+        return;
+    }
+
+
     WnckWindowType wt = wnck_window_get_window_type(window);
 
     if (wt == WNCK_WINDOW_DESKTOP ||
@@ -903,6 +913,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_cellwidth == DEF_CELLWIDTH)
         m_cellheight = DEF_CELLHIGHT;
 
+    //g_print("m_iconsize %d\n", m_iconsize);
+
     // compute the cell height if need to resized
     if ((resizeNeeded && m_previousCellwidth != m_cellwidth)) {
 
@@ -1064,8 +1076,12 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     int previewHeight = 0;
     int previewWindowWidth = 0;
 
-    
     m_preview.init(dockitem, previewWidth, previewHeight, previewWindowWidth);
+
+    if (previewHeight < DEF_PREVIEW_MINHEIGHT) {
+        g_warning("there are to many windows open. A window Preview is no possible. Close some widows and try again.");
+        return;
+    }
 
     // calculate the preview position. 
     int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
@@ -1074,22 +1090,14 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     int maxwidth = centerpos + previewWindowWidth; //(dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
     maxwidth -= MonitorGeometry::getGeometry().x;
 
-    if (maxwidth >= MonitorGeometry::getGeometry().width){
-        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width) ;
-    }
-    
-    int leftpos = (centerpos - (itemscount/2)) - MonitorGeometry::getGeometry().x;
-    if( leftpos < 0 ) {
-        centerpos+=abs(leftpos);
-       // centerpos = (MonitorGeometry::getGeometry().width+ MonitorGeometry::getGeometry().x )/2;
-    }
-    //if( centerpos < MonitorGeometry::getGeometry().x)
-        
+    if (maxwidth >= MonitorGeometry::getGeometry().width)
+        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width);
+
     // Debug
-    g_print("previewWindowWidth %d max %d %d Left: %d\n", previewWindowWidth, maxwidth,MonitorGeometry::getGeometry().width,leftpos);
+    g_print("previewWindowWidth %d max %d %d previewHeight: %d\n", previewWindowWidth, maxwidth, MonitorGeometry::getGeometry().width, previewHeight);
     m_previewWindowActive = true;
     m_preview.show_now();
-    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight );
+    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);
 
 }
 
@@ -1118,7 +1126,7 @@ bool DockPanel::isExitstMaximizedWindows()
 
 void DockPanel::loadAttachedItems()
 {
-     
+
     DIR* dirFile = opendir(m_applicationDatapath.c_str());
     struct dirent* hFile;
     errno = 0;
@@ -1133,7 +1141,7 @@ void DockPanel::loadAttachedItems()
             std::string imageFilePath = std::string(m_applicationDatapath) +
                     std::string("/") + filename;
 
-            g_print("found an .png file: %s\n", imageFilePath.c_str());
+            //g_print("found an .png file: %s\n", imageFilePath.c_str());
 
             std::vector<std::string> tokens = Utilities::split(filename, '_');
             std::size_t found = filename.find_last_of(".");
