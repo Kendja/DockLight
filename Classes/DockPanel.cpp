@@ -1093,6 +1093,12 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (maxwidth >= MonitorGeometry::getGeometry().width)
         centerpos -= (maxwidth - MonitorGeometry::getGeometry().width);
 
+    int leftpos = (centerpos - (itemscount / 2)) - MonitorGeometry::getGeometry().x;
+    if (leftpos < 0) {
+        centerpos += abs(leftpos);
+    }
+
+
     // Debug
     g_print("previewWindowWidth %d max %d %d previewHeight: %d\n", previewWindowWidth, maxwidth, MonitorGeometry::getGeometry().width, previewHeight);
     m_previewWindowActive = true;
