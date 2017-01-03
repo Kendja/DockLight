@@ -31,7 +31,7 @@ namespace DockPosition
     int m_previewWidth = DEF_PREVIEW_WIDTH;
     int m_previewHeight = DEF_PREVIEW_HEIGHT;
 
-    int m_autoHide = false;
+    bool m_autoHide = false;
     bool m_visible = false;
     
     bool isAutoHide()

@@ -73,7 +73,7 @@ m_applicationDatapath(m_applicationpath + "/data")
  * @param Gtk::Window*  window
  * @return return 0 is success or -1 is an error found
  */
-int DockPanel::preInit(Gtk::Window* window)
+int DockPanel::preInit(Gtk::Window* window, bool autohide)
 {
     m_AppWindow = window;
 
@@ -102,7 +102,7 @@ int DockPanel::preInit(Gtk::Window* window)
     // Menus
     // Home Menu items
     m_AutohideMenuItem.set_label("Autohide");
-    m_AutohideMenuItem.set_active(true);
+    m_AutohideMenuItem.set_active(autohide);
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
     

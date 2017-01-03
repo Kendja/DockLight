@@ -20,6 +20,8 @@
 //****************************************************************
 #include <gtkmm/application.h>
 #include "AppWindow.h"
+#include <sstream>
+#include "Utilities.h"
 
 /**
  * The Entry Point.
@@ -31,9 +33,36 @@ int main(int argc, char *argv[])
 {
     Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
-    
+
     AppWindow win;
-    int r = win.Init(panel_locationType::BOTTOM);
+    int autohide = 0;
+
+    std::string filepath = Utilities::getExecPath("docklight.config");
+    GError *error = NULL;
+    GKeyFile *key_file = g_key_file_new();
+
+    gboolean found = g_key_file_load_from_file(key_file,
+            filepath.c_str(), GKeyFileFlags::G_KEY_FILE_NONE, &error);
+
+    if (found) {
+        // read the Autohide Entry 
+        found = g_key_file_get_boolean(key_file, "DockLight", "Autohide", &error);
+        autohide = (int)found;
+        if (error) {
+            g_warning("Autohide Entry not found. %s\n", error->message);
+            g_error_free(error);
+            error = NULL;
+        }
+    } else {
+        g_warning("docklight config  file not found.\n");
+        if (error) {
+            g_error_free(error);
+            error = NULL;
+        }
+    }
+
+
+    int r = win.Init(panel_locationType::BOTTOM, autohide);
     if (r != 0) {
         exit(r);
     }

@@ -23,6 +23,7 @@
 
 #include "Defines.h"
 
+
 namespace DockPosition
 {
     int getCenterPosByCurrentDockItemIndex(int dockitemscount, 

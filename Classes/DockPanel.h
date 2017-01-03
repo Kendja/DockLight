@@ -50,7 +50,7 @@ class DockPanel : public Gtk::DrawingArea
 public:
 
     DockPanel();
-    int preInit(Gtk::Window* window);
+    int preInit(Gtk::Window* window,bool autohide);
     void postInit();
 
     virtual ~DockPanel();
