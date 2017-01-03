@@ -42,6 +42,7 @@ m_cellwidth(DEF_CELLWIDTH),
 m_iconsize(DEF_ICONSIZE),
 m_previousCellwidth(DEF_CELLWIDTH),
 m_cellheight(DEF_CELLHIGHT),
+m_popupMenuOn(false),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/data")
 {
@@ -100,18 +101,37 @@ int DockPanel::preInit(Gtk::Window* window)
 
     // Menus
     // Home Menu items
+    m_AutohideMenuItem.set_label("Autohide");
+    m_AutohideMenuItem.set_active(true);
+    m_AutohideMenuItem.signal_toggled().
+            connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
+    
+    m_CloseAllWindowsMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllWindows_event));
+    
+    
+    
+            
     m_CloseAllWindowsMenuItem.set_label("Close all Windows");
     m_CloseAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllWindows_event));
-    m_HomeMenu_Popup.append(m_CloseAllWindowsMenuItem);
 
+    m_HomeMenu_Popup.append(m_AutohideMenuItem);
+    m_HomeMenu_Popup.append(m_separatorMenuItem0);
+    m_HomeMenu_Popup.append(m_CloseAllWindowsMenuItem);
     m_HomeMenu_Popup.append(m_separatorMenuItem1);
+
+    m_HomeMenu_Popup.signal_deactivate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_MenuDeactivated_event));
+
+    // m_HomeMenu_Popup.signal_enter_notify_event().
+    //        connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
+
 
     m_QuitMenuItem.set_label("Quit");
     m_QuitMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
     m_HomeMenu_Popup.append(m_QuitMenuItem);
-
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
 
@@ -147,6 +167,8 @@ int DockPanel::preInit(Gtk::Window* window)
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAll_event));
     m_Menu_Popup.append(m_MenuItemCloseAll);
 
+    m_Menu_Popup.signal_deactivate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_MenuDeactivated_event));
 
     m_Menu_Popup.show_all();
     m_Menu_Popup.accelerate(*this);
@@ -160,6 +182,7 @@ int DockPanel::preInit(Gtk::Window* window)
  */
 void DockPanel::postInit()
 {
+
     m_fpstimer.start();
     // m_titleTimer.start();
 
@@ -217,6 +240,7 @@ int DockPanel::getIndex(int x, int y)
             continue;
 
         if (mouse.get_x() >= col && mouse.get_x() <= col + m_cellwidth) {
+
             return idx;
         }
 
@@ -237,7 +261,9 @@ int DockPanel::getIndex(int x, int y)
  */
 bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
 {
+    m_popupMenuOn = false;
     m_mouseIn = true;
+
     return true;
 }
 
@@ -267,6 +293,7 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
         WnckWindow *window = wnck_screen_get_active_window(wnckscreen);
         if (window == NULL) {
             m_currentMoveIndex = -1;
+
             return true;
         }
 
@@ -282,6 +309,7 @@ void DockPanel::previewWindowClosed()
     WnckWindow *window = wnck_screen_get_active_window(wnckscreen);
     if (window == NULL) {
         m_currentMoveIndex = -1;
+
         return;
     }
 
@@ -299,7 +327,25 @@ void DockPanel::previewWindowClosed()
 bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
+
     return false;
+}
+
+//bool DockPanel::on_MenuEnterNotify_event(GdkEventCrossing* crossing_event)
+//{
+//
+//}
+
+void DockPanel::on_MenuDeactivated_event()
+{
+    m_popupMenuOn = false;
+}
+
+bool DockPanel::ispopupMenuActive()
+{
+
+    return m_popupMenuOn || m_previewWindowActive;
+
 }
 
 /** 
@@ -327,6 +373,7 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
         if (event->button == 3 && !m_mouseRightButtonDown) {
             m_mouseRightButtonDown = true;
             // The event has been handled.
+
             return true;
         }
     }
@@ -381,6 +428,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             m_Menu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_menu_position), 1, event->time);
 
+            m_popupMenuOn = true;
             return true;
         }
         if (m_currentMoveIndex == 0) {
@@ -391,6 +439,8 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             m_HomeMenu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             m_HomeMenu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_homemenu_position), 1, event->time);
+
+            m_popupMenuOn = true;
 
             return true;
         }
@@ -410,48 +460,48 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
  */
 void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 {
+
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
 
     int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
     x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex);
-    y = MonitorGeometry::getAppWindowTopPosition();
+    y = DockPosition::getHomeMenuTopPosition();
 
-    // This is a fix for a BUG! in  Gtk::Menu.
-    // The position don't work on resolution smaller or equal then 768 height.
-    if (MonitorGeometry::getGeometry().height <= 768) {
-        y -= HOME_POPUPMENU_Y_768_REPOSITION; // Modify this value depend of the menu children count
-    }
 }
 
 void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 {
+
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_Menu_Popup.get_allocated_width() / 2);
+
+
+
 
     int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
     x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex);
-    y = MonitorGeometry::getAppWindowTopPosition();
+    y = DockPosition::getItemMenuTopPosition();
 
-    // This is a fix for a BUG! in  Gtk::Menu.
-    // The position don't work on resolution smaller or equal then 768 height.
-    if (MonitorGeometry::getGeometry().height <= 768) {
-        y -= ITEM_POPUPMENU_Y_768_REPOSITION; // Modify this value depend of the menu children count.
-    }
 }
 
 void DockPanel::on_QuitMenu_event()
 {
+
+   
     m_AppWindow->close();
 }
 
 void DockPanel::on_menuNew_event()
 {
 
+   
+
     int index = m_currentMoveIndex;
     if (index < 1)
+
         return;
 
     Launcher::Launch(m_dockitems.at(index));
@@ -460,12 +510,15 @@ void DockPanel::on_menuNew_event()
 
 void DockPanel::on_AttachToDock_event()
 {
+  
+
     if (m_currentMoveIndex < 1)
         return;
 
-    DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (dockitem->m_isAttached)
+
         return; // already attached
 
     dockitem->m_isAttached = true;
@@ -484,10 +537,12 @@ void DockPanel::on_AttachToDock_event()
 
 void DockPanel::on_DetachFromDock_event()
 {
+   
+
     if (m_currentMoveIndex < 0)
         return;
 
-    DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (!dockitem->m_isAttached)
         return;
@@ -506,6 +561,7 @@ void DockPanel::on_DetachFromDock_event()
 
     if (remove(filename) != 0) {
         g_print("\non_UnPin_event. ERROR remove file. ");
+
         return;
     }
 
@@ -522,13 +578,16 @@ void DockPanel::on_DetachFromDock_event()
 
 void DockPanel::on_CloseAll_event()
 {
+   
+
     if (m_currentMoveIndex < 0)
         return;
 
-    DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
     for (auto item : dockitem->m_items) {
         WnckWindow *window = item->m_window;
         if (window == NULL)
+
             continue;
 
         int ct = gtk_get_current_event_time();
@@ -538,10 +597,12 @@ void DockPanel::on_CloseAll_event()
 
 void DockPanel::on_MinimieAll_event()
 {
+   
+
     if (m_currentMoveIndex < 0)
         return;
 
-    DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
     for (auto item : dockitem->m_items) {
         WnckWindow *window = item->m_window;
         if (window == NULL)
@@ -552,8 +613,22 @@ void DockPanel::on_MinimieAll_event()
     }
 }
 
+void DockPanel::on_AutohideToggled_event()
+{
+    //discover the new state.
+    bool autohide = m_AutohideMenuItem.get_active();
+    DockPosition::setAutoHide(autohide);
+    if( autohide )
+        MonitorGeometry::RemoveStrut();
+    
+    MonitorGeometry::updateStrut();
+    
+}
+
 void DockPanel::on_CloseAllWindows_event()
 {
+   
+
     WnckScreen *screen;
     GList *window_l;
 
@@ -573,6 +648,7 @@ void DockPanel::on_CloseAllWindows_event()
                 wt == WNCK_WINDOW_DOCK ||
                 wt == WNCK_WINDOW_TOOLBAR ||
                 wt == WNCK_WINDOW_MENU) {
+
             continue;
         }
 
@@ -593,16 +669,17 @@ bool DockPanel::on_scroll_event(GdkEventScroll * e)
     if (index == -1 || index == 0)
         return true;
 
-    DockItem *item = m_dockitems.at(index)->GetNext();
+    DockItem * item = m_dockitems.at(index)->GetNext();
     if (item == nullptr)
         return true;
 
-    WnckWindow *itemWindow = item->m_window;
+    WnckWindow * itemWindow = item->m_window;
     int ct = gtk_get_current_event_time();
 
     if ((int) e->delta_y == (int) 1) {
         wnck_window_activate(itemWindow, (guint32) ct);
     } else if ((int) e->delta_y == (int) - 1) {
+
         wnck_window_activate(itemWindow, (guint32) ct);
     }
 
@@ -645,6 +722,7 @@ bool DockPanel::on_timeoutDraw()
     m_last_time += m_fpstimer.elapsed();
 
     if (m_last_time >= 0) {
+
         m_curFPS = (float) (m_frames / m_last_time);
         m_frames = 0;
         m_last_time = 0;
@@ -664,6 +742,7 @@ bool DockPanel::on_timeoutDraw()
  */
 void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointer data)
 {
+
     Update(window, Window_action::OPEN);
 }
 
@@ -675,6 +754,7 @@ void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointe
  */
 void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
+
     Update(window, Window_action::CLOSE);
 }
 
@@ -690,9 +770,10 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
     if (m_previewWindowActive)
         return;
 
-    WnckWindow *window = wnck_screen_get_active_window(screen);
+    WnckWindow * window = wnck_screen_get_active_window(screen);
     if (window == NULL) {
         m_currentMoveIndex = -1;
+
         return;
     }
 
@@ -731,13 +812,16 @@ void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
 void DockPanel::Update(WnckWindow* window, Window_action actiontype)
 {
 
+
+
+
     int cw;
     int iw;
     DockPosition::getDockItemGeometry(m_dockitems.size() + 1, cw, iw);
 
     if (iw < DEF_MINCONSIZE) {
         g_warning("there are to many dock Items. Please close some windows and try again.");
-        return;
+        //return;
     }
 
 
@@ -889,6 +973,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
                     if (c->m_xid == xid) {
                         delete(c);
                         item->m_items.erase(item->m_items.begin() + idx);
+
                         return;
                     }
                     idx++;
@@ -1030,6 +1115,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                     m_iconsize, m_iconsize, Gdk::INTERP_BILINEAR);
 
         } else {
+
             icon = item->m_image;
         }
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_ICONTOPMARGIN);
@@ -1051,6 +1137,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 std::string DockPanel::getApplicationPath()
 {
+
     return m_applicationpath;
 }
 
@@ -1060,7 +1147,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (index < 1)
         return;
 
-    DockItem *dockitem = m_dockitems.at(index);
+    DockItem * dockitem = m_dockitems.at(index);
     int itemscount = dockitem->m_items.size();
 
     if (itemscount == 0 && dockitem->m_isAttached) {
@@ -1095,6 +1182,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     int leftpos = (centerpos - (itemscount / 2)) - MonitorGeometry::getGeometry().x;
     if (leftpos < 0) {
+
         centerpos += abs(leftpos);
     }
 
@@ -1113,7 +1201,7 @@ bool DockPanel::isExitstMaximizedWindows()
         return false;
 
     bool result = false;
-    DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
     for (auto item : dockitem->m_items) {
 
         WnckWindow *window = item->m_window;
@@ -1122,6 +1210,7 @@ bool DockPanel::isExitstMaximizedWindows()
 
         if (wnck_window_is_minimized(window) == FALSE) {
             result = true;
+
             break;
         }
 
@@ -1162,7 +1251,7 @@ void DockPanel::loadAttachedItems()
             titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
 
 
-            DockItem* item = new DockItem();
+            DockItem * item = new DockItem();
             item->m_appname = appname;
             item->m_instancename = Utilities::stringToLower(appname.c_str());
             item->m_realgroupname = appname;

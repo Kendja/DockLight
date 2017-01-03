@@ -92,6 +92,12 @@ int AppWindow::Init(panel_locationType location)
     g_signal_connect(screen, "monitors-changed",
             G_CALLBACK(monitor_size_changed_callback), (gpointer) this);
 
+    Glib::signal_timeout().connect(sigc::mem_fun(*this,
+            &AppWindow::on_timeout), 1000 / 60);
+
+
+    DockPosition::setAutoHide(true);
+
     // Initialize the dock Panel
     if (m_dockpanel.preInit(this) != 0)
         return -1;
@@ -101,8 +107,56 @@ int AppWindow::Init(panel_locationType location)
         m_dockpanel.postInit();
     }
 
+
+
     return 0;
 
+}
+
+
+//bool visible = true;
+bool mouseIn = false;
+
+bool AppWindow::on_timeout()
+{
+
+    if (!DockPosition::isAutoHide())
+        return true;
+
+    bool popupMenuActive = m_dockpanel.ispopupMenuActive();
+
+
+    if ((mouseIn && DockPosition::isVisible()) || popupMenuActive) {
+        m_Timer.start();
+    }
+
+    if (mouseIn && !DockPosition::isVisible()) {
+
+        move(MonitorGeometry::getGeometry().x, Gdk::screen_height() - MonitorGeometry::getStrutHeight());
+        DockPosition::setVisibleState(true);
+    }
+    //g_print("Visible %d mousein: %d popup: %d  %d\n", (int) visible, (int) mouseIn, (int) popupRealized,(int) m_Timer.elapsed());
+
+
+    if (DockPosition::isVisible() && !mouseIn && !popupMenuActive && m_Timer.elapsed() > 1.5) {
+        move(MonitorGeometry::getGeometry().x, Gdk::screen_height() - DEF_PANELHIGHTHIDE);
+        DockPosition::setVisibleState(false);
+
+    }
+
+    return true;
+}
+
+bool AppWindow::on_enter_notify_event(GdkEventCrossing* crossing_event)
+{
+    mouseIn = true;
+    return true;
+}
+
+bool AppWindow::on_leave_notify_event(GdkEventCrossing* crossing_event)
+{
+    mouseIn = false;
+    return true;
 }
 
 /**

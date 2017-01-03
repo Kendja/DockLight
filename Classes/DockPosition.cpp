@@ -22,7 +22,6 @@
 #include "DockPosition.h"
 #include "MonitorGeometry.h"
 
-
 class DockPanel;
 
 namespace DockPosition
@@ -31,7 +30,33 @@ namespace DockPosition
     int m_cellwidth = DEF_CELLWIDTH;
     int m_previewWidth = DEF_PREVIEW_WIDTH;
     int m_previewHeight = DEF_PREVIEW_HEIGHT;
+
+    int m_autoHide = false;
+    bool m_visible = false;
     
+    bool isAutoHide()
+    {
+        return m_autoHide;
+    }
+
+    void setAutoHide(bool autohide)
+    {
+        m_autoHide = autohide;
+    }
+
+    bool isVisible()
+    {
+        return m_visible;
+    }
+    
+    void setVisibleState(bool visible)
+    {
+        if( !m_autoHide ) {
+            m_visible = true;
+        }
+        
+        m_visible = visible;
+    }
     
     /**
      * If the DockItems count are greater then the monitor width we need 
@@ -44,14 +69,14 @@ namespace DockPosition
     bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize)
     {
         // avoid 0 division 
-        if( dockitemscount < 3 ) {
-            
+        if (dockitemscount < 3) {
+
             m_cellwidth = cellsize = DEF_CELLWIDTH;
             iconsize = DEF_ICONSIZE;
-            
+
             return false;
         }
-        
+
         int maxize = (dockitemscount + 2) * DEF_CELLWIDTH;
         int diff = maxize - MonitorGeometry::getGeometry().width;
 
@@ -65,7 +90,7 @@ namespace DockPosition
         int factor = abs((int) (diff / dockitemscount - 2));
         m_cellwidth = cellsize = DEF_CELLWIDTH - factor;
         iconsize = DEF_ICONSIZE - factor;
-        
+
         return true;
 
     }
@@ -80,30 +105,31 @@ namespace DockPosition
      */
     bool getPreviewItemGeometry(int dockitemscount, int &width, int &height)
     {
-         // avoid 0 division 
-         if( dockitemscount < 1 )
+        // avoid 0 division 
+        if (dockitemscount < 1)
             return false;
-        
-        int maxize = (dockitemscount  ) * DEF_PREVIEW_WIDTH;
+
+        int maxize = (dockitemscount) * DEF_PREVIEW_WIDTH;
         int diff = maxize - MonitorGeometry::getGeometry().width;
 
         if (diff < 0) {
 
             m_previewWidth = width = DEF_PREVIEW_WIDTH;
             m_previewHeight = height = DEF_PREVIEW_HEIGHT;
-           
+
             return true;
         }
 
-        int factor = abs((int) (diff / dockitemscount   ));
-        m_previewWidth = width = (DEF_PREVIEW_WIDTH - factor) - 6 ;
-        if( m_previewWidth <= DEF_PREVIEW_HEIGHT )
+        int factor = abs((int) (diff / dockitemscount));
+        m_previewWidth = width = (DEF_PREVIEW_WIDTH - factor) - 6;
+        if (m_previewWidth <= DEF_PREVIEW_HEIGHT)
             m_previewHeight = height = m_previewWidth - (DEF_PREVIEW_WIDTH - DEF_PREVIEW_HEIGHT);
-       
-        
+
+
         return true;
 
     }
+
     /**
      * Calculates the center position required to center a target window
      * on top of a DockItem. 
@@ -123,4 +149,49 @@ namespace DockPosition
 
         return centerpos - (targetwidth / 2);
     }
+
+    int getHomeMenuTopPosition()
+    {
+        int position = MonitorGeometry::getScreenHeight() -
+                MonitorGeometry::getStrutHeight();
+
+        if (m_autoHide) {
+
+            position -= 76;
+
+        } else {
+
+            // This is a fix for a BUG! in  Gtk::Menu.
+            // The position don't work on resolution smaller or equal then 768 height.
+            if (MonitorGeometry::getGeometry().height <= 768) {
+                position -= 78;   // Modify this value depend of the menu children count
+            }
+        }
+
+        return position;
+    }
+
+    int getItemMenuTopPosition()
+    {
+        int position = MonitorGeometry::getScreenHeight() -
+                MonitorGeometry::getStrutHeight();
+
+        if (m_autoHide) {
+
+            position -= 124;
+
+        } else {
+
+            // This is a fix for a BUG! in  Gtk::Menu.
+            // The position don't work on resolution smaller or equal then 768 height.
+            if (MonitorGeometry::getGeometry().height <= 768) {
+                position -= 126;   // Modify this value depend of the menu children count
+            }
+        }
+
+        return position;
+    }
+    
+    
 }
+

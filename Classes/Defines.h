@@ -68,6 +68,7 @@ typedef enum StrutsPosition_t
 
 
 
+#define DEF_PANELHIGHTHIDE  4                 
 #define DEF_PANELHIGHT 72 
 #define DEF_PREVIEW_WIDTH 220               // the preview popup window width
 #define DEF_PREVIEW_HEIGHT 200              // the preview popup window height

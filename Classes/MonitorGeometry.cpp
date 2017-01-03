@@ -12,21 +12,23 @@ namespace MonitorGeometry
     int ScreenWidth;
     int AppWindowHeight;
     int StrutHeight;
+
+    Gtk::Window* m_window = nullptr;
+
+
+
     GdkRectangle geometry;
 
     int getStrutHeight()
     {
         return StrutHeight;
     }
-    
+
     int getAppWindowTopPosition()
     {
-       return  ScreenHeight - StrutHeight ;
+        return ScreenHeight - StrutHeight;
     }
-    
-    
-    
-    
+
     /**
      * Returns the Monitor geometry
      * @return  GdkRectangle geometry
@@ -83,6 +85,8 @@ namespace MonitorGeometry
             return -1;
         }
 
+        m_window = window;
+
 #ifdef GTKDEPRECATED
         Gdk::Rectangle monitor_geo;
         auto screen = Gdk::Screen::get_default();
@@ -123,34 +127,34 @@ namespace MonitorGeometry
         g_print("geometry: %d/%d\n", geometry.width, geometry.height);
         g_print("screen: %d/%d\n", Gdk::screen_width(), Gdk::screen_height());
         g_print("window height: %d\n", AppWindowHeight);
-        
+
         // set the strut
-        return updateStrut(window, DEF_PANELHIGHT );
+        return updateStrut(window, DEF_PANELHIGHT);
     }
 
-    int updateStrut(Gtk::Window* window, int height)
+    int ApplyStrut(int height)
     {
 
-        if (window == NULL) {
+        if (m_window == nullptr) {
             g_critical(" updateStrut::update: window is null.");
             return -1;
         }
-        GtkWidget *toplevel = gtk_widget_get_toplevel(GTK_WIDGET(window->gobj()));
+        GtkWidget *toplevel = gtk_widget_get_toplevel(GTK_WIDGET(m_window->gobj()));
         GdkWindow *gdk_window = gtk_widget_get_window(toplevel);
         if (gdk_window == NULL) {
             g_critical(" updateStrut::update: gdk_window is null.");
             return -1;
         }
 
-        StrutHeight = height;
-                
         // Position only  BOTTOM for now. 
         // A future implementation for TOP,LEFT,RIGHT may be a possibility...
         long insets[12] = {0};
         panel_locationType location = panel_locationType::BOTTOM;
         switch (location) {
             case panel_locationType::BOTTOM:
-                window->move(geometry.x, Gdk::screen_height() - height);
+                
+                if( DockPosition::isAutoHide() == false)
+                    m_window->move(geometry.x, Gdk::screen_height() - height);
 
                 insets[strutsPosition::BottomStart] = geometry.x;
                 insets[strutsPosition::BottomEnd] = geometry.x + geometry.width - 1;
@@ -174,7 +178,52 @@ namespace MonitorGeometry
                 gdk_atom_intern("CARDINAL", FALSE), 32, GDK_PROP_MODE_REPLACE,
                 (unsigned char *) &insets, 4);
 
-
         return 0;
     }
+
+    int updateStrut()
+    {
+        if (m_window == nullptr)
+            return -1;
+
+        return updateStrut(m_window, StrutHeight);
+
+    }
+
+    int updateStrut(int height)
+    {
+        if (m_window == nullptr)
+            return -1;
+
+        return updateStrut(m_window, height);
+    }
+
+    int updateStrut(Gtk::Window* window, int height)
+    {
+
+        StrutHeight = height;
+
+        if (DockPosition::isAutoHide()) {
+
+            if (!DockPosition::isVisible()) {
+                window->move(geometry.x, Gdk::screen_height() - height);
+                DockPosition::setVisibleState(true);
+                
+            } else {
+                window->move(geometry.x, Gdk::screen_height() - DEF_PANELHIGHTHIDE);
+                DockPosition::setVisibleState(false);
+            }
+            
+            return 0;
+        }
+
+        return ApplyStrut(height);
+    }
+
+    int RemoveStrut()
+    {
+        return ApplyStrut(0);
+    }
+
+
 }

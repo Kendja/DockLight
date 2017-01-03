@@ -18,7 +18,7 @@
 //
 //****************************************************************
 #ifndef APPWINDOW_H
-#define	APPWINDOW_H
+#define APPWINDOW_H
 
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
@@ -37,17 +37,27 @@ public:
     AppWindow();
     int Init(panel_locationType location);
     virtual ~AppWindow();
-    DockPanel* getDockPanelReference(){ return &m_dockpanel; }
+
+    DockPanel* getDockPanelReference()
+    {
+        return &m_dockpanel;
+    }
 private:
     DockPanel m_dockpanel;
+    Glib::Timer m_Timer;
+    gdouble m_timerElapsedSeconds;
     
+    bool on_timeout();
+
     static void configureCallback(GtkWindow* parentWindow, GdkEvent* event, gpointer data);
-    static void window_opened_callback(WnckScreen* screen,WnckWindow* window, gpointer data);
-    static void application_opened_callback (WnckScreen *screen, WnckApplication *app);
-    static void window_geometry_changed_callback (WnckWindow *window, gpointer user_data);
+    static void window_opened_callback(WnckScreen* screen, WnckWindow* window, gpointer data);
+    static void application_opened_callback(WnckScreen *screen, WnckApplication *app);
+    static void window_geometry_changed_callback(WnckWindow *window, gpointer user_data);
     static void monitor_size_changed_callback(GdkScreen *screen, gpointer user_data);
-   
+
+    virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
+    virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
 };
 
-#endif	/* APPWINDOW_H */
+#endif /* APPWINDOW_H */
 

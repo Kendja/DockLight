@@ -63,11 +63,12 @@ public:
         return m_currentMoveIndex;
     };
 
+    bool ispopupMenuActive();
 private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
     Preview m_preview;
-
+    bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
@@ -103,11 +104,18 @@ private:
     void on_CloseAll_event();
     void on_MinimieAll_event();
     void on_CloseAllWindows_event();
+    void on_AutohideToggled_event();
+    
+    void on_MenuDeactivated_event();
+    //bool on_MenuEnterNotify_event (GdkEventCrossing* crossing_event);
+    
+    
 
 
     // Mome menu 
     Gtk::Menu m_HomeMenu_Popup;
     Gtk::MenuItem m_QuitMenuItem;
+    Gtk::CheckMenuItem m_AutohideMenuItem;
 
     // Item menu
     Gtk::Menu m_Menu_Popup;
@@ -118,6 +126,7 @@ private:
     Gtk::MenuItem m_MenuItemMinimizedAll;
     Gtk::MenuItem m_CloseAllWindowsMenuItem;
 
+    Gtk::SeparatorMenuItem m_separatorMenuItem0;
     Gtk::SeparatorMenuItem m_separatorMenuItem1;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
     Gtk::SeparatorMenuItem m_separatorMenuItem3;
