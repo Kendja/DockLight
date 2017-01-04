@@ -1,6 +1,6 @@
 nbproject/
 bin/
-
+debian/.debhelper
 
 # Prerequisites
 *.d
