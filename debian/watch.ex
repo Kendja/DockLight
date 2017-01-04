@@ -11,28 +11,28 @@ version=4
 
 # HTTP site (basic)
 #http://example.com/downloads.html \
-#  files/docklight-1.0-([\d\.]+)\.tar\.gz debian uupdate
+#  files/docklight-([\d\.]+)\.tar\.gz debian uupdate
 
 # Uncommment to examine a FTP server
-#ftp://ftp.example.com/pub/docklight-1.0-(.*)\.tar\.gz debian uupdate
+#ftp://ftp.example.com/pub/docklight-(.*)\.tar\.gz debian uupdate
 
 # SourceForge hosted projects
-# http://sf.net/docklight-1.0/ docklight-1.0-(.*)\.tar\.gz debian uupdate
+# http://sf.net/docklight/ docklight-(.*)\.tar\.gz debian uupdate
 
 # GitHub hosted projects
 #opts="filenamemangle=s%(?:.*?)?v?(\d[\d.]*)\.tar\.gz%<project>-$1.tar.gz%" \
-#   https://github.com/<user>/docklight-1.0/tags \
+#   https://github.com/<user>/docklight/tags \
 #   (?:.*?/)?v?(\d[\d.]*)\.tar\.gz debian uupdate
 
 # PyPI
-# https://pypi.debian.net/docklight-1.0/docklight-1.0-(.+)\.(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz)))
+# https://pypi.debian.net/docklight/docklight-(.+)\.(?:zip|tgz|tbz|txz|(?:tar\.(?:gz|bz2|xz)))
 
 # Direct Git
-# opts="mode=git" http://git.example.com/docklight-1.0.git \
+# opts="mode=git" http://git.example.com/docklight.git \
 #   refs/tags/v([\d\.]+) debian uupdate
 
 
 
 
 # Uncomment to find new files on GooglePages
-# http://example.googlepages.com/foo.html docklight-1.0-(.*)\.tar\.gz
+# http://example.googlepages.com/foo.html docklight-(.*)\.tar\.gz

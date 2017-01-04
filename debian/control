@@ -1,16 +1,16 @@
-Source: docklight-1.0
-Section: Utility
+Source: docklight
+Section: utils
 Priority: optional
-Maintainer: Juan Gonzalez <j-gonzalez@email.de>
-Build-Depends: debhelper (>= 9), autotools-dev
+Maintainer: Juan R. Gonzalez <j-gonzalez@email.de>
+Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.8
 Homepage: https://github.com/yoosamui/DockLight
-#Vcs-Git: https://anonscm.debian.org/collab-maint/docklight-1.0.git
-#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/docklight-1.0.git
+#Vcs-Git: https://anonscm.debian.org/collab-maint/docklight.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/docklight.git
 
-Package: docklight-1.0
+Package: docklight
 Architecture: any
-Depends:  libwnck-3-common, libwnck-3-dev, libc6-dev, libgtkmm-3.0-dev (>=3.0)
-Description: this programm shows a simple Dock Panel with window preview.
- Docklight is an easy Linux gnome dock application for opening common applications.
-
+Depends:  libwnck-3-common, libwnck-3-dev, libc6-dev, libgtkmm-3.0-dev (>=3.0), debconf
+Description: This program shows a Dock Panel with window preview.
+ Docklight is a Linux GNOME dock utility
+ for opening common applications.
