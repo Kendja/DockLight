@@ -138,18 +138,6 @@ namespace DockPosition
      * @param int targetwidth the width of the target window.
      * @return the center position.
      */
-    int getCenterPosByCurrentDockItemIndex(int dockitemscount,
-            int currentindex, int targetwidth)
-    {
-
-        int center = (MonitorGeometry::getGeometry().width / 2);
-        int col = center - (dockitemscount * m_cellwidth) / 2;
-        int centerpos = MonitorGeometry::getGeometry().x +
-                col + (m_cellwidth / 2) + (m_cellwidth * currentindex);
-
-        return centerpos - (targetwidth / 2);
-    }
-
     int getDockItemCenterPos(int dockitemscount, int currentindex, int targetwidth)
     {
 
@@ -157,21 +145,21 @@ namespace DockPosition
         int monitorX = MonitorGeometry::getGeometry().x;
         int monitorcenter = monitorWidth / 2;
         int intemcenter = (dockitemscount * m_cellwidth) / 2;
-        int firstItempos = monitorX  + (monitorcenter - intemcenter); 
-        int lastItempos = monitorX + (monitorcenter + (intemcenter -m_cellwidth ));
+        int firstItempos = monitorX + (monitorcenter - intemcenter);
+        int lastItempos = monitorX + (monitorcenter + (intemcenter - m_cellwidth));
         int cellleftpos = monitorX + firstItempos + (m_cellwidth * currentindex);
-         int centerpos = cellleftpos -( (targetwidth / 2) -(m_cellwidth/2)) - monitorX;
-       
+        int centerpos = cellleftpos - ((targetwidth / 2) -(m_cellwidth / 2)) - monitorX;
+
         // checks left monitor limit
         if (centerpos < monitorX)
             centerpos = firstItempos;
 
         // checks right monitor limit
-        if ((centerpos-monitorX) + targetwidth  >monitorWidth) 
-             centerpos =  ( lastItempos - targetwidth ) + m_cellwidth;
-       
+        if ((centerpos - monitorX) + targetwidth > monitorWidth)
+            centerpos = (lastItempos - targetwidth) + m_cellwidth;
 
-        return centerpos; 
+
+        return centerpos;
 
     }
 

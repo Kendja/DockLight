@@ -25,8 +25,7 @@
 #include "IconLoader.h"
 #include "DockPosition.h"
 
-#include <gtkmm/dialog.h>
-#include <gtkmm-3.0/gtkmm/window.h>
+#include <gtkmm/window.h>
 
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
