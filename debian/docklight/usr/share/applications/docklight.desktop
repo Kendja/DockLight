@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=DockLight
+Version=1.0
+Exec=/lib/DockLight/docklight
+Comment=this programm shows a simple Dock Panel with window preview.
+Icon=/lib/DockLight/docklight.ico
+Type=Application
+Terminal=false
+StartupNotify=false
+Encoding=UTF-8
+Categories=Utility;
