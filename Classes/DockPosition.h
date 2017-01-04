@@ -28,6 +28,8 @@ namespace DockPosition
 {
     int getCenterPosByCurrentDockItemIndex(int dockitemscount, 
             int currentindex,int targetwidth);
+    
+    int getDockItemCenterPos(int dockitemscount, int currentindex, int targetwidth);
  
     bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize);
     bool getPreviewItemGeometry(int dockitemscount, int &width,int &height);

@@ -67,13 +67,16 @@ public:
 private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
+    TitleWindow m_infowindow;
+    
     Preview m_preview;
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
 
-
+   // Gtk::MessageDialog m_messageDialog;
+    
     std::string m_applicationpath;
     std::string m_applicationDatapath;
     

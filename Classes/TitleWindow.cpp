@@ -20,12 +20,11 @@
 
 #include "TitleWindow.h"
 /**
- * constructs a window POPUP for teh dock item  title.
+ * constructs a window POPUP contained a Label.
  */
 TitleWindow::TitleWindow() :
 Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_HBox(Gtk::ORIENTATION_HORIZONTAL, 5),
-m_Width(0),
 m_Label("", false)
 {
     Gtk::Window::set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_TOOLTIP);
@@ -40,6 +39,7 @@ m_Label("", false)
     add(m_HBox);
     m_HBox.add(m_Label);
     
+  
 }
 /**
  * Hide the window on destroy
@@ -56,18 +56,6 @@ TitleWindow::~TitleWindow()
 void TitleWindow::setText(const Glib::ustring text)
 {
     m_Label.set_text(text);
-  
-    resize(10, get_height()); // Trick to auto resize the window
+    resize(2,get_height()); // Trick to auto resize the window
     show_all();
-    
-    m_Width = get_width();
 }
-/**
- * get the calculated width
- * @return width of the window;
- */
-int TitleWindow::getCurrentWidth()
-{
-    return m_Width;
-}
-

@@ -31,10 +31,8 @@ public:
     TitleWindow();
     virtual ~TitleWindow();
     void setText(const Glib::ustring text);
-    int getCurrentWidth();
         
 private:
-    int m_Width;
     
     //Child widgets:
     Gtk::Box m_HBox;

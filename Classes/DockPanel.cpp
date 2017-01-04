@@ -25,6 +25,9 @@
 #include "IconLoader.h"
 #include "DockPosition.h"
 
+#include <gtkmm/dialog.h>
+#include <gtkmm-3.0/gtkmm/window.h>
+
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
@@ -105,13 +108,13 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     m_AutohideMenuItem.set_active(autohide);
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
-    
+
     m_CloseAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllWindows_event));
-    
-    
-    
-            
+
+
+
+
     m_CloseAllWindowsMenuItem.set_label("Close all Windows");
     m_CloseAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllWindows_event));
@@ -279,6 +282,7 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 
     m_mouseIn = false;
     m_titlewindow.hide();
+    m_infowindow.hide();
     // if(!m_preview.m_mouseIn )
     //   m_preview.hide();
 
@@ -490,14 +494,14 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 void DockPanel::on_QuitMenu_event()
 {
 
-   
+
     m_AppWindow->close();
 }
 
 void DockPanel::on_menuNew_event()
 {
 
-   
+
 
     int index = m_currentMoveIndex;
     if (index < 1)
@@ -510,7 +514,7 @@ void DockPanel::on_menuNew_event()
 
 void DockPanel::on_AttachToDock_event()
 {
-  
+
 
     if (m_currentMoveIndex < 1)
         return;
@@ -537,7 +541,7 @@ void DockPanel::on_AttachToDock_event()
 
 void DockPanel::on_DetachFromDock_event()
 {
-   
+
 
     if (m_currentMoveIndex < 0)
         return;
@@ -578,7 +582,7 @@ void DockPanel::on_DetachFromDock_event()
 
 void DockPanel::on_CloseAll_event()
 {
-   
+
 
     if (m_currentMoveIndex < 0)
         return;
@@ -597,7 +601,7 @@ void DockPanel::on_CloseAll_event()
 
 void DockPanel::on_MinimieAll_event()
 {
-   
+
 
     if (m_currentMoveIndex < 0)
         return;
@@ -618,16 +622,16 @@ void DockPanel::on_AutohideToggled_event()
     //discover the new state.
     bool autohide = m_AutohideMenuItem.get_active();
     DockPosition::setAutoHide(autohide);
-    if( autohide )
+    if (autohide)
         MonitorGeometry::RemoveStrut();
-    
+
     MonitorGeometry::updateStrut();
-    
+
 }
 
 void DockPanel::on_CloseAllWindows_event()
 {
-   
+
 
     WnckScreen *screen;
     GList *window_l;
@@ -983,6 +987,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     }
 }
 
+
 /**
  * Renderer
  * @param Cairo::Context
@@ -1011,7 +1016,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels);
 
-        g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
+        //g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
     }
 
 
@@ -1022,10 +1027,12 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     // Timer control for the title Window
     if (m_mouseIn && m_currentMoveIndex == -1) {
         m_titlewindow.hide();
+        m_infowindow.hide();
 
         if (m_previewWindowActive)
             m_preview.hideMe();
     }
+
     if (m_mouseIn && m_currentMoveIndex != -1) {
         if (m_titleItemOldindex != m_currentMoveIndex) {
             m_titleItemOldindex = m_currentMoveIndex;
@@ -1034,32 +1041,30 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             m_titleShow = false;
 
             m_titlewindow.hide();
+            m_infowindow.hide();
             if (m_previewWindowActive)
                 m_preview.hideMe();
 
         }
 
-        if (m_titleItemOldindex == m_currentMoveIndex) {
+        if (m_titleItemOldindex == m_currentMoveIndex ) {
             if (m_titleElapsedSeconds > 0.5 && m_titleShow == false && !m_previewWindowActive) {
 
                 DockItem* item = m_dockitems.at(m_currentMoveIndex);
                 m_titlewindow.setText(item->getTitle());
 
-                int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
+                int centerpos = DockPosition::getDockItemCenterPos(
                         m_dockitems.size(),
                         m_currentMoveIndex,
-                        m_titlewindow.getCurrentWidth()
+                        m_titlewindow.get_width()
                         );
 
                 m_titlewindow.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - 30);
-
-                //g_print("SHOW%d\n", (int) m_currentMoveIndex);
                 m_titleShow = true;
 
             }
 
             m_titleElapsedSeconds = m_titleTimer.elapsed();
-            //g_print("%d\n", (int) m_titleElapsedSeconds);
         }
     }
 
@@ -1147,7 +1152,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (index < 1)
         return;
 
-    DockItem * dockitem = m_dockitems.at(index);
+    DockItem* dockitem = m_dockitems.at(index);
     int itemscount = dockitem->m_items.size();
 
     if (itemscount == 0 && dockitem->m_isAttached) {
@@ -1165,14 +1170,31 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     m_preview.init(dockitem, previewWidth, previewHeight, previewWindowWidth);
 
-    if (previewHeight < DEF_PREVIEW_MINHEIGHT) {
-        g_warning("there are to many windows open. A window Preview is no possible. Close some widows and try again.");
-        return;
-    }
+
 
     // calculate the preview position. 
-    int centerpos = DockPosition::getCenterPosByCurrentDockItemIndex(
+    int centerpos = DockPosition::getDockItemCenterPos(
             m_dockitems.size(), index, previewWindowWidth);
+
+    if (previewHeight < DEF_PREVIEW_MINHEIGHT) {
+
+        // TODO: add text to a string resource
+        char message[PATH_MAX];
+        sprintf(message, "(%s) %d windows.\nthere are to many windows open for a Preview.\nClose some widows and try again.",
+                dockitem->getTitle().c_str(), itemscount);
+        
+        m_infowindow.setText(message);
+        int centerpos = DockPosition::getDockItemCenterPos(
+                (int)m_dockitems.size(),
+                m_currentMoveIndex,
+                m_infowindow.get_width()
+                );
+
+        m_infowindow.move(centerpos, 
+                MonitorGeometry::getAppWindowTopPosition() - 90);
+       
+        return;
+    }
 
     int maxwidth = centerpos + previewWindowWidth; //(dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
     maxwidth -= MonitorGeometry::getGeometry().x;
@@ -1187,8 +1209,11 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     }
 
 
+
     // Debug
-    g_print("previewWindowWidth %d max %d %d previewHeight: %d\n", previewWindowWidth, maxwidth, MonitorGeometry::getGeometry().width, previewHeight);
+    //g_print("previewWindowWidth %d max %d %d previewHeight: %d\n", previewWindowWidth,
+    //            maxwidth, MonitorGeometry::getGeometry().width, previewHeight);
+    
     m_previewWindowActive = true;
     m_preview.show_now();
     m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);

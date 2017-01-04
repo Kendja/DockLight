@@ -33,7 +33,7 @@ namespace DockPosition
 
     bool m_autoHide = false;
     bool m_visible = false;
-    
+
     bool isAutoHide()
     {
         return m_autoHide;
@@ -48,16 +48,16 @@ namespace DockPosition
     {
         return m_visible;
     }
-    
+
     void setVisibleState(bool visible)
     {
-        if( !m_autoHide ) {
+        if (!m_autoHide) {
             m_visible = true;
         }
-        
+
         m_visible = visible;
     }
-    
+
     /**
      * If the DockItems count are greater then the monitor width we need 
      * to compute the new width of the cell and the new size of the icon.
@@ -150,6 +150,31 @@ namespace DockPosition
         return centerpos - (targetwidth / 2);
     }
 
+    int getDockItemCenterPos(int dockitemscount, int currentindex, int targetwidth)
+    {
+
+        int monitorWidth = MonitorGeometry::getGeometry().width;
+        int monitorX = MonitorGeometry::getGeometry().x;
+        int monitorcenter = monitorWidth / 2;
+        int intemcenter = (dockitemscount * m_cellwidth) / 2;
+        int firstItempos = monitorX  + (monitorcenter - intemcenter); 
+        int lastItempos = monitorX + (monitorcenter + (intemcenter -m_cellwidth ));
+        int cellleftpos = monitorX + firstItempos + (m_cellwidth * currentindex);
+         int centerpos = cellleftpos -( (targetwidth / 2) -(m_cellwidth/2)) - monitorX;
+       
+        // checks left monitor limit
+        if (centerpos < monitorX)
+            centerpos = firstItempos;
+
+        // checks right monitor limit
+        if ((centerpos-monitorX) + targetwidth  >monitorWidth) 
+             centerpos =  ( lastItempos - targetwidth ) + m_cellwidth;
+       
+
+        return centerpos; 
+
+    }
+
     int getHomeMenuTopPosition()
     {
         int position = MonitorGeometry::getScreenHeight() -
@@ -164,7 +189,7 @@ namespace DockPosition
             // This is a fix for a BUG! in  Gtk::Menu.
             // The position don't work on resolution smaller or equal then 768 height.
             if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 78;   // Modify this value depend of the menu children count
+                position -= 78; // Modify this value depend of the menu children count
             }
         }
 
@@ -185,13 +210,13 @@ namespace DockPosition
             // This is a fix for a BUG! in  Gtk::Menu.
             // The position don't work on resolution smaller or equal then 768 height.
             if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 126;   // Modify this value depend of the menu children count
+                position -= 126; // Modify this value depend of the menu children count
             }
         }
 
         return position;
     }
-    
-    
+
+
 }
 
