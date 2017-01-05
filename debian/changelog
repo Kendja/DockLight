@@ -1,8 +1,10 @@
-docklight (1.0-4) UNRELEASED; urgency=medium
+docklight (1.0-6) UNRELEASED; urgency=medium
 
   * Initial release. 
-  * 1.0-2
-  * testing remove pack
+  * general modification
+  * testing remove package
   * rename docklight.config docklight.settings
+  * modify postinst to not delete the data directoy 
+  
 
- -- Juan R. Gonzalez <j-gonzalez@email.de>  Thu, 05 Jan 2017 03:34:01 +0700
+ -- Juan R. Gonzalez <j-gonzalez@email.de>  Thu, 05 Jan 2017 19:42:54 +0700
