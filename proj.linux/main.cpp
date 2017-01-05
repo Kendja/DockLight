@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     AppWindow win;
     int autohide = 0;
 
-    std::string filepath = Utilities::getExecPath("docklight.config");
+    std::string filepath = Utilities::getExecPath("docklight.ini");
     GError *error = NULL;
     GKeyFile *key_file = g_key_file_new();
 

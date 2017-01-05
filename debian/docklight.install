@@ -1,5 +1,5 @@
 bin/docklight /lib/DockLight
 bin/docklight.ico /lib/DockLight
-debian/docklight.config /lib/DockLight
+debian/docklight.ini /lib/DockLight
 debian/docklight.desktop /usr/share/applications/
 
