@@ -1,10 +1,47 @@
+docklight (1.0-8) UNRELEASED; urgency=medium
+
+  * debian file an ITP (Intent To Package) 
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:54:05 +0700
+
 docklight (1.0-7) UNRELEASED; urgency=medium
 
-  * Initial release. 
-  * general modification
-  * testing remove package
-  * rename docklight.config docklight.settings
-  * modify postinst to not delete the data directory 
-  * modify debian package scripts  
+  * add package comments and remove litian errors and warnings
+	
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:52:52 +0700
 
- -- Juan R. Gonzalez <j-gonzalez@email.de>  Thu, 05 Jan 2017 22:29:47 +0700
+docklight (1.0-6) UNRELEASED; urgency=medium
+
+  * test: debian package purge 
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:52:21 +0700
+
+docklight (1.0-5) UNRELEASED; urgency=medium
+
+  * test: debian package creation
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:51:54 +0700
+
+docklight (1.0-4) UNRELEASED; urgency=medium
+
+  * modify make file 
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:51:22 +0700
+
+docklight (1.0-3) UNRELEASED; urgency=medium
+
+  * add debian deb scripts 
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:50:50 +0700
+
+docklight (1.0-2) UNRELEASED; urgency=medium
+
+  * organize install process 
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:50:06 +0700
+
+docklight (1.0.1) UNRELEASED; urgency=medium
+
+  * Initial release: prepare for debian 
+
+ -- Juan R. González <j-gonzalez@email.de>  Fri, 06 Jan 2017 14:49:40 +0700
