@@ -9,40 +9,36 @@ Select the window or close the desired application the real time preview make th
 “Docklight” is written in C++ with “GTK 3” and “libmnck”. “Docklight” is open source width a GNU General Public License.
 
 
-
-
 ![docklight_sample](https://cloud.githubusercontent.com/assets/9448387/19643317/e3d066ea-9a13-11e6-8971-96cf38752c97.jpg)
 
-Licensing:
+
+ Licensing:
 
   This program is released under the terms of the GNU General Public
   License (GNU GPL).
 
   You can find a copy of the license in the file COPYING.
   
-  
-  Compiling:
+ Compiling:
   
   In order to build this program you need a working GNOME environment
   version 3 or greater, with the development tools installed properly.
   The following is the detailed list of libraries you need:
   
-   - glib
-   - gtk-3 
-   - gtkmm
-   - libmwnck
+	- gtkmm-3.0
+	- libwnck-3.0	
    
  Install from a debian package:
  
- you can install “DockLight” direct from the debian Package/docklight_1.0-8_amd64.deb
+  you can install “DockLight” direct from the debian Package/docklight_1.0-8_amd64.deb
  
  Credits:
 
   Docklight is based of the inspiration from other great docks. It is simple but is still in   development. 
   It will  bring more refinements and  new features to make DockLight more comfortable ad powerful.
+  Many thanks to the all developers and to all the people who contribute to debian.
 
-
- Many thanks to the all developers and to all the people who contribute to debian.
+  -eof-
 
 
 
