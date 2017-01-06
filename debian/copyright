@@ -3,7 +3,7 @@ Upstream-Name: docklight
 Source: https://github.com/yoosamui/DockLight
 
 Files: *
-Copyright: 2016-2017 Juan R. Gonzalez
+Copyright: 2016-2017 Juan R. González
 
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
