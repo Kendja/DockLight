@@ -1,6 +1,7 @@
 nbproject/
 bin/
 debian/.debhelper
+debian/docklight
 
 # Prerequisites
 *.d
