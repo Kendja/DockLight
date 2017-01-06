@@ -41,6 +41,8 @@ clean:
 	rm -f *.o
 	rm -f Classes/*.o
 	rm -f $(OUTPUTDIR)/$(APPNAME)
+	rm -fr debian/$(APPNAME)
+	rm -fr debian/.debhelper
 
 main.o: proj.linux/main.cpp 
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c proj.linux/main.cpp

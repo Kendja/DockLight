@@ -409,7 +409,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
             
-            cr->set_source_rgba(1.0, 1.0, 1.8, 0.06);
+            cr->set_source_rgba(1.0, 1.0, 1.8, 0.08);
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
             cr->fill();
 
