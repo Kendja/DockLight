@@ -26,6 +26,7 @@
 #include "DockPosition.h"
 
 #include <gtkmm/window.h>
+#include <limits.h>
 
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
@@ -191,7 +192,8 @@ void DockPanel::postInit()
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
             &DockPanel::on_timeoutDraw), 1000 / 60);
 
-    WnckScreen *wnckscreen = wnck_screen_get(0); //_default();
+    // Gets the default WnckScreen on the default display.
+    WnckScreen *wnckscreen = wnck_screen_get_default();
 
     g_signal_connect(G_OBJECT(wnckscreen), "window-opened",
             G_CALLBACK(DockPanel::on_window_opened), NULL);
@@ -986,7 +988,6 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     }
 }
 
-
 /**
  * Renderer
  * @param Cairo::Context
@@ -1046,12 +1047,19 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         }
 
-        if (m_titleItemOldindex == m_currentMoveIndex ) {
+        if (m_titleItemOldindex == m_currentMoveIndex) {
             if (m_titleElapsedSeconds > 0.5 && m_titleShow == false && !m_previewWindowActive) {
 
                 DockItem* item = m_dockitems.at(m_currentMoveIndex);
-                m_titlewindow.setText(item->getTitle());
+                std::string title = item->getTitle();
 
+                if (item->m_items.size() > 1) {
+                    char buff[NAME_MAX];
+                    sprintf(buff, "%s (%d)", title.c_str(), (int) item->m_items.size());
+                    title = buff;
+                }
+
+                m_titlewindow.setText(title);
                 int centerpos = DockPosition::getDockItemCenterPos(
                         m_dockitems.size(),
                         m_currentMoveIndex,
@@ -1181,17 +1189,17 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
         char message[PATH_MAX];
         sprintf(message, "(%s) %d windows.\nthere are to many windows open for a Preview.\nClose some widows and try again.",
                 dockitem->getTitle().c_str(), itemscount);
-        
+
         m_infowindow.setText(message);
         int centerpos = DockPosition::getDockItemCenterPos(
-                (int)m_dockitems.size(),
+                (int) m_dockitems.size(),
                 m_currentMoveIndex,
                 m_infowindow.get_width()
                 );
 
-        m_infowindow.move(centerpos, 
+        m_infowindow.move(centerpos,
                 MonitorGeometry::getAppWindowTopPosition() - 90);
-       
+
         return;
     }
 
@@ -1212,11 +1220,10 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     // Debug
     //g_print("previewWindowWidth %d max %d %d previewHeight: %d\n", previewWindowWidth,
     //            maxwidth, MonitorGeometry::getGeometry().width, previewHeight);
-    
-    m_previewWindowActive = true;
-    m_preview.show_now();
-    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);
 
+    m_previewWindowActive = true;
+    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);
+    m_preview.show_now();
 }
 
 bool DockPanel::isExitstMaximizedWindows()

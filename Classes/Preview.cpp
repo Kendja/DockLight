@@ -30,6 +30,7 @@
 // Static members
 std::vector<DockItem*> Preview::m_previewtems;
 bool Preview::m_isActive;
+
 /**
  * Handles the Preview 
  * ctor
@@ -89,6 +90,7 @@ Preview::~Preview()
  */
 void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
 {
+    m_isActive = false;
     m_previewtems.clear();
     for (DockItem* child : item->m_items) {
 
@@ -96,29 +98,29 @@ void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
             continue;
 
         DockItem* newchild = new DockItem();
-       
+
         newchild->m_window = child->m_window;
         newchild->m_xid = child->m_xid;
 
         m_previewtems.push_back(newchild);
     }
-      
+
     m_currentIndex = 0;
-    int itemsize = m_previewtems.size() ;
+    int itemsize = m_previewtems.size();
     m_initialItemMax = itemsize;
-          
+
     m_previewWidth = DEF_PREVIEW_WIDTH;
     m_previewHeight = DEF_PREVIEW_HEIGHT;
-       
-    DockPosition::getPreviewItemGeometry(itemsize,m_previewWidth,m_previewHeight );
+
+    DockPosition::getPreviewItemGeometry(itemsize, m_previewWidth, m_previewHeight);
     width = m_previewWidth;
     height = m_previewHeight;
-    windowWidth = (m_previewWidth * itemsize ) + 30;
-    
+    windowWidth = (m_previewWidth * itemsize) + 30;
+
     //g_print("windowWidth %d\n ",windowWidth);
-    
+
     resize(windowWidth, m_previewHeight);
-    
+
     m_isActive = true;
 }
 
@@ -157,7 +159,9 @@ bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
  */
 void Preview::hideMe()
 {
+
     hide();
+    m_isActive = false;
     m_mouseIn = false;
     m_dockpanelReference->m_previewWindowActive = false;
     m_previewtems.clear();
@@ -293,13 +297,13 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                 return true;
             }
 
-//            if( wnck_window_is_active( item->m_window )){
-//                wnck_window_minimize(item->m_window);
-//                return true;
-//            }
-                
+            //            if( wnck_window_is_active( item->m_window )){
+            //                wnck_window_minimize(item->m_window);
+            //                return true;
+            //            }
+
             wnck_window_activate(item->m_window, ct);
-            
+
             // The event has been handled.
             return true;
         }
@@ -320,9 +324,9 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
     if (m_currentIndex < 1)
         return true;
 
-   // DockItem* item = m_previewtems.at(m_currentIndex);
-   // wnck_window_activate(item->m_window, gtk_get_current_event_time());
-            
+    // DockItem* item = m_previewtems.at(m_currentIndex);
+    // wnck_window_activate(item->m_window, gtk_get_current_event_time());
+
     return true;
 }
 
@@ -333,7 +337,7 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-   
+
     if (!m_isActive)
         return Gtk::Window::on_draw(cr);
 
@@ -356,26 +360,21 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     int idx = 0;
 
-    for (int i = 0; i < m_initialItemMax; i++) {
-//
-//        cr->set_line_width(1);
-//        cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
-//        Utilities::RoundedRectangle(cr, 14 + (m_previewWidth * i), 16, m_previewWidth + 1, m_previewHeight - 30, 2.0);
-//        cr->fill();
 
-        
+    for (int i = 0; i < m_initialItemMax; i++) {
+
         cr->set_line_width(1);
         cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
         Utilities::RoundedRectangle(cr,
-                DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * i), 
+                DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * i),
                 16, m_previewWidth,
-                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING , 2.0);
-        
-         cr->stroke();
-         
+                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING, 2.0);
+
+        cr->stroke();
 
     }
-  
+
+
     for (DockItem* item : m_previewtems) {
         if (item->m_window == NULL || item->m_xid == 0 || !item->visible)
             continue;
@@ -409,17 +408,18 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             pos_width = m_previewWidth + 1;
             pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
-            cr->set_line_width(2);
-            cr->set_source_rgba(1.0, 1.0, 1.8, 0.1);
+            
+            cr->set_source_rgba(1.0, 1.0, 1.8, 0.06);
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
             cr->fill();
 
             // rectangle frame selector
-            cr->set_source_rgba(1.0, 1.0, 1.0, 0.3);
+            cr->set_line_width(2);
+            cr->set_source_rgba(1.0, 1.0, 1.0, 0.9);
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
             cr->stroke();
 
-            
+
             // Close rectangle
             cr->set_source_rgba(1.0, 1.0, 1.0, 1);
             cr->set_source_rgba(0.337, 0.612, 0.117, 1.0); // green
@@ -430,13 +430,13 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             // Close X text
             cr->set_source_rgba(1.0, 1.0, 1.0, 1); //white
-            cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING-1);
+            cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING - 1);
             cr->show_text("X");
-              
-        }
-          
 
-        
+        }
+
+
+
         // get the preview for the window.
         GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
                 gdk_display_get_default(), item->m_xid);
@@ -445,22 +445,22 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         // titlebar/borders if any.
         GdkRectangle boundingbox;
         gdk_window_get_frame_extents(wm_window, &boundingbox);
-        
+
         // create the image
         GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
-                0, 0, boundingbox.width-10, boundingbox.height-24);
+                0, 0, boundingbox.width - 10, boundingbox.height - 24);
 
         // FIXME: Scale don't work well
         int height = m_previewHeight - DEF_PREVIEW_SCALE_HEIGHT_OFFSET;
         int width = m_previewWidth - DEF_PREVIEW_SCALE_WIDTH_OFFSET;
         int scale_heght = height;
-        
-        int windowheight = gdk_window_get_height (wm_window);
-        if( windowheight < 200){
 
-            scale_heght = height/2;
+        int windowheight = gdk_window_get_height(wm_window);
+        if (windowheight < 200) {
+
+            scale_heght = height / 2;
         }
-                
+
         GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
                 width,
                 scale_heght,
@@ -474,7 +474,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         // unreferenced release memory. 
         g_object_unref(scaledpb);
         g_object_unref(pb);
-        
+
         idx++;
     }
 
