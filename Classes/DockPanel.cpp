@@ -1170,23 +1170,11 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (m_dockitems.at(index)->m_window == NULL)
         return;
 
+    int previewWidth = DEF_PREVIEW_WIDTH;
+    int previewHeight = DEF_PREVIEW_HEIGHT;
+       
+    DockPosition::getPreviewItemGeometry(itemscount,previewWidth,previewHeight );
     
-    m_previewWindowActive = true;
-    m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
-    
-/*
-    int previewWidth = 0;
-    int previewHeight = 0;
-    int previewWindowWidth = 0;
-
-    m_preview.init(dockitem, previewWidth, previewHeight, previewWindowWidth);
-
-
-
-    // calculate the preview position. 
-    int centerpos = DockPosition::getDockItemCenterPos(
-            m_dockitems.size(), index, previewWindowWidth);
-
     if (previewHeight < DEF_PREVIEW_MINHEIGHT) {
 
         // TODO: add text to a string resource
@@ -1206,29 +1194,9 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
         return;
     }
-
-    int maxwidth = centerpos + previewWindowWidth; //(dockitem->m_items.size() * (DEF_PREVIEW_WIDTH+4) );
-    maxwidth -= MonitorGeometry::getGeometry().x;
-
-    if (maxwidth >= MonitorGeometry::getGeometry().width)
-        centerpos -= (maxwidth - MonitorGeometry::getGeometry().width);
-
-    int leftpos = (centerpos - (itemscount / 2)) - MonitorGeometry::getGeometry().x;
-    if (leftpos < 0) {
-
-        centerpos += abs(leftpos);
-    }
-
-
-
-    // Debug
-    //g_print("previewWindowWidth %d max %d %d previewHeight: %d\n", previewWindowWidth,
-    //            maxwidth, MonitorGeometry::getGeometry().width, previewHeight);
-
+    
     m_previewWindowActive = true;
-    m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);
-    m_preview.show_now();
- */ 
+    m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
 }
 
 bool DockPanel::isExitstMaximizedWindows()

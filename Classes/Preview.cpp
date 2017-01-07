@@ -128,7 +128,6 @@ void Preview::Activate(DockItem* item, int dockitemscount, int index)
     m_isActive = true;
 }
 
-
 void Preview::updatePosition()
 {
     m_previewWidth = DEF_PREVIEW_WIDTH;
@@ -208,22 +207,13 @@ void Preview::hideMe()
 bool Preview::on_timeoutDraw()
 {
     if (!m_canLeave && m_currentIndex == -1) {
-        std::string result = Utilities::exec("xdotool getmouselocation");
-        std::size_t startPos = result.find("y:");
-        if (startPos != std::string::npos) {
-            std::size_t endPos = result.find("screen");
-            if (endPos != std::string::npos) {
-                startPos += 2;
-                std::string strmousey = result.substr(startPos, endPos - startPos);
-                // check if is a int numeric value
-                std::istringstream isint(strmousey);
-                int size;
-                if (isint >> size) {
-                    int mousey = std::atoi(strmousey.c_str());
-                    if (mousey < (MonitorGeometry::getAppWindowTopPosition() - m_previewHeight))
-                        hideMe();
-                }
-            }
+
+        int mouseX;
+        int mouseY;
+
+        if (Utilities::getMousePosition(mouseX, mouseY)) {
+            if (mouseY < (MonitorGeometry::getAppWindowTopPosition() - m_previewHeight))
+                hideMe();
         }
     }
 
@@ -350,7 +340,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                 m_previewtems.erase(m_previewtems.begin() + m_currentIndex);
                 m_currentIndex = getIndex(event->x, event->y);
                 m_isActive = false;
-          
+
                 updatePosition();
 
                 return true;

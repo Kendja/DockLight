@@ -43,6 +43,7 @@ namespace Utilities
     std::string stringToLower(const char* strp);
     std::string getGtkVersion();
     std::string exec(const char* cmd);
+    bool getMousePosition(int&x,int &y);
 
 
 }

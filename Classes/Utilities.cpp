@@ -21,6 +21,12 @@
 #include "Utilities.h"
 #include <gtk/gtk.h>
 
+#include <X11/Xlib.h>
+#include <assert.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <malloc.h>
+
 #include <iostream>
 #include <stdexcept>
 #include <stdio.h>
@@ -178,4 +184,27 @@ namespace Utilities
         return result;
     }
 
+    bool getMousePosition(int&x, int &y)
+    {
+        Window window_returned;
+        int root_x, root_y;
+        int win_x, win_y;
+        unsigned int mask_return;
+
+        Display *display = XOpenDisplay(NULL);
+        if (display == NULL)
+            return false;
+
+        Window root_window = XRootWindow(display, XDefaultScreen(display));
+        Bool found = XQueryPointer(display, root_window, &window_returned,
+                &window_returned, &root_x, &root_y, &win_x, &win_y,
+                &mask_return);
+        if( found ) {
+            x = win_x;
+            y = win_y;
+        }
+        
+        XCloseDisplay(display);
+        return found;
+    }
 }
