@@ -55,6 +55,8 @@ private:
     static void window_geometry_changed_callback(WnckWindow *window, gpointer user_data);
     static void monitor_size_changed_callback(GdkScreen *screen, gpointer user_data);
 
+    
+    
     virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
 };

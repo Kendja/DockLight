@@ -21,17 +21,23 @@
 #include "Utilities.h"
 #include <gtk/gtk.h>
 
+#include <iostream>
+#include <stdexcept>
+#include <stdio.h>
+#include <string>
+
+
 namespace Utilities
 {
-    
+
     std::string getGtkVersion()
     {
         char buff[PATH_MAX];
-        guint maxv = gtk_get_major_version ();
-        guint minv = gtk_get_minor_version ();
-        sprintf(buff,"%d.%d",maxv,minv);
-        
-        std::string result( buff );
+        guint maxv = gtk_get_major_version();
+        guint minv = gtk_get_minor_version();
+        sprintf(buff, "%d.%d", maxv, minv);
+
+        std::string result(buff);
         return result;
     }
 
@@ -67,9 +73,9 @@ namespace Utilities
      */
     std::string getExecPath(const std::string str)
     {
-        std::string result( Utilities::getExecPath());
-        result+="/"+str;
-      
+        std::string result(Utilities::getExecPath());
+        result += "/" + str;
+
         return result;
     }
 
@@ -151,6 +157,25 @@ namespace Utilities
         transform(str.begin(), str.end(), str.begin(), ::tolower);
 
         return str;
+    }
+
+    std::string exec(const char* cmd)
+    {
+        char buffer[128];
+        std::string result = "";
+        FILE* pipe = popen(cmd, "r");
+        if (!pipe) throw std::runtime_error("popen() failed!");
+        try {
+            while (!feof(pipe)) {
+                if (fgets(buffer, 128, pipe) != NULL)
+                    result += buffer;
+            }
+        } catch (...) {
+            pclose(pipe);
+            throw;
+        }
+        pclose(pipe);
+        return result;
     }
 
 }

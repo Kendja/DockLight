@@ -1170,7 +1170,11 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (m_dockitems.at(index)->m_window == NULL)
         return;
 
-
+    
+    m_previewWindowActive = true;
+    m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
+    
+/*
     int previewWidth = 0;
     int previewHeight = 0;
     int previewWindowWidth = 0;
@@ -1224,6 +1228,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     m_previewWindowActive = true;
     m_preview.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);
     m_preview.show_now();
+ */ 
 }
 
 bool DockPanel::isExitstMaximizedWindows()

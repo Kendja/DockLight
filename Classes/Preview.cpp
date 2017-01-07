@@ -27,6 +27,7 @@
 #include <gdk/gdkx.h>
 
 
+
 // Static members
 std::vector<DockItem*> Preview::m_previewtems;
 bool Preview::m_isActive;
@@ -40,6 +41,9 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_mouseIn(false),
 m_currentIndex(0),
 m_initialItemMax(0),
+m_dockItemIndex(-1),
+m_dockItemsCount(0),
+m_canLeave(true),
 m_previewWidth(DEF_PREVIEW_WIDTH),
 m_previewHeight(DEF_PREVIEW_HEIGHT)
 {
@@ -73,6 +77,7 @@ m_previewHeight(DEF_PREVIEW_HEIGHT)
     g_signal_connect(wnckscreen, "window_closed",
             G_CALLBACK(Preview::on_window_closed), NULL);
 
+
     m_timer.start();
 
 }
@@ -88,10 +93,11 @@ Preview::~Preview()
  * Sets the caller pointer 
  * @param DockItem* item
  */
-void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
+void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/)
 {
-    m_isActive = false;
+
     m_previewtems.clear();
+
     for (DockItem* child : item->m_items) {
 
         if (child->m_window == NULL || child->m_xid == 0)
@@ -106,22 +112,44 @@ void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
     }
 
     m_currentIndex = 0;
-    int itemsize = m_previewtems.size();
-    m_initialItemMax = itemsize;
+    m_initialItemMax = (int) m_previewtems.size();
 
+}
+
+void Preview::Activate(DockItem* item, int dockitemscount, int index)
+{
+    m_isActive = false;
+
+    init(item);
+    m_dockItemIndex = index;
+    m_dockItemsCount = dockitemscount;
+    updatePosition();
+
+    m_isActive = true;
+}
+
+
+void Preview::updatePosition()
+{
     m_previewWidth = DEF_PREVIEW_WIDTH;
     m_previewHeight = DEF_PREVIEW_HEIGHT;
 
+    int itemsize = (int) m_previewtems.size();
+
     DockPosition::getPreviewItemGeometry(itemsize, m_previewWidth, m_previewHeight);
-    width = m_previewWidth;
-    height = m_previewHeight;
-    windowWidth = (m_previewWidth * itemsize) + 30;
+    int windowWidth = (m_previewWidth * itemsize) + DEF_PREVIEW_RIGHT_MARGING;
 
-    //g_print("windowWidth %d\n ",windowWidth);
+    // calculate the preview position. 
+    int centerpos = DockPosition::getDockItemCenterPos(
+            m_dockItemsCount, m_dockItemIndex, windowWidth);
 
+    m_canLeave = false;
+    hide();
+
+    move(centerpos, MonitorGeometry::getAppWindowTopPosition() - m_previewHeight);
     resize(windowWidth, m_previewHeight);
+    show_all();
 
-    m_isActive = true;
 }
 
 /**
@@ -133,6 +161,7 @@ void Preview::init(DockItem* item, int &width, int &height, int &windowWidth)
  */
 bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
 {
+    m_canLeave = true;
     m_mouseIn = true;
     m_dockpanelReference->m_previewWindowActive = true;
     return true;
@@ -147,6 +176,10 @@ bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
  */
 bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
+    if (!m_canLeave) {
+        return false;
+    }
+
     m_isActive = false;
     this->hideMe();
     m_dockpanelReference->previewWindowClosed();
@@ -161,6 +194,7 @@ void Preview::hideMe()
 {
 
     hide();
+    m_canLeave = true;
     m_isActive = false;
     m_mouseIn = false;
     m_dockpanelReference->m_previewWindowActive = false;
@@ -173,6 +207,26 @@ void Preview::hideMe()
  */
 bool Preview::on_timeoutDraw()
 {
+    if (!m_canLeave && m_currentIndex == -1) {
+        std::string result = Utilities::exec("xdotool getmouselocation");
+        std::size_t startPos = result.find("y:");
+        if (startPos != std::string::npos) {
+            std::size_t endPos = result.find("screen");
+            if (endPos != std::string::npos) {
+                startPos += 2;
+                std::string strmousey = result.substr(startPos, endPos - startPos);
+                // check if is a int numeric value
+                std::istringstream isint(strmousey);
+                int size;
+                if (isint >> size) {
+                    int mousey = std::atoi(strmousey.c_str());
+                    if (mousey < (MonitorGeometry::getAppWindowTopPosition() - m_previewHeight))
+                        hideMe();
+                }
+            }
+        }
+    }
+
     Gtk::Widget::queue_draw();
     return true;
 }
@@ -248,6 +302,8 @@ bool Preview::on_scroll_event(GdkEventScroll * event)
  */
 void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
+
+
     m_isActive = false;
     int idx = 0;
     for (DockItem* item : m_previewtems) {
@@ -260,6 +316,7 @@ void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer 
     }
 
     m_isActive = true;
+
 }
 
 /**
@@ -288,19 +345,16 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                     event->y >= 19 && event->y <= 19 + 14) {
 
                 wnck_window_close(item->m_window, (guint32) ct);
-                m_isActive = false;
 
                 // delete the item here, so the Draw method can't paint it anymore
                 m_previewtems.erase(m_previewtems.begin() + m_currentIndex);
                 m_currentIndex = getIndex(event->x, event->y);
+                m_isActive = false;
+          
+                updatePosition();
 
                 return true;
             }
-
-            //            if( wnck_window_is_active( item->m_window )){
-            //                wnck_window_minimize(item->m_window);
-            //                return true;
-            //            }
 
             wnck_window_activate(item->m_window, ct);
 
@@ -324,9 +378,6 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
     if (m_currentIndex < 1)
         return true;
 
-    // DockItem* item = m_previewtems.at(m_currentIndex);
-    // wnck_window_activate(item->m_window, gtk_get_current_event_time());
-
     return true;
 }
 
@@ -337,9 +388,12 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
+    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
+    cr->paint();
 
-    if (!m_isActive)
+    if (!m_isActive) {
         return Gtk::Window::on_draw(cr);
+    }
 
 
     if (m_previewtems.size() < 1) {
@@ -347,11 +401,6 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         return Gtk::Window::on_draw(cr);
     }
 
-    // debug
-    //g_print("Draw %d \n", (int) m_timer.elapsed());
-
-    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
-    cr->paint();
 
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
     cr->rectangle(0, 0, this->get_width(), this->get_height());
@@ -359,22 +408,6 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_line_width(1.0);
 
     int idx = 0;
-
-
-    for (int i = 0; i < m_initialItemMax; i++) {
-
-        cr->set_line_width(1);
-        cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
-        Utilities::RoundedRectangle(cr,
-                DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * i),
-                16, m_previewWidth,
-                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING, 2.0);
-
-        cr->stroke();
-
-    }
-
-
     for (DockItem* item : m_previewtems) {
         if (item->m_window == NULL || item->m_xid == 0 || !item->visible)
             continue;
@@ -383,6 +416,17 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         int pos_y = 16;
         int pos_width = m_previewWidth - DEF_PREVIEW_LEFT_MARGING;
         int pos_height = 20;
+
+
+        cr->set_line_width(1);
+        cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
+        Utilities::RoundedRectangle(cr,
+                DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx),
+                16, m_previewWidth,
+                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING, 2.0);
+
+        cr->stroke();
+
 
         // draw title the clipping rectangle
         cr->set_source_rgba(1.0, 1.0, 1.0, 0.0);
@@ -408,7 +452,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             pos_width = m_previewWidth + 1;
             pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
-            
+
             cr->set_source_rgba(1.0, 1.0, 1.8, 0.08);
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
             cr->fill();

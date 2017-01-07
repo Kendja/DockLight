@@ -36,8 +36,9 @@ public:
         m_dockpanelReference = &dockpanel;
     };
     
-    void init(DockItem* item, int &width, int &height,int &windowWidth);
    
+    void Activate(DockItem* item,int dockitemscount, int index);
+    
     
 protected:
     //Override default signal handler:
@@ -54,15 +55,20 @@ protected:
     bool on_scroll_event(GdkEventScroll *event);
     bool on_button_press_event(GdkEventButton *event);
     
-   
+   void init(DockItem* item/*, int &width, int &height,int &windowWidth*/);
+   void updatePosition();
    
 private:
     
     static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
-
+    int m_dockItemIndex;
+    int m_dockItemsCount;
+    
+    
     int m_previewWidth;
     int m_previewHeight;
      
+    bool m_canLeave;
     bool m_mouseIn;
     static bool m_isActive;
     int m_currentIndex;

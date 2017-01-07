@@ -93,9 +93,10 @@ int AppWindow::Init(panel_locationType location, int autohide)
             G_CALLBACK(monitor_size_changed_callback), (gpointer) this);
 
 
+
     bool isautohide = autohide == 1;
     DockPosition::setAutoHide(isautohide);
-    
+
 
     // Initialize the dock Panel
     if (m_dockpanel.preInit(this, isautohide) != 0)
@@ -103,13 +104,13 @@ int AppWindow::Init(panel_locationType location, int autohide)
 
     // read the monitor geometry and repositioning the window
     if (MonitorGeometry::update(this) == 0) {
+        
         m_dockpanel.postInit();
+        
+        Glib::signal_timeout().connect(sigc::mem_fun(*this,
+                &AppWindow::on_timeout), 1000 / 60);
+
     }
-
-    Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &AppWindow::on_timeout), 1000 / 60);
-
-
     return 0;
 
 }

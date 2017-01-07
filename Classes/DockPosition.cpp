@@ -149,7 +149,7 @@ namespace DockPosition
         int lastItempos = monitorX + (monitorcenter + (intemcenter - m_cellwidth));
         int cellleftpos = monitorX + firstItempos + (m_cellwidth * currentindex);
         int centerpos = cellleftpos - ((targetwidth / 2) -(m_cellwidth / 2)) - monitorX;
-
+      
         // checks left monitor limit
         if (centerpos < monitorX)
             centerpos = firstItempos;
@@ -157,7 +157,12 @@ namespace DockPosition
         // checks right monitor limit
         if ((centerpos - monitorX) + targetwidth > monitorWidth)
             centerpos = (lastItempos - targetwidth) + m_cellwidth;
-
+        
+        // centerpos < 0  then center on screen
+        if( centerpos < 0 ) {
+            centerpos = monitorcenter - (targetwidth/2);
+            
+        }
 
         return centerpos;
 
