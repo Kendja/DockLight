@@ -7,7 +7,7 @@ class DockItem;
 
 namespace Launcher
 {
-    void Launch(DockItem* item);
+    bool Launch(DockItem* item);
     std::string getTitleNameFromDesktopFile(std::string desktopfile);
 }
 

@@ -12,7 +12,7 @@ namespace Launcher
      * Launch an application from a desktop file or from bash.
      * @param DockItem* item
      */
-    void Launch(DockItem* item)
+    bool Launch(DockItem* item)
     {
         std::string lowerrealgroupname(Utilities::stringToLower(item->m_realgroupname.c_str()));
 
@@ -43,7 +43,7 @@ namespace Launcher
             sprintf(command, "\"%s\"", lowerrealgroupname.c_str());
             // Launch from command line
             if (g_spawn_command_line_async(command, &error)) {
-                return;
+                return true;
             }
 
             if (error) {
@@ -61,7 +61,7 @@ namespace Launcher
                 g_object_unref(app_info);
                 g_object_unref(context);
 
-                return;
+                return true;
             }
             if (error) {
                 g_warning("Failed to launch desktop file %s: Error: %s", command, error->message);
@@ -73,7 +73,9 @@ namespace Launcher
             if (context != NULL)
                 g_object_unref(context);
         }
-
+        
+        g_critical("Launcher not found: %s.desktop\n", lowerrealgroupname.c_str());
+        return false;
     }
 
     std::string getTitleNameFromDesktopFile(std::string desktopfile)

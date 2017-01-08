@@ -130,6 +130,19 @@ namespace DockPosition
 
     }
 
+    void getCenterScreenPos(int targetwidth,int targetheight, int &posx, int &posy)
+    {
+         int monitorWidth = MonitorGeometry::getGeometry().width;
+         int monitorHeight = MonitorGeometry::getGeometry().height;
+         
+         int monitorcenterWidth = monitorWidth / 2;
+         int monitorcenterHeight = monitorHeight / 2;
+         
+         
+         posx = monitorcenterWidth - (targetwidth/2); 
+         posy = monitorcenterHeight - (targetheight/2);
+         
+    }
     /**
      * Calculates the center position required to center a target window
      * on top of a DockItem. 

@@ -98,6 +98,9 @@ private:
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);
     bool isExitstMaximizedWindows();
+    bool LauncherNotFoundMessageBox(DockItem* item) ;
+    void createLauncher(DockItem* item);
+    
 
 
     void on_QuitMenu_event();

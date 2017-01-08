@@ -501,15 +501,18 @@ void DockPanel::on_QuitMenu_event()
 
 void DockPanel::on_menuNew_event()
 {
-
-
-
     int index = m_currentMoveIndex;
     if (index < 1)
-
         return;
 
-    Launcher::Launch(m_dockitems.at(index));
+    DockItem* item = m_dockitems.at(index);
+
+    if (!Launcher::Launch(item)) {
+        
+        LauncherNotFoundMessageBox(item);
+       // createLauncher(item);
+        
+    }
 
 }
 
@@ -1163,7 +1166,11 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     int itemscount = dockitem->m_items.size();
 
     if (itemscount == 0 && dockitem->m_isAttached) {
-        Launcher::Launch(dockitem);
+        if (!Launcher::Launch(dockitem)) {
+            LauncherNotFoundMessageBox(dockitem);
+           // createLauncher(dockitem);
+        }
+
         return;
     }
 
@@ -1172,9 +1179,9 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     int previewWidth = DEF_PREVIEW_WIDTH;
     int previewHeight = DEF_PREVIEW_HEIGHT;
-       
-    DockPosition::getPreviewItemGeometry(itemscount,previewWidth,previewHeight );
-    
+
+    DockPosition::getPreviewItemGeometry(itemscount, previewWidth, previewHeight);
+
     if (previewHeight < DEF_PREVIEW_MINHEIGHT) {
 
         // TODO: add text to a string resource
@@ -1194,7 +1201,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
         return;
     }
-    
+
     m_previewWindowActive = true;
     m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
 }
@@ -1271,4 +1278,77 @@ void DockPanel::loadAttachedItems()
         }
     }
     closedir(dirFile);
+}
+
+void DockPanel::createLauncher(DockItem* item)
+{
+    //return true;
+
+
+    //sudo cinnamon-desktop-editor  -m launcher  -d /home/yoo/Desktop  -o /home/yoo/Desktop/dlinkmountnew.desktop
+    //cinnamon-desktop-editor  -m launcher -o/home/yoo/Desktop/gonzalez.desktop -d /home/yoo/Desktop
+
+    std::string desktopfile(Utilities::stringToLower(item->m_realgroupname.c_str()));
+    std::size_t foundspace = desktopfile.find(" ");
+    if (foundspace > 0) {
+        std::string s = desktopfile;
+        std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
+        desktopfile = s;
+    }
+
+
+    char command[PATH_MAX];
+    sprintf(command, "gksu \"cinnamon-desktop-editor -m launcher -d /usr/share/applications -o /usr/share/applications/%s.desktop\" ",
+            desktopfile.c_str());
+    Utilities::exec(command);
+    //return true;
+}
+
+bool DockPanel::LauncherNotFoundMessageBox(DockItem* item)
+{
+    // TODO: add text to a string resource
+    char message[PATH_MAX];
+    sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.", item->getTitle().c_str());
+    
+    m_infowindow.setText(message);
+    int centerpos = DockPosition::getDockItemCenterPos(
+            (int) m_dockitems.size(),
+            m_currentMoveIndex,
+            m_infowindow.get_width()
+            );
+
+    m_infowindow.move(centerpos,
+            MonitorGeometry::getAppWindowTopPosition() - 100);
+    return true;
+    /*
+    char message[PATH_MAX];
+    sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.\n\n Do you want to proceed? ", item->getTitle().c_str());
+    Gtk::MessageDialog dialog(
+     *m_AppWindow,
+            message,
+            false,
+            Gtk::MessageType::MESSAGE_QUESTION,
+            Gtk::ButtonsType::BUTTONS_OK_CANCEL,
+            true);
+
+    // int dlgwidth = dialog.get_width();
+    int posx, posy;
+    int mw, nw;
+    int mh, nh;
+    dialog.get_preferred_width(mw, nw);
+    dialog.get_preferred_height(mh, nh);
+
+    DockPosition::getCenterScreenPos(nw, nh, posx, posy);
+
+    dialog.set_title("DockLight could not find a Launcher.");
+    dialog.move(posx, posy);
+    dialog.set_transient_for(*m_AppWindow);
+    int result = dialog.run();
+    dialog.hide();
+    dialog.close();
+
+
+    return result == Gtk::RESPONSE_OK;
+     */
+
 }

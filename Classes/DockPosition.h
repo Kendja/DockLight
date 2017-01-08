@@ -26,10 +26,11 @@
 
 namespace DockPosition
 {
-   
+
+    void getCenterScreenPos(int targetwidth,int targetheight, int &posx, int &posy);
     int getDockItemCenterPos(int dockitemscount, int currentindex, int targetwidth);
     bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize);
-    bool getPreviewItemGeometry(int dockitemscount, int &width,int &height);
+    bool getPreviewItemGeometry(int dockitemscount, int &width, int &height);
     int getHomeMenuTopPosition();
     int getItemMenuTopPosition();
     bool isAutoHide();
