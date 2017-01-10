@@ -22,6 +22,8 @@
 #include "Defines.h"
 #include "Utilities.h"
 
+#include <gtkmm/icontheme.h>
+
 namespace IconLoader
 {
     // https://developer.gnome.org/gtk3/stable/GtkIconTheme.html#GtkIconLookupFlags
@@ -86,7 +88,37 @@ namespace IconLoader
             }
         }
 
+        
         GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
+        
+        //auto icon_theme2 = Gtk::IconTheme::get_default() ;	//TODO use this instead of GtkIconTheme
+        //icon_theme2->set_custom_theme( "gnome" );
+        
+        //https://code.launchpad.net/~ted/libappindicator/lp875770/+merge/95685
+        /*
+        gchar **path;
+        gint n_elements,i;
+        gtk_icon_theme_get_search_path(icon_theme,&path,&n_elements);
+        for (i=0; i< n_elements || path[i] == NULL; i++) {
+            std::string p( path[i] );
+        }
+        g_strfreev (path);        
+        */
+        //gtk_icon_
+        //Glib::RefPtr<IconTheme> ttt = Gtk::IconTheme::get_default() ;	
+	
+        //tt->set_custom_theme("Adwaita");
+        //const Glib::ustring themename = "Adwaita";
+        //Gtk::IconTheme::set_
+      // tt->load_icon()
+        
+                
+    //Sets the name of the icon theme that the Gtk::IconTheme object uses overriding system configuration. 
+    
+    //Gtk::IconTheme::set_custom_theme(themename);	
+
+        
+        
         if (icon_theme != NULL && gtk_icon_theme_has_icon(icon_theme, lowerName.c_str())) {
 
             icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
@@ -109,9 +141,10 @@ namespace IconLoader
             }
         }
 
+        
         if (result == NULLPB)
             result = PixbufConvert(icon);
-
+       
         return result;
 
     }

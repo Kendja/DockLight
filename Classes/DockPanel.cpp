@@ -32,6 +32,7 @@
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
 bool DockPanel::m_previewWindowActive;
+WnckWindow* DockPanel::m_launcherWnckWindow;
 
 DockPanel::DockPanel() :
 m_frames(0),
@@ -46,10 +47,12 @@ m_iconsize(DEF_ICONSIZE),
 m_previousCellwidth(DEF_CELLWIDTH),
 m_cellheight(DEF_CELLHIGHT),
 m_popupMenuOn(false),
+m_launcherWindow(nullptr),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/data")
 {
 
+    m_launcherWnckWindow = nullptr;
     m_currentMoveIndex = -1;
 
 
@@ -508,10 +511,10 @@ void DockPanel::on_menuNew_event()
     DockItem* item = m_dockitems.at(index);
 
     if (!Launcher::Launch(item)) {
-        
+
         LauncherNotFoundMessageBox(item);
-       // createLauncher(item);
-        
+        // createLauncher(item);
+
     }
 
 }
@@ -820,9 +823,6 @@ void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
 void DockPanel::Update(WnckWindow* window, Window_action actiontype)
 {
 
-
-
-
     int cw;
     int iw;
     DockPosition::getDockItemGeometry(m_dockitems.size() + 1, cw, iw);
@@ -872,6 +872,12 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     if (realgroupname == "Wine")
         realgroupname = instancename;
 
+    
+    if ( instancename == "docklight") {
+        m_launcherWnckWindow = window;
+        return;
+    }
+    
 
     //DEBUG
     g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
@@ -1168,7 +1174,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (itemscount == 0 && dockitem->m_isAttached) {
         if (!Launcher::Launch(dockitem)) {
             LauncherNotFoundMessageBox(dockitem);
-           // createLauncher(dockitem);
+            // createLauncher(dockitem);
         }
 
         return;
@@ -1282,34 +1288,27 @@ void DockPanel::loadAttachedItems()
 
 void DockPanel::createLauncher(DockItem* item)
 {
-    //return true;
-
-
-    //sudo cinnamon-desktop-editor  -m launcher  -d /home/yoo/Desktop  -o /home/yoo/Desktop/dlinkmountnew.desktop
-    //cinnamon-desktop-editor  -m launcher -o/home/yoo/Desktop/gonzalez.desktop -d /home/yoo/Desktop
-
-    std::string desktopfile(Utilities::stringToLower(item->m_realgroupname.c_str()));
-    std::size_t foundspace = desktopfile.find(" ");
-    if (foundspace > 0) {
-        std::string s = desktopfile;
-        std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
-        desktopfile = s;
-    }
-
-
-    char command[PATH_MAX];
-    sprintf(command, "gksu \"cinnamon-desktop-editor -m launcher -d /usr/share/applications -o /usr/share/applications/%s.desktop\" ",
-            desktopfile.c_str());
-    Utilities::exec(command);
-    //return true;
+   
 }
 
 bool DockPanel::LauncherNotFoundMessageBox(DockItem* item)
 {
+    // TODO RELEASE
+    if( m_launcherWindow == nullptr )
+     m_launcherWindow = new LauncherWindow();
+        
+
+    m_launcherWindow->init(item);
+    m_launcherWindow->show_all();
+    
+    if( m_launcherWnckWindow != nullptr)
+        wnck_window_activate(m_launcherWnckWindow, gtk_get_current_event_time());
+   
+
     // TODO: add text to a string resource
     char message[PATH_MAX];
     sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.", item->getTitle().c_str());
-    
+
     m_infowindow.setText(message);
     int centerpos = DockPosition::getDockItemCenterPos(
             (int) m_dockitems.size(),
@@ -1349,6 +1348,14 @@ bool DockPanel::LauncherNotFoundMessageBox(DockItem* item)
 
 
     return result == Gtk::RESPONSE_OK;
+     * 
+     * 
+     * 
+     *     dialog = Gtk.MessageDialog(None,
+                               Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                               Gtk.MessageType.QUESTION,
+                               Gtk.ButtonsType.YES_NO,
+                               None)
      */
 
 }

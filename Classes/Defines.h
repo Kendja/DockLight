@@ -55,6 +55,10 @@ typedef enum StrutsPosition_t
 } strutsPosition;
 
 #define DEF_ICONFILE    "docklight.ico"
+#define DEF_INSTALLATION_DIR     "/lib/DockLight/"
+#define DEF_INSTALLATIONDATA_DIR "/lib/DockLight/data/"
+#define DEF_LAUNCHER_DIR "/usr/share/applications/"
+
 
 #define DEF_CELLWIDTH 58                    // Cell Width
 #define DEF_CELLHIGHT 62                    // Cell Height

@@ -36,6 +36,7 @@
 #include "TitleWindow.h"
 #include "Preview.h"
 #include "DockPosition.h"
+#include "LauncherWindow.h"
 
 
 // This is a fix for a BUG! in  Gtk::Menu.
@@ -68,7 +69,7 @@ private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;
-    
+    static WnckWindow* m_launcherWnckWindow;
     Preview m_preview;
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
@@ -93,13 +94,14 @@ private:
     gdouble m_titleElapsedSeconds;
     int m_titleItemOldindex = 0;
     bool m_titleShow = false;
-
+    LauncherWindow* m_launcherWindow;
 
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);
     bool isExitstMaximizedWindows();
     bool LauncherNotFoundMessageBox(DockItem* item) ;
     void createLauncher(DockItem* item);
+    
     
 
 

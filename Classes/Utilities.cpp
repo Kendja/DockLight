@@ -184,6 +184,13 @@ namespace Utilities
         return result;
     }
 
+    int system(const char* cmd)
+    {
+        char command[128];
+        sprintf(command, "%s &", cmd);
+        return  std::system(command);
+    }
+
     bool getMousePosition(int&x, int &y)
     {
         Window window_returned;
@@ -199,11 +206,11 @@ namespace Utilities
         Bool found = XQueryPointer(display, root_window, &window_returned,
                 &window_returned, &root_x, &root_y, &win_x, &win_y,
                 &mask_return);
-        if( found ) {
+        if (found) {
             x = win_x;
             y = win_y;
         }
-        
+
         XCloseDisplay(display);
         return found;
     }

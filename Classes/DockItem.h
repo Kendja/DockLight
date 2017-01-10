@@ -48,6 +48,7 @@ public:
     bool visible = true;
     
     std::string getTitle();
+    std::string getDesktopFileName();
 private:
     //TODO: setters getters
 

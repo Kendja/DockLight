@@ -21,6 +21,8 @@
 #include <string>
 #include <iostream>
 
+#include "Utilities.h"
+
 using namespace std;
 
 /**
@@ -86,4 +88,18 @@ std::string DockItem::getTitle()
         return m_titlename;
     
     return m_realgroupname;
+}
+
+
+std::string DockItem::getDesktopFileName()
+{
+    std::string desktopfile(Utilities::stringToLower(m_realgroupname.c_str()));
+    std::size_t foundspace = desktopfile.find(" ");
+    if (foundspace > 0) {
+        std::string s = desktopfile;
+        std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
+        desktopfile = s;
+    }
+    
+    return desktopfile+".desktop";
 }
