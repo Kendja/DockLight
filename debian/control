@@ -10,7 +10,7 @@ Homepage: https://github.com/yoosamui/DockLight
 
 Package: docklight
 Architecture: any
-Depends:  libwnck-3-common, libwnck-3-dev, libc6-dev, libgtkmm-3.0-dev (>=3.0), debconf, xdotool
+Depends:  libwnck-3-common, libwnck-3-dev, libc6-dev, libgtkmm-3.0-dev (>=3.0), debconf, gksu
 Description: This program shows a Dock Panel with window preview.
  Docklight” is a simple but effective dock for opening
  common applications for GNOME 3 desktops e.g (cinnamon).
