@@ -1,3 +1,9 @@
+docklight (1.0-10) UNRELEASED; urgency=medium
+
+  * reorgaize laucher and urilities 
+
+ -- Juan R. González <j-gonzalez@email.de>  Tue, 10 Jan 2017 18:36:41 +0700
+
 docklight (1.0-9) UNRELEASED; urgency=medium
 
   * test: debian package installation
