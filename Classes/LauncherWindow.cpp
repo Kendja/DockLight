@@ -45,6 +45,7 @@ m_Button_File("Choose command"),
 m_Button_Icon("Choose Icon"),
 m_Button_create("Create Launcher"),
 m_Button_test("Test Launcher"),
+m_Button_CategoriesLink("Available"),
 m_labeInfo("Create Launcher."),
 m_labelName("Name: "),
 m_labelComment("Comment: "),
@@ -52,8 +53,8 @@ m_labelIcon("Icon: "),
 m_labelCategories("Categories: "),
 m_Button_close("Close")
 {
-    set_title("DockLight Launcher");
 
+    set_title("DockLight Launcher");
     set_size_request(440, 300);
     this->set_resizable(false);
 
@@ -116,7 +117,10 @@ m_Button_close("Close")
     m_grid.attach(m_Button_Icon, 2, 6, 1, 1);
 
     m_grid.attach(m_labelCategories, 0, 8, 1, 1);
-    m_grid.attach(m_EntryCategories, 1, 8, 2, 1);
+    m_grid.attach(m_EntryCategories, 1, 8, 1, 1);
+    m_grid.attach(m_Button_CategoriesLink, 2, 8, 1, 1);
+
+
 
     m_grid.set_row_spacing(4);
     m_grid.set_column_spacing(4);
@@ -135,12 +139,17 @@ m_Button_close("Close")
     m_Button_Icon.signal_clicked().connect(sigc::mem_fun(*this,
             &LauncherWindow::on_button_icon_clicked));
 
+    m_Button_CategoriesLink.signal_clicked().connect(sigc::mem_fun(*this,
+            &LauncherWindow::on_button_CategoriesLink_clicked));
 
 
 
-    // int x,y;
-    //  DockPosition::getCenterScreenPos(440,300,x,y );
-    // move(x,y);
+
+
+
+    int x, y;
+    DockPosition::getCenterScreenPos(440, 300, x, y);
+    move(x, y);
     m_grid.show_all();
 
 
@@ -163,13 +172,17 @@ void LauncherWindow::init(DockItem* dockitem)
     m_EntryCategories.set_text("Other");
 }
 
-//Signal handlers
-
 void LauncherWindow::on_button_testLauncher_clicked()
 {
-    if( Utilities::system( m_EntryFile.get_text().c_str() ) == 0 )
+    if (!isFormFieldsValid()) {
+        InvalidFormFieldsMessage();
         return;
-    
+    }
+
+
+    if (Utilities::system(m_EntryFile.get_text().c_str()) == 0)
+        return;
+
     Gtk::MessageDialog dialog(*this, "Launcher test Failed!", false, Gtk::MESSAGE_INFO);
     //dialog.set_icon_name()
     dialog.set_secondary_text("The command you enter is invalid.\n\n"
@@ -188,6 +201,11 @@ void LauncherWindow::on_button_testLauncher_clicked()
 
 void LauncherWindow::on_button_createLauncher_clicked()
 {
+
+    if (!isFormFieldsValid()) {
+        InvalidFormFieldsMessage();
+        return;
+    }
 
     std::string desktopfile(DEF_INSTALLATIONDATA_DIR + m_dockitem->getDesktopFileName());
 
@@ -338,5 +356,29 @@ void LauncherWindow::on_button_icon_clicked()
     std::string filename = dialog.get_filename();
 
     m_EntryIcon.set_text(filename.c_str());
+
+}
+
+void LauncherWindow::on_button_CategoriesLink_clicked()
+{
+    Utilities::exec("sensible-browser https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
+}
+
+bool LauncherWindow::isFormFieldsValid()
+{
+    if (m_EntryName.get_text().empty())
+        return false;
+
+    if (m_EntryFile.get_text().empty())
+        return false;
+
+    return true;
+
+}
+
+void LauncherWindow::InvalidFormFieldsMessage()
+{
+    Gtk::MessageDialog dialog(*this, "Fields Name and Command can't be empty!\n", false, Gtk::MESSAGE_INFO);
+    dialog.run();
 
 }

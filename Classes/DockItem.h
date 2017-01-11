@@ -33,6 +33,7 @@ public:
     DockItem();
     virtual ~DockItem();
     Glib::RefPtr<Gdk::Pixbuf> m_image;
+    
     DockItem* GetCurrent();
     DockItem* GetNext();
     WnckWindow *m_window;

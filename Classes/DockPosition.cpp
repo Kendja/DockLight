@@ -143,6 +143,8 @@ namespace DockPosition
          posy = monitorcenterHeight - (targetheight/2);
          
     }
+    
+    
     /**
      * Calculates the center position required to center a target window
      * on top of a DockItem. 
@@ -188,14 +190,14 @@ namespace DockPosition
 
         if (m_autoHide) {
 
-            position -= 76;
+            position -= 174;
 
         } else {
 
             // This is a fix for a BUG! in  Gtk::Menu.
             // The position don't work on resolution smaller or equal then 768 height.
             if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 78; // Modify this value depend of the menu children count
+                position -= 176; // Modify this value depend of the menu children count
             }
         }
 
@@ -209,14 +211,14 @@ namespace DockPosition
 
         if (m_autoHide) {
 
-            position -= 124;
+            position -= 148;
 
         } else {
 
             // This is a fix for a BUG! in  Gtk::Menu.
             // The position don't work on resolution smaller or equal then 768 height.
             if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 126; // Modify this value depend of the menu children count
+                position -= 150; // Modify this value depend of the menu children count
             }
         }
 

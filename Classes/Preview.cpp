@@ -23,6 +23,7 @@
 #include "DockPanel.h"
 #include "IconLoader.h"
 #include "MonitorGeometry.h"
+#include "WindowControl.h"
 
 #include <gdk/gdkx.h>
 
@@ -105,6 +106,7 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
 
         DockItem* newchild = new DockItem();
 
+        newchild->m_image = NULLPB;
         newchild->m_window = child->m_window;
         newchild->m_xid = child->m_xid;
 
@@ -206,6 +208,15 @@ void Preview::hideMe()
  */
 bool Preview::on_timeoutDraw()
 {
+//    int x,y;
+//    if (Utilities::getMousePosition(x, y)){
+//         g_print("%d %d \n",x,m_previewWidth + 16 );
+//    }
+        
+    
+    
+    
+       
     if (!m_canLeave && m_currentIndex == -1) {
 
         int mouseX;
@@ -229,19 +240,20 @@ bool Preview::on_timeoutDraw()
  */
 int Preview::getIndex(int x, int y)
 {
-
+  
     int col = 0;
     int idx = 0;
 
+   // g_print("%d %d \n",x,m_previewWidth + 16 );
     for (DockItem* item : m_previewtems) {
         if (item->m_window == NULL)
             continue;
 
-        if (x > col && x <= col + (m_previewWidth + 10))
+        if (x > col && x < col + (m_previewWidth + 16))
             return idx;
 
         idx++;
-        col += m_previewWidth;
+        col += m_previewWidth ;
     }
 
     return -1;
@@ -254,7 +266,6 @@ int Preview::getIndex(int x, int y)
  */
 bool Preview::on_scroll_event(GdkEventScroll * event)
 {
-
     int count = m_previewtems.size();
     if (count == 0)
         return false;
@@ -277,7 +288,7 @@ bool Preview::on_scroll_event(GdkEventScroll * event)
     m_currentIndex = index;
 
     itemWindow = m_previewtems.at(m_currentIndex)->m_window;
-    wnck_window_activate(itemWindow, gtk_get_current_event_time());
+    WindowControl::ActivateWindow(itemWindow);
 
     // Event has been handled
     return true;
@@ -346,7 +357,52 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                 return true;
             }
 
+            WindowControl::ActivateWindow(item->m_window);
+
+
+            //
+            //            if ( !wnck_window_is_active(item->m_window)|| wnck_window_is_maximized( item->m_window ) || wnck_window_is_minimized(item->m_window)){
+            //                centerAndFocusWindow( item->m_window );
+            //            }
+            //            else
+            //            {
+            //                wnck_window_minimize( item->m_window );
+            //            }
+
+
+
+            //
+            //            g_print("MOUSE %d \n", m_currentIndex);
+            //            WnckWorkspace *workspace = wnck_window_get_workspace(item->m_window);
+            //
+            //            //
+            //            if (!wnck_window_is_active(item->m_window) || wnck_window_is_minimized(item->m_window)) {
+            //
+            //                wnck_window_activate(item->m_window, ct + 50);
+            //                //   wnck_window_unminimize(item->m_window, ct);
+            //                //   wnck_window_activate_transient(item->m_window, ct);
+            //
+            //                g_print("ACTIVATE-----------------%d -\n", ct);
+            //                return true;
+            //            }
+            //                wnck_window_get_workspace(item->m_window) != 
+
+            // wnck_window_is_visible_on_workspace ()
+
+
+
+
+
+
+
+            /*
+            if( wnck_window_is_active(item->m_window) || wnck_window_is_minimized(item->m_window) == FALSE  ) {
+                wnck_window_minimize( item->m_window );
+                return true;
+            }
+            
             wnck_window_activate(item->m_window, ct);
+             */
 
             // The event has been handled.
             return true;
@@ -363,11 +419,8 @@ bool Preview::on_button_press_event(GdkEventButton *event)
  * @return true/false
  */
 bool Preview::on_motion_notify_event(GdkEventMotion*event)
-{
+{    
     m_currentIndex = getIndex(event->x, event->y);
-    if (m_currentIndex < 1)
-        return true;
-
     return true;
 }
 
@@ -381,6 +434,12 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
     cr->paint();
 
+    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
+    cr->rectangle(0, 0, this->get_width(), this->get_height());
+    cr->fill();
+    cr->set_line_width(1.0);
+
+
     if (!m_isActive) {
         return Gtk::Window::on_draw(cr);
     }
@@ -392,10 +451,6 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
 
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-    cr->rectangle(0, 0, this->get_width(), this->get_height());
-    cr->fill();
-    cr->set_line_width(1.0);
 
     int idx = 0;
     for (DockItem* item : m_previewtems) {
@@ -470,19 +525,21 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
 
 
-
         // get the preview for the window.
         GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
                 gdk_display_get_default(), item->m_xid);
+
 
         // Obtains the bounding box of the window, including window manager 
         // titlebar/borders if any.
         GdkRectangle boundingbox;
         gdk_window_get_frame_extents(wm_window, &boundingbox);
 
-        // create the image
+        // create the image SLOW!!!
         GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
                 0, 0, boundingbox.width - 10, boundingbox.height - 24);
+        if (pb == NULL)
+            continue;
 
         // FIXME: Scale don't work well
         int height = m_previewHeight - DEF_PREVIEW_SCALE_HEIGHT_OFFSET;
@@ -501,9 +558,16 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 GDK_INTERP_BILINEAR);
 
         Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
+
+
         Gdk::Cairo::set_source_pixbuf(cr, preview, (m_previewWidth * idx) +
                 20, DEF_PREVIEW_PIXBUF_TOP);
         cr->paint();
+
+
+
+
+
 
         // unreferenced release memory. 
         g_object_unref(scaledpb);

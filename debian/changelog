@@ -1,6 +1,8 @@
 docklight (1.0-10) UNRELEASED; urgency=medium
 
-  * reorgaize laucher and urilities 
+  * reorganize launcher and utilities
+  * add Home Menu items for minimize and unminimized
+  * add Items unminimized Menu 	 
 
  -- Juan R. González <j-gonzalez@email.de>  Tue, 10 Jan 2017 18:36:41 +0700
 

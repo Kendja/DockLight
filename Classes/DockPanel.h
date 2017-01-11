@@ -98,8 +98,8 @@ private:
 
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);
-    bool isExitstMaximizedWindows();
-    bool LauncherNotFoundMessageBox(DockItem* item) ;
+   
+    
     void createLauncher(DockItem* item);
     
     
@@ -111,7 +111,17 @@ private:
     void on_AttachToDock_event();
     void on_CloseAll_event();
     void on_MinimieAll_event();
-    void on_CloseAllWindows_event();
+    void on_UnMinimieAll_event();
+    
+    void on_HomeCloseAllWindows_event();
+    void on_HomeCloseAllWindowsExceptActive_event();
+    
+    
+    void on_HomeMinimizeAllWindows_event();
+    void on_HomeUnMinimizeAllWindows_event();
+    void on_HomeMinimizeAllWindowsExceptActive_event();
+    
+    
     void on_AutohideToggled_event();
     
     void on_MenuDeactivated_event();
@@ -132,12 +142,22 @@ private:
     Gtk::MenuItem m_MenuItemDetach;
     Gtk::MenuItem m_MenuItemCloseAll;
     Gtk::MenuItem m_MenuItemMinimizedAll;
-    Gtk::MenuItem m_CloseAllWindowsMenuItem;
-
+    Gtk::MenuItem m_MenuItemUnMinimizedAll;
+    
+    
+    Gtk::MenuItem m_HomeCloseAllWindowsMenuItem;
+    Gtk::MenuItem m_HomeCloseAllWindowsExceptActiveMenuItem;
+    
+    Gtk::MenuItem m_HomeMinimizeAllWindowsMenuItem;
+    Gtk::MenuItem m_HomeUnMinimizeAllWindowsMenuItem;
+    Gtk::MenuItem m_HomeMinimizeAllWindowsExceptActiveMenuItem;
+    
     Gtk::SeparatorMenuItem m_separatorMenuItem0;
     Gtk::SeparatorMenuItem m_separatorMenuItem1;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
     Gtk::SeparatorMenuItem m_separatorMenuItem3;
+    Gtk::SeparatorMenuItem m_separatorMenuItem4;
+    Gtk::SeparatorMenuItem m_separatorMenuItem5;
 
     gboolean m_mouseLeftButtonDown;
     gboolean m_mouseRightButtonDown;

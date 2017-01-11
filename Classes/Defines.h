@@ -24,6 +24,8 @@
 
 
 #define APPNAME "DockLight"
+#define INSTANCENAME "docklight"
+
 #define NULLPB (Glib::RefPtr<Gdk::Pixbuf>)NULL
 
 typedef enum Window_action_t

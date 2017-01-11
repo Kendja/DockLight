@@ -34,7 +34,9 @@ protected:
     void on_button_icon_clicked();
     void on_button_createLauncher_clicked();
     void on_button_testLauncher_clicked();
-    
+    void on_button_CategoriesLink_clicked();
+    bool isFormFieldsValid();
+    void InvalidFormFieldsMessage();
 
     //Child widgets:
     Gtk::Grid m_grid;
@@ -51,6 +53,8 @@ protected:
     Gtk::Label m_labelCategories;
     
     
+    
+    
     Gtk::Entry m_EntryName;
     Gtk::Entry m_EntryComment;
     Gtk::Entry m_EntryFile;
@@ -60,7 +64,7 @@ protected:
     
     
     Gtk::ButtonBox m_ButtonBox;
-    Gtk::Button m_Button_File, m_Button_Folder;
+    Gtk::Button m_Button_File, m_Button_CategoriesLink;
     
     Gtk::Button m_Button_Icon;
     Gtk::Button m_Button_close;

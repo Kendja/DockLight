@@ -24,8 +24,11 @@
 #include "MonitorGeometry.h"
 #include "IconLoader.h"
 #include "DockPosition.h"
+#include "WindowControl.h"
 
 #include <gtkmm/window.h>
+#include <gtkmm/messagedialog.h>
+
 #include <limits.h>
 
 // static members
@@ -112,19 +115,38 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
 
-    m_CloseAllWindowsMenuItem.signal_activate().
-            connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllWindows_event));
+    m_HomeUnMinimizeAllWindowsMenuItem.set_label("Unminimize all Windows");
+    m_HomeUnMinimizeAllWindowsMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomeUnMinimizeAllWindows_event));
+
+    m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_label("Minimize all Windows except active");
+    m_HomeMinimizeAllWindowsExceptActiveMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomeMinimizeAllWindowsExceptActive_event));
 
 
+    m_HomeMinimizeAllWindowsMenuItem.set_label("Minimize all Windows");
+    m_HomeMinimizeAllWindowsMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomeMinimizeAllWindows_event));
+
+    m_HomeCloseAllWindowsExceptActiveMenuItem.set_label("Close all Windows except active");
+    m_HomeCloseAllWindowsExceptActiveMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomeCloseAllWindowsExceptActive_event));
 
 
-    m_CloseAllWindowsMenuItem.set_label("Close all Windows");
-    m_CloseAllWindowsMenuItem.signal_activate().
-            connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllWindows_event));
+    m_HomeCloseAllWindowsMenuItem.set_label("Close all Windows");
+    m_HomeCloseAllWindowsMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomeCloseAllWindows_event));
 
     m_HomeMenu_Popup.append(m_AutohideMenuItem);
     m_HomeMenu_Popup.append(m_separatorMenuItem0);
-    m_HomeMenu_Popup.append(m_CloseAllWindowsMenuItem);
+    m_HomeMenu_Popup.append(m_HomeUnMinimizeAllWindowsMenuItem);
+    m_HomeMenu_Popup.append(m_separatorMenuItem5);
+    m_HomeMenu_Popup.append(m_HomeMinimizeAllWindowsExceptActiveMenuItem);
+    m_HomeMenu_Popup.append(m_HomeMinimizeAllWindowsMenuItem);
+
+    m_HomeMenu_Popup.append(m_separatorMenuItem4);
+    m_HomeMenu_Popup.append(m_HomeCloseAllWindowsExceptActiveMenuItem);
+    m_HomeMenu_Popup.append(m_HomeCloseAllWindowsMenuItem);
     m_HomeMenu_Popup.append(m_separatorMenuItem1);
 
     m_HomeMenu_Popup.signal_deactivate().
@@ -162,9 +184,16 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
 
     m_Menu_Popup.append(m_separatorMenuItem3);
 
+    m_MenuItemUnMinimizedAll.set_label("Unminimize all");
+    m_MenuItemUnMinimizedAll.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_UnMinimieAll_event));
+
+
     m_MenuItemMinimizedAll.set_label("Minimize all");
     m_MenuItemMinimizedAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_MinimieAll_event));
+
+    m_Menu_Popup.append(m_MenuItemUnMinimizedAll);
     m_Menu_Popup.append(m_MenuItemMinimizedAll);
 
 
@@ -418,14 +447,23 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         m_mouseRightButtonDown = false;
 
 
+        // Items 
         if (m_currentMoveIndex > 0) {
             DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
-            bool maximizedexistst = isExitstMaximizedWindows();
+            bool maximizedexistst =
+                    WindowControl::isExistsUnMaximizedWindowsByDockItem(dockitem);
+            bool minizedexitst =
+                    WindowControl::isExistsMinimizedWindowsByDockItem(dockitem);
+
+
             m_MenuItemMinimizedAll.set_sensitive(dockitem->m_items.size() > 0 && maximizedexistst);
+            m_MenuItemUnMinimizedAll.set_sensitive(dockitem->m_items.size() > 0 && minizedexitst);
+
             m_MenuItemCloseAll.set_sensitive(dockitem->m_items.size() > 0);
             m_MenuItemAttach.set_sensitive(dockitem->m_isAttached == false);
             m_MenuItemDetach.set_sensitive(dockitem->m_isAttached &&
                     dockitem->m_items.size() == 0);
+
 
             if (!m_Menu_Popup.get_attach_widget())
                 m_Menu_Popup.attach_to_widget(*this);
@@ -439,7 +477,20 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             m_popupMenuOn = true;
             return true;
         }
+        //Home
         if (m_currentMoveIndex == 0) {
+
+            int wincount = WindowControl::windowscount();
+            int minimized = WindowControl::minimizedWindowscount();
+            int unminimized = WindowControl::unMinimizedWindowsCount();
+
+            m_HomeCloseAllWindowsMenuItem.set_sensitive(wincount > 0);
+            m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 0);
+            m_HomeMinimizeAllWindowsMenuItem.set_sensitive(unminimized > 0);
+            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(minimized > 0);
+            m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 0);
+
+
             if (!m_HomeMenu_Popup.get_attach_widget())
                 m_HomeMenu_Popup.attach_to_widget(*this);
 
@@ -511,10 +562,7 @@ void DockPanel::on_menuNew_event()
     DockItem* item = m_dockitems.at(index);
 
     if (!Launcher::Launch(item)) {
-
-        LauncherNotFoundMessageBox(item);
-        // createLauncher(item);
-
+        createLauncher(item);
     }
 
 }
@@ -606,22 +654,23 @@ void DockPanel::on_CloseAll_event()
     }
 }
 
-void DockPanel::on_MinimieAll_event()
+void DockPanel::on_UnMinimieAll_event()
 {
-
-
     if (m_currentMoveIndex < 0)
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
-    for (auto item : dockitem->m_items) {
-        WnckWindow *window = item->m_window;
-        if (window == NULL)
-            continue;
+    WindowControl::unMinimizeAllByDockItem(dockitem);
+}
 
-        if (wnck_window_is_minimized(window) == false)
-            wnck_window_minimize(window);
-    }
+void DockPanel::on_MinimieAll_event()
+{
+    if (m_currentMoveIndex < 0)
+        return;
+
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
+    WindowControl::minimizeAllByDockItem(dockitem);
+
 }
 
 void DockPanel::on_AutohideToggled_event()
@@ -636,36 +685,29 @@ void DockPanel::on_AutohideToggled_event()
 
 }
 
-void DockPanel::on_CloseAllWindows_event()
+void DockPanel::on_HomeMinimizeAllWindows_event()
 {
+    WindowControl::HomeMinimizeAll();
+}
 
+void DockPanel::on_HomeUnMinimizeAllWindows_event()
+{
+    WindowControl::HomeUnMinimizeAll();
+}
 
-    WnckScreen *screen;
-    GList *window_l;
+void DockPanel::on_HomeMinimizeAllWindowsExceptActive_event()
+{
+    WindowControl::HomeMinimizeAllExceptActive();
+}
 
-    screen = wnck_screen_get_default();
-    wnck_screen_force_update(screen);
+void DockPanel::on_HomeCloseAllWindowsExceptActive_event()
+{
+    WindowControl::HomeCloseAllExceptActive();
+}
 
-    for (window_l = wnck_screen_get_windows(screen);
-            window_l != NULL; window_l = window_l->next) {
-
-        WnckWindow *window = WNCK_WINDOW(window_l->data);
-        if (window == NULL)
-            continue;
-
-        WnckWindowType wt = wnck_window_get_window_type(window);
-
-        if (wt == WNCK_WINDOW_DESKTOP ||
-                wt == WNCK_WINDOW_DOCK ||
-                wt == WNCK_WINDOW_TOOLBAR ||
-                wt == WNCK_WINDOW_MENU) {
-
-            continue;
-        }
-
-        int ct = gtk_get_current_event_time();
-        wnck_window_close(window, (guint32) ct);
-    }
+void DockPanel::on_HomeCloseAllWindows_event()
+{
+    WindowControl::HomeCloseAllWindows();
 
 }
 
@@ -872,12 +914,12 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     if (realgroupname == "Wine")
         realgroupname = instancename;
 
-    
-    if ( instancename == "docklight") {
+
+    if (instancename == "docklight") {
         m_launcherWnckWindow = window;
         return;
     }
-    
+
 
     //DEBUG
     g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
@@ -1173,8 +1215,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     if (itemscount == 0 && dockitem->m_isAttached) {
         if (!Launcher::Launch(dockitem)) {
-            LauncherNotFoundMessageBox(dockitem);
-            // createLauncher(dockitem);
+            createLauncher(dockitem);
         }
 
         return;
@@ -1210,30 +1251,6 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     m_previewWindowActive = true;
     m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
-}
-
-bool DockPanel::isExitstMaximizedWindows()
-{
-    if (m_currentMoveIndex < 0)
-        return false;
-
-    bool result = false;
-    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
-    for (auto item : dockitem->m_items) {
-
-        WnckWindow *window = item->m_window;
-        if (window == NULL)
-            continue;
-
-        if (wnck_window_is_minimized(window) == FALSE) {
-            result = true;
-
-            break;
-        }
-
-    }
-
-    return result;
 }
 
 void DockPanel::loadAttachedItems()
@@ -1288,74 +1305,14 @@ void DockPanel::loadAttachedItems()
 
 void DockPanel::createLauncher(DockItem* item)
 {
-   
-}
+    if (m_launcherWindow == nullptr)
+        m_launcherWindow = new LauncherWindow(); // TODO: free space in dtor
 
-bool DockPanel::LauncherNotFoundMessageBox(DockItem* item)
-{
-    // TODO RELEASE
-    if( m_launcherWindow == nullptr )
-     m_launcherWindow = new LauncherWindow();
-        
 
     m_launcherWindow->init(item);
     m_launcherWindow->show_all();
-    
-    if( m_launcherWnckWindow != nullptr)
+
+    if (m_launcherWnckWindow != nullptr)
         wnck_window_activate(m_launcherWnckWindow, gtk_get_current_event_time());
-   
-
-    // TODO: add text to a string resource
-    char message[PATH_MAX];
-    sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.", item->getTitle().c_str());
-
-    m_infowindow.setText(message);
-    int centerpos = DockPosition::getDockItemCenterPos(
-            (int) m_dockitems.size(),
-            m_currentMoveIndex,
-            m_infowindow.get_width()
-            );
-
-    m_infowindow.move(centerpos,
-            MonitorGeometry::getAppWindowTopPosition() - 100);
-    return true;
-    /*
-    char message[PATH_MAX];
-    sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.\n\n Do you want to proceed? ", item->getTitle().c_str());
-    Gtk::MessageDialog dialog(
-     *m_AppWindow,
-            message,
-            false,
-            Gtk::MessageType::MESSAGE_QUESTION,
-            Gtk::ButtonsType::BUTTONS_OK_CANCEL,
-            true);
-
-    // int dlgwidth = dialog.get_width();
-    int posx, posy;
-    int mw, nw;
-    int mh, nh;
-    dialog.get_preferred_width(mw, nw);
-    dialog.get_preferred_height(mh, nh);
-
-    DockPosition::getCenterScreenPos(nw, nh, posx, posy);
-
-    dialog.set_title("DockLight could not find a Launcher.");
-    dialog.move(posx, posy);
-    dialog.set_transient_for(*m_AppWindow);
-    int result = dialog.run();
-    dialog.hide();
-    dialog.close();
-
-
-    return result == Gtk::RESPONSE_OK;
-     * 
-     * 
-     * 
-     *     dialog = Gtk.MessageDialog(None,
-                               Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                               Gtk.MessageType.QUESTION,
-                               Gtk.ButtonsType.YES_NO,
-                               None)
-     */
-
 }
+

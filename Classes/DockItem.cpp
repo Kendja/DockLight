@@ -31,6 +31,7 @@ using namespace std;
 DockItem::DockItem()
 {
     this->m_image = NULLPB;
+   // this->m_preview = NULL;
 }
 
 /**

@@ -30,6 +30,7 @@ OBJS =  \
  Preview.o \
  DockPosition.o \
  LauncherWindow.o \
+ WindowControl.o \
  main.o \
  $(NULL)
 
@@ -80,4 +81,8 @@ Preview.o: Classes/Preview.o
 
 LauncherWindow.o: Classes/LauncherWindow.o
 	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/LauncherWindow.cpp
+	
+	
+WindowControl.o: Classes/WindowControl.o
+	$(CC) -I$(INCLUDE) $(CPPFLAGS) -c Classes/WindowControl.cpp
 	
