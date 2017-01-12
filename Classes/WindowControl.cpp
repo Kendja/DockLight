@@ -31,7 +31,7 @@ namespace WindowControl
             }
 
             const char* instancename = wnck_window_get_class_instance_name(window);
-            if (instancename != NULL && strcmp(instancename, INSTANCENAME) == 0) {
+            if (instancename != NULL && strcmp(instancename, DOCKLIGHT_INSTANCENAME) == 0) {
                 continue;
             }
 
@@ -280,7 +280,7 @@ namespace WindowControl
             }
 
             const char* instancename = wnck_window_get_class_instance_name(window);
-            if (instancename != NULL && strcmp(instancename, INSTANCENAME) == 0) {
+            if (instancename != NULL && strcmp(instancename, DOCKLIGHT_INSTANCENAME) == 0) {
                 continue;
             }
 
@@ -317,7 +317,7 @@ namespace WindowControl
             }
 
             const char* instancename = wnck_window_get_class_instance_name(window);
-            if (instancename != NULL && strcmp(instancename, INSTANCENAME) == 0) {
+            if (instancename != NULL && strcmp(instancename, DOCKLIGHT_INSTANCENAME) == 0) {
                 continue;
             }
 

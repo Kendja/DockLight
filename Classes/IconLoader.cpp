@@ -80,7 +80,7 @@ namespace IconLoader
         const char* _bettername = wnck_window_get_class_group_name(window);
         //const char* _bettername = wnck_window_get_class_instance_name(window);
         if (_bettername != NULL) {
-          
+
             std::string bettername(Utilities::stringToLower(_bettername));
             std::size_t foundspace = lowerName.find(" ");
             if (foundspace > 0 && bettername != "wine") {
@@ -88,12 +88,12 @@ namespace IconLoader
             }
         }
 
-        
+
         GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
-        
+
         //auto icon_theme2 = Gtk::IconTheme::get_default() ;	//TODO use this instead of GtkIconTheme
         //icon_theme2->set_custom_theme( "gnome" );
-        
+
         //https://code.launchpad.net/~ted/libappindicator/lp875770/+merge/95685
         /*
         gchar **path;
@@ -103,22 +103,22 @@ namespace IconLoader
             std::string p( path[i] );
         }
         g_strfreev (path);        
-        */
+         */
         //gtk_icon_
         //Glib::RefPtr<IconTheme> ttt = Gtk::IconTheme::get_default() ;	
-	
+
         //tt->set_custom_theme("Adwaita");
         //const Glib::ustring themename = "Adwaita";
         //Gtk::IconTheme::set_
-      // tt->load_icon()
-        
-                
-    //Sets the name of the icon theme that the Gtk::IconTheme object uses overriding system configuration. 
-    
-    //Gtk::IconTheme::set_custom_theme(themename);	
+        // tt->load_icon()
 
-        
-        
+
+        //Sets the name of the icon theme that the Gtk::IconTheme object uses overriding system configuration. 
+
+        //Gtk::IconTheme::set_custom_theme(themename);	
+
+
+
         if (icon_theme != NULL && gtk_icon_theme_has_icon(icon_theme, lowerName.c_str())) {
 
             icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
@@ -141,10 +141,10 @@ namespace IconLoader
             }
         }
 
-        
+
         if (result == NULLPB)
             result = PixbufConvert(icon);
-       
+
         return result;
 
     }
@@ -202,6 +202,7 @@ namespace IconLoader
             if (error) {
                 g_warning("Icon Desktop Entry found: %s %s", iconname, error->message);
                 g_error_free(error);
+                error = NULL;
             }
 
             return NULLPB;
@@ -216,6 +217,21 @@ namespace IconLoader
                 icon = wnck_window_get_icon(window);
 
         } else {
+
+            if (g_file_test(iconname, GFileTest::G_FILE_TEST_EXISTS)) {
+                try {
+                    Glib::RefPtr<Gdk::Pixbuf> fromfile;
+                    return fromfile->create_from_file(iconname);
+                    
+                } catch (Glib::FileError fex) {
+                    g_warning("Icon file: %s from desktop: %s could not be found.",
+                            iconname, desktopfilename.c_str());
+
+                } catch (Gdk::PixbufError bex) {
+                    g_warning("Icon file: %s from desktop: %s PixbufError.",
+                            iconname, desktopfilename.c_str());
+                }
+            }
             // Gets the icon to be used for window.
             // If no icon was found, a fallback icon is used. 
             // wnck_window_get_icon_is_fallback() 

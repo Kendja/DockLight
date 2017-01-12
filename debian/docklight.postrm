@@ -3,7 +3,7 @@ set -e
 
 if [ "$1" = "purge" ]; then
   # purge DockLight.
-  rm -fr /lib/DockLight	
+  rm -fr /usr/lib/DockLight	
 fi
 
 if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then

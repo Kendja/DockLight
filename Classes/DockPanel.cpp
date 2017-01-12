@@ -35,7 +35,6 @@
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
 bool DockPanel::m_previewWindowActive;
-WnckWindow* DockPanel::m_launcherWnckWindow;
 
 DockPanel::DockPanel() :
 m_frames(0),
@@ -52,12 +51,10 @@ m_cellheight(DEF_CELLHIGHT),
 m_popupMenuOn(false),
 m_launcherWindow(nullptr),
 m_applicationpath(Utilities::getExecPath()),
+
 m_applicationDatapath(m_applicationpath + "/data")
 {
-
-    m_launcherWnckWindow = nullptr;
     m_currentMoveIndex = -1;
-
 
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
@@ -394,10 +391,10 @@ bool DockPanel::ispopupMenuActive()
  */
 bool DockPanel::on_button_press_event(GdkEventButton *event)
 {
+
     if ((event->type == GDK_BUTTON_PRESS)) {
 
         m_currentMoveIndex = getIndex(event->x, event->y);
-
         m_mouseRightClick = false;
 
         // Check if the event is a left button click.
@@ -915,11 +912,14 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
         realgroupname = instancename;
 
 
-    if (instancename == "docklight") {
-        m_launcherWnckWindow = window;
-        return;
-    }
+    //    if (instancename == DOCKLIGHT_INSTANCENAME && !m_launcherWnckWindowSet) {
+    //        m_launcherWnckWindowSet = true;
+    //        m_launcherWnckWindow = window;
+    //        return;
+    //    }
 
+    if (instancename == DOCKLIGHT_INSTANCENAME)
+        return;
 
     //DEBUG
     g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
@@ -1292,7 +1292,20 @@ void DockPanel::loadAttachedItems()
             item->m_titlename = titlename;
             item->m_window = NULL;
             item->m_xid = 0;
-            item->m_image = item->m_image->create_from_file(imageFilePath);
+            item->m_image = NULLPB;
+
+
+            try {
+                item->m_image = item->m_image->create_from_file(imageFilePath);
+
+            } catch (Glib::FileError fex) {
+                g_critical("Attachment file not found %s\n", appname.c_str());
+
+            } catch (Gdk::PixbufError bex) {
+                g_critical("Attachment file PixbufError %s\n", appname.c_str());
+            }
+
+
             item->m_isAttached = true;
             item->m_isDirty = true;
 
@@ -1305,14 +1318,14 @@ void DockPanel::loadAttachedItems()
 
 void DockPanel::createLauncher(DockItem* item)
 {
-    if (m_launcherWindow == nullptr)
+    if (m_launcherWindow == nullptr) {
         m_launcherWindow = new LauncherWindow(); // TODO: free space in dtor
+        m_launcherWindow->init(*this, item);
+        m_launcherWindow->show_all();
+    }
 
-
-    m_launcherWindow->init(item);
-    m_launcherWindow->show_all();
-
-    if (m_launcherWnckWindow != nullptr)
-        wnck_window_activate(m_launcherWnckWindow, gtk_get_current_event_time());
+    //
+    //    if (m_launcherWnckWindow != nullptr)
+    //        wnck_window_activate(m_launcherWnckWindow, gtk_get_current_event_time());
 }
 

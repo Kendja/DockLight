@@ -208,15 +208,15 @@ void Preview::hideMe()
  */
 bool Preview::on_timeoutDraw()
 {
-//    int x,y;
-//    if (Utilities::getMousePosition(x, y)){
-//         g_print("%d %d \n",x,m_previewWidth + 16 );
-//    }
-        
-    
-    
-    
-       
+    //    int x,y;
+    //    if (Utilities::getMousePosition(x, y)){
+    //         g_print("%d %d \n",x,m_previewWidth + 16 );
+    //    }
+
+
+
+
+
     if (!m_canLeave && m_currentIndex == -1) {
 
         int mouseX;
@@ -240,11 +240,11 @@ bool Preview::on_timeoutDraw()
  */
 int Preview::getIndex(int x, int y)
 {
-  
+
     int col = 0;
     int idx = 0;
 
-   // g_print("%d %d \n",x,m_previewWidth + 16 );
+    // g_print("%d %d \n",x,m_previewWidth + 16 );
     for (DockItem* item : m_previewtems) {
         if (item->m_window == NULL)
             continue;
@@ -253,7 +253,7 @@ int Preview::getIndex(int x, int y)
             return idx;
 
         idx++;
-        col += m_previewWidth ;
+        col += m_previewWidth;
     }
 
     return -1;
@@ -359,51 +359,6 @@ bool Preview::on_button_press_event(GdkEventButton *event)
 
             WindowControl::ActivateWindow(item->m_window);
 
-
-            //
-            //            if ( !wnck_window_is_active(item->m_window)|| wnck_window_is_maximized( item->m_window ) || wnck_window_is_minimized(item->m_window)){
-            //                centerAndFocusWindow( item->m_window );
-            //            }
-            //            else
-            //            {
-            //                wnck_window_minimize( item->m_window );
-            //            }
-
-
-
-            //
-            //            g_print("MOUSE %d \n", m_currentIndex);
-            //            WnckWorkspace *workspace = wnck_window_get_workspace(item->m_window);
-            //
-            //            //
-            //            if (!wnck_window_is_active(item->m_window) || wnck_window_is_minimized(item->m_window)) {
-            //
-            //                wnck_window_activate(item->m_window, ct + 50);
-            //                //   wnck_window_unminimize(item->m_window, ct);
-            //                //   wnck_window_activate_transient(item->m_window, ct);
-            //
-            //                g_print("ACTIVATE-----------------%d -\n", ct);
-            //                return true;
-            //            }
-            //                wnck_window_get_workspace(item->m_window) != 
-
-            // wnck_window_is_visible_on_workspace ()
-
-
-
-
-
-
-
-            /*
-            if( wnck_window_is_active(item->m_window) || wnck_window_is_minimized(item->m_window) == FALSE  ) {
-                wnck_window_minimize( item->m_window );
-                return true;
-            }
-            
-            wnck_window_activate(item->m_window, ct);
-             */
-
             // The event has been handled.
             return true;
         }
@@ -419,7 +374,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
  * @return true/false
  */
 bool Preview::on_motion_notify_event(GdkEventMotion*event)
-{    
+{
     m_currentIndex = getIndex(event->x, event->y);
     return true;
 }
@@ -524,11 +479,9 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         }
 
-
-        // get the preview for the window.
+        // get the GdkWindow for the preview.
         GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
                 gdk_display_get_default(), item->m_xid);
-
 
         // Obtains the bounding box of the window, including window manager 
         // titlebar/borders if any.
@@ -546,28 +499,40 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         int width = m_previewWidth - DEF_PREVIEW_SCALE_WIDTH_OFFSET;
         int scale_heght = height;
 
+        // https://mail.gnome.org/archives/commits-list/2014-February/msg06954.html
+        /*
+        GValue scaleFactor = G_VALUE_INIT;
+        GdkScreen *screen = gdk_screen_get_default();
+        gdk_screen_get_setting (screen, "gdk-window-scaling-factor", &scaleFactor);
+        
+        double scaleFactor = 0.1;
+        auto wfactor = width * 1.3 * scaleFactor;
+        auto hfactor = height * 1.3 * scaleFactor;
+         */
         int windowheight = gdk_window_get_height(wm_window);
-        if (windowheight < 200) {
 
-            scale_heght = height / 2;
-        }
+        int heightHalf = (height / 2);
 
-        GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,
-                width,
-                scale_heght,
-                GDK_INTERP_BILINEAR);
+        if (windowheight < 300)
+            scale_heght = heightHalf;
+        if (windowheight < 200)
+            scale_heght = heightHalf - 20;
+        if (windowheight < 100)
+            scale_heght = heightHalf - 40;
+        if (windowheight < 50)
+            scale_heght = heightHalf - 60;
+
+        if (scale_heght < 10)
+            scale_heght = height;
+
+
+        GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,width,scale_heght,
+                GDK_INTERP_BILINEAR); // offers reasonable quality and speed.
 
         Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
-
-
         Gdk::Cairo::set_source_pixbuf(cr, preview, (m_previewWidth * idx) +
                 20, DEF_PREVIEW_PIXBUF_TOP);
         cr->paint();
-
-
-
-
-
 
         // unreferenced release memory. 
         g_object_unref(scaledpb);

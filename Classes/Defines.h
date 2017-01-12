@@ -24,7 +24,8 @@
 
 
 #define APPNAME "DockLight"
-#define INSTANCENAME "docklight"
+#define DOCKLIGHT_INSTANCENAME "docklight"
+#define DOCKLIGHTLAUNCHER "DockLight Launcher"
 
 #define NULLPB (Glib::RefPtr<Gdk::Pixbuf>)NULL
 
@@ -57,8 +58,6 @@ typedef enum StrutsPosition_t
 } strutsPosition;
 
 #define DEF_ICONFILE    "docklight.ico"
-#define DEF_INSTALLATION_DIR     "/lib/DockLight/"
-#define DEF_INSTALLATIONDATA_DIR "/lib/DockLight/data/"
 #define DEF_LAUNCHER_DIR "/usr/share/applications/"
 
 

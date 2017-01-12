@@ -3,6 +3,7 @@
 #include "Defines.h"
 #include "DockPosition.h"
 #include "DockItem.h"
+#include "DockPanel.h"
 
 LaucherButtonBox::LaucherButtonBox(bool horizontal,
         const Glib::ustring& title,
@@ -35,8 +36,10 @@ m_Button_Cancel("Cancel")
 
 }
 
+
 LauncherWindow::LauncherWindow()
 : //Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
+Gtk::Window(Gtk::WindowType::WINDOW_TOPLEVEL),
 m_VBox(Gtk::ORIENTATION_VERTICAL),
 m_VPaned(Gtk::ORIENTATION_VERTICAL),
 m_ButtonBox(Gtk::ORIENTATION_VERTICAL),
@@ -57,7 +60,11 @@ m_Button_close("Close")
     set_title("DockLight Launcher");
     set_size_request(440, 300);
     this->set_resizable(false);
+    this->set_keep_above(true);
+    this->set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DIALOG);
+    
 
+    
     //this->set_decorated(false);
     /* Sets the border width of the window. */
     set_border_width(12);
@@ -141,23 +148,36 @@ m_Button_close("Close")
 
     m_Button_CategoriesLink.signal_clicked().connect(sigc::mem_fun(*this,
             &LauncherWindow::on_button_CategoriesLink_clicked));
-
-
-
-
-
-
+    
+    
+    this->signal_delete_event().
+            connect(sigc::mem_fun(*this,&LauncherWindow::on_delete_event));
+    
     int x, y;
     DockPosition::getCenterScreenPos(440, 300, x, y);
     move(x, y);
     m_grid.show_all();
-
+    
+    //std::string iconFile = Utilities::getExecPath("gnome-panel-launcher.png");
+    //this->set_icon_from_file(iconFile);
 
 }
 
-void LauncherWindow::init(DockItem* dockitem)
+bool LauncherWindow::on_delete_event(GdkEventAny* event)
+{
+    m_dockpanel->m_launcherWindow = nullptr;
+    delete(this);
+    return false;
+}
+
+LauncherWindow::~LauncherWindow()
+{
+    g_print("LauncherWindow deleted!\n");
+}
+void LauncherWindow::init(DockPanel& dockpanel, DockItem* dockitem)
 {
     m_dockitem = dockitem;
+    m_dockpanel = &dockpanel;
 
     char message[NAME_MAX];
     sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.",
@@ -207,20 +227,26 @@ void LauncherWindow::on_button_createLauncher_clicked()
         return;
     }
 
-    std::string desktopfile(DEF_INSTALLATIONDATA_DIR + m_dockitem->getDesktopFileName());
-
+    
+    std::string desktopfile = m_dockitem->getDesktopFileName();
+    
+    std::string templatefileLocal(Utilities::getExecPath("data/template.desktop"));
+    std::string desktopfileLocal(Utilities::getExecPath("data/"+desktopfile));
+    
+    // create a copy from template
     char command[NAME_MAX];
-    sprintf(command, "cp %stemplate.desktop %s &",
-            DEF_INSTALLATIONDATA_DIR,
-            desktopfile.c_str());
-
-    Utilities::exec(command); //TODO: move to launcher
-
+    sprintf(command, "cp %s %s ",templatefileLocal.c_str(),desktopfileLocal.c_str());
+    if(system(command) != 0 ){
+        Gtk::MessageDialog dialog(*this, "\n\nCopy template Error!\n\n", false, Gtk::MESSAGE_INFO);
+        dialog.run();
+        return;
+    }
+    
 
     GError *error = NULL;
     GKeyFile *key_file = g_key_file_new();
     if (FALSE == g_key_file_load_from_file(key_file,
-            desktopfile.c_str(),
+            desktopfileLocal.c_str(),
             GKeyFileFlags::G_KEY_FILE_NONE, &error)) {
 
         if (error) {
@@ -277,7 +303,7 @@ void LauncherWindow::on_button_createLauncher_clicked()
 
 
 
-    if (FALSE == g_key_file_save_to_file(key_file, desktopfile.c_str(), &error)) {
+    if (FALSE == g_key_file_save_to_file(key_file, desktopfileLocal.c_str(), &error)) {
         if (error) {
             g_error_free(error);
             error = NULL;
@@ -288,16 +314,21 @@ void LauncherWindow::on_button_createLauncher_clicked()
 
 
     g_key_file_free(key_file);
-
-    sprintf(command, "gksu mv %s %s", desktopfile.c_str(), DEF_LAUNCHER_DIR);
-    Utilities::exec(command); // TODO: move to launcher
-
+    
+         
+    //https://www.freedesktop.org/software/polkit/docs/0.105/pkexec.1.html
+    sprintf(command, "pkexec %s %s",
+    Utilities::getExecPath("createlauncher.sh").c_str(),desktopfileLocal.c_str());
+    if(system(command) != 0 ){
+        Gtk::MessageDialog dialog(*this, "\n\nError in command. Please try again!\n\n", false, Gtk::MESSAGE_INFO);
+        dialog.run();
+        return;
+    }
+ 
 
     Gtk::MessageDialog dialog(*this, "\n\nLauncher created successfully!\n\n", false, Gtk::MESSAGE_INFO);
     dialog.run();
     close();
-
-
 }
 
 void LauncherWindow::on_button_file_clicked()
@@ -378,7 +409,12 @@ bool LauncherWindow::isFormFieldsValid()
 
 void LauncherWindow::InvalidFormFieldsMessage()
 {
-    Gtk::MessageDialog dialog(*this, "Fields Name and Command can't be empty!\n", false, Gtk::MESSAGE_INFO);
+    //MessageDialog (const Glib::ustring& message, bool use_markup=false, MessageType type=MESSAGE_INFO, ButtonsType buttons=BUTTONS_OK, bool modal=false)
+    Gtk::MessageDialog dialog(*this, "Fields Name and Command can't be empty!\n", false,
+            Gtk::MESSAGE_INFO,
+            Gtk::BUTTONS_OK,
+            true
+            );
     dialog.run();
 
 }

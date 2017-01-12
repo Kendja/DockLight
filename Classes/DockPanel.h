@@ -38,14 +38,6 @@
 #include "DockPosition.h"
 #include "LauncherWindow.h"
 
-
-// This is a fix for a BUG! in  Gtk::Menu.
-// The position don't work on resolution smaller or equal then 768 height.
-#define HOME_POPUPMENU_Y_768_REPOSITION  56    // Modify this value depend of the menu children count
-#define ITEM_POPUPMENU_Y_768_REPOSITION  128   // Modify this value depend of the menu children count
-
-using namespace std;
-
 class DockPanel : public Gtk::DrawingArea
 {
 public:
@@ -64,12 +56,16 @@ public:
         return m_currentMoveIndex;
     };
 
+    //static bool m_launcherWnckWindowSet;
+    //static WnckWindow* m_launcherWnckWindow;
+    LauncherWindow* m_launcherWindow;
+     
     bool ispopupMenuActive();
 private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;
-    static WnckWindow* m_launcherWnckWindow;
+   
     Preview m_preview;
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
@@ -94,7 +90,7 @@ private:
     gdouble m_titleElapsedSeconds;
     int m_titleItemOldindex = 0;
     bool m_titleShow = false;
-    LauncherWindow* m_launcherWindow;
+    
 
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);

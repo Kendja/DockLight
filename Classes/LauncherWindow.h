@@ -5,6 +5,7 @@
 #include <gtkmm.h>
 
 class DockItem;
+class DockPanel;
 
 class LaucherButtonBox : public Gtk::Frame
 {
@@ -23,11 +24,13 @@ class LauncherWindow : public Gtk::Window
 public:
 
     LauncherWindow();
-    void init(DockItem* dockitem);
+    virtual ~LauncherWindow();
+    void init(DockPanel& dockpanel,DockItem* dockitem);
     
 
 protected:
     DockItem* m_dockitem;
+    DockPanel* m_dockpanel;
     
     //Signal handlers:
     void on_button_file_clicked();
@@ -38,6 +41,8 @@ protected:
     bool isFormFieldsValid();
     void InvalidFormFieldsMessage();
 
+    bool on_delete_event(GdkEventAny* event);
+    
     //Child widgets:
     Gtk::Grid m_grid;
     

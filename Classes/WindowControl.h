@@ -30,7 +30,7 @@ namespace WindowControl
     int minimizedWindowscount();
     int unMinimizedWindowsCount();
     
-    
+   
 }
 
 #endif /* WINDOWCONTROL_H */
