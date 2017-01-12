@@ -31,7 +31,7 @@ Select the window or close the desired application the real time preview make th
    
  Install from a debian package:
  
-  you can install “DockLight” direct from the debian Package/docklight_1.0-8_amd64.deb
+  you can install “DockLight” direct from the debian Package/docklight_1.0-*_amd64.deb
  
  Credits:
 
