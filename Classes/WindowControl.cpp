@@ -103,7 +103,7 @@ namespace WindowControl
                 continue;
 
             wnck_window_minimize(window);
-            Glib::usleep(10000);
+            
         }
     }
 
@@ -133,7 +133,7 @@ namespace WindowControl
             }
 
             wnck_window_minimize(window);
-            Glib::usleep(10000);
+            
         }
     }
 
@@ -178,7 +178,7 @@ namespace WindowControl
         if (wnck_window_is_minimized(window))
             wnck_window_unminimize(window, ct);
 
-        wnck_window_activate_transient(window, ct);
+       // wnck_window_activate_transient(window, ct);
     }
 
     bool isExistsUnMaximizedWindowsByDockItem(DockItem* dockitem)

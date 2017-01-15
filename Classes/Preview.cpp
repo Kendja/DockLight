@@ -474,8 +474,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
 
                 return true;
             }
-
-            wnck_window_make_above(item->m_window);
+            
             WindowControl::ActivateWindow(item->m_window);
 
             // The event has been handled.
