@@ -348,28 +348,6 @@ void Preview::on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer 
     m_isActive = false;
     WindowControl::hideWindow(m_thisInstance);
 
-
-    /*
-    const char* _appname = wnck_window_get_name(window);
-    if (_appname == NULL) {
-        g_print("Update: No Application name....\n");
-        return;
-    }
-    
-    const char* _instancename = wnck_window_get_class_instance_name(window);
-    if (_instancename == NULL) {
-        return;
-    }
-
-    std::string ss = m_instancename;
-    const std::string extensions[] = {".py", ".exe", ".sh"};
-    std::string instancename = Utilities::removeExtension(_instancename, extensions);
-
-    if (m_instancename == instancename) {
-        m_isActive = false;
-        WindowControl::hideWindow(m_thisInstance);
-    }
-     */
 }
 
 /**

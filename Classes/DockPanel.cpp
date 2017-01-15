@@ -83,14 +83,14 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
 {
     m_AppWindow = window;
 
+    // assumes that the docklight.ico exists.
     std::string filename = Utilities::getExecPath(DEF_ICONFILE);
     gboolean isexists = g_file_test(filename.c_str(), G_FILE_TEST_EXISTS);
     if (!isexists) {
         g_critical("init: docklight.ico could not be found!\n");
         return -1;
     }
-
-    // assumes that the docklight.ico exists.
+    
     DockItem* dockItem = new DockItem();
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONFILE).c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
@@ -232,9 +232,6 @@ void DockPanel::postInit()
 
     g_signal_connect(wnckscreen, "active_window_changed",
             G_CALLBACK(DockPanel::on_active_window_changed_callback), NULL);
-
-    g_signal_connect(G_OBJECT(wnckscreen), "state-changed",
-            G_CALLBACK(DockPanel::on_windowStateChange_callback), NULL);
 
 }
 
@@ -428,7 +425,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 {
 
     if (!m_mouseIn)
-        return false;
+        return true;
 
     if (m_mouseLeftButtonDown) {
 
@@ -841,13 +838,6 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
     DockPanel::setItemImdexFromActiveWindow(window);
 }
 
-void DockPanel::on_windowStateChange_callback(WnckWindow *window,
-        WnckWindowState changed_mask,
-        WnckWindowState new_state,
-        gpointer user_data)
-{
-
-}
 
 void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
 {
@@ -924,18 +914,12 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     std::string realgroupname(_realgroupname);
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
-    std::string titlename = Utilities::stringToLower(realgroupname.c_str());
-    titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
+    std::string titlename = 
+            Launcher::getTitleNameFromDesktopFile(instancename,realgroupname);
 
     if (realgroupname == "Wine")
         realgroupname = instancename;
 
-
-    //    if (instancename == DOCKLIGHT_INSTANCENAME && !m_launcherWnckWindowSet) {
-    //        m_launcherWnckWindowSet = true;
-    //        m_launcherWnckWindow = window;
-    //        return;
-    //    }
 
     if (instancename == DOCKLIGHT_INSTANCENAME)
         return;
@@ -1300,8 +1284,8 @@ void DockPanel::loadAttachedItems()
             std::replace(appname.begin(), appname.end(), '_', ' ');
 
 
-            std::string titlename = Utilities::stringToLower(appname.c_str());
-            titlename = (Launcher::getTitleNameFromDesktopFile(titlename));
+            std::string titlename =
+                    Launcher::getTitleNameFromDesktopFile(appname);
 
 
             DockItem * item = new DockItem();

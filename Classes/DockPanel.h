@@ -170,11 +170,7 @@ private:
     static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
     static void on_active_window_changed_callback(WnckScreen *screen,
             WnckWindow *previously_active_window, gpointer user_data);
-    
-    static void on_windowStateChange_callback (WnckWindow *window,
-               WnckWindowState changed_mask,
-               WnckWindowState new_state,
-               gpointer        user_data);
+
 
     int getIndex(int x, int y);
 
