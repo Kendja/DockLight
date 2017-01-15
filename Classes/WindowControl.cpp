@@ -37,6 +37,7 @@ namespace WindowControl
 
 
             wnck_window_close(window, gtk_get_current_event_time());
+            
         }
     }
 
@@ -67,9 +68,9 @@ namespace WindowControl
 
             if (wnck_window_is_active(window))
                 continue;
-
-            int ct = gtk_get_current_event_time();
-            wnck_window_close(window, (guint32) ct);
+            
+            wnck_window_close(window, gtk_get_current_event_time());
+            
         }
     }
 
@@ -102,6 +103,7 @@ namespace WindowControl
                 continue;
 
             wnck_window_minimize(window);
+            Glib::usleep(10000);
         }
     }
 
@@ -131,6 +133,7 @@ namespace WindowControl
             }
 
             wnck_window_minimize(window);
+            Glib::usleep(10000);
         }
     }
 
@@ -193,10 +196,10 @@ namespace WindowControl
             }
 
         }
-        
+
         return result;
     }
-    
+
     bool isExistsMinimizedWindowsByDockItem(DockItem* dockitem)
     {
         bool result = false;
@@ -212,7 +215,7 @@ namespace WindowControl
             }
 
         }
-        
+
         return result;
     }
 
@@ -290,6 +293,99 @@ namespace WindowControl
         return count;
     }
 
+    WnckWindow* getActive()
+    {
+        WnckScreen *screen;
+        GList *window_l;
+        
+        screen = wnck_screen_get_default();
+        wnck_screen_force_update(screen);
+
+        for (window_l = wnck_screen_get_windows(screen);
+                window_l != NULL; window_l = window_l->next) {
+
+            WnckWindow *window = WNCK_WINDOW(window_l->data);
+            if (window == NULL)
+                continue;
+
+             WnckWindowType wt = wnck_window_get_window_type(window);
+
+            if (wt == WNCK_WINDOW_DESKTOP ||
+                    wt == WNCK_WINDOW_DOCK ||
+                    wt == WNCK_WINDOW_TOOLBAR ||
+                    wt == WNCK_WINDOW_MENU) {
+
+                continue;
+            }
+             
+            if( wnck_window_is_active( window ) ) {
+                return window;
+            }
+        }
+
+        return nullptr;
+    }
+    
+    bool isWindowExists(XID xid)
+    {
+        WnckScreen *screen;
+        GList *window_l;
+        
+        screen = wnck_screen_get_default();
+        wnck_screen_force_update(screen);
+
+        for (window_l = wnck_screen_get_windows(screen);
+                window_l != NULL; window_l = window_l->next) {
+
+            WnckWindow *window = WNCK_WINDOW(window_l->data);
+            if (window == NULL)
+                continue;
+
+            if( wnck_window_get_xid(window) == xid )
+                return true;
+            
+        }
+
+        return false;
+    }
+    bool isExistsMinimizedWindows()
+    {
+        
+        WnckScreen *screen;
+        GList *window_l;
+
+        screen = wnck_screen_get_default();
+        wnck_screen_force_update(screen);
+
+        for (window_l = wnck_screen_get_windows(screen);
+                window_l != NULL; window_l = window_l->next) {
+
+            WnckWindow *window = WNCK_WINDOW(window_l->data);
+            if (window == NULL)
+                continue;
+
+            WnckWindowType wt = wnck_window_get_window_type(window);
+
+            if (wt == WNCK_WINDOW_DESKTOP ||
+                    wt == WNCK_WINDOW_DOCK ||
+                    wt == WNCK_WINDOW_TOOLBAR ||
+                    wt == WNCK_WINDOW_MENU) {
+
+                continue;
+            }
+
+            const char* instancename = wnck_window_get_class_instance_name(window);
+            if (instancename != NULL && strcmp(instancename, DOCKLIGHT_INSTANCENAME) == 0) {
+                continue;
+            }
+
+            if (wnck_window_is_minimized(window))
+                return true;
+        }
+
+        return false;
+    }
+
     int minimizedWindowscount()
     {
         int count = 0;
@@ -331,6 +427,12 @@ namespace WindowControl
     int unMinimizedWindowsCount()
     {
         return windowscount() - minimizedWindowscount();
+    }
+    
+    
+    void hideWindow(Gtk::Window* instance)
+    {
+        instance->hide();
     }
 }
 

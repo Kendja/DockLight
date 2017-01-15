@@ -7,7 +7,10 @@
 
 #include <libwnck/libwnck.h>
 #include <glibmm/timer.h>
+#include <gtkmm/window.h> 
 #include "DockItem.h"
+
+#include <X11/X.h>
 
 
 namespace WindowControl
@@ -26,9 +29,17 @@ namespace WindowControl
     bool isExistsUnMaximizedWindowsByDockItem(DockItem* dockitem);
     bool isExistsMinimizedWindowsByDockItem(DockItem* dockitem);
     
+    bool isExistsMinimizedWindows();
+    
     int windowscount();
     int minimizedWindowscount();
     int unMinimizedWindowsCount();
+    
+    
+    WnckWindow* getActive();
+    bool isWindowExists(XID xid);
+    
+    void hideWindow(Gtk::Window* instance);
     
    
 }

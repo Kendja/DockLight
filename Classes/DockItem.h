@@ -24,7 +24,8 @@
 
 #include <libwnck/libwnck.h>
 
-#include <gtkmm/window.h> 	
+#include <gtkmm/window.h> 
+#include <glibmm/timer.h>
 #include "Defines.h"
 
 class DockItem
@@ -33,7 +34,12 @@ public:
     DockItem();
     virtual ~DockItem();
     Glib::RefPtr<Gdk::Pixbuf> m_image;
-    
+    guchar m_pixelsbuf[DEF_PREVIEW_WIDTH * DEF_PREVIEW_HEIGHT * 3] = {0};
+    GdkPixbuf *m_scaledPixbuf;
+    bool m_imageLoadedRequired;
+    bool m_isDynamic;
+    Glib::Timer m_timer;
+    bool m_timerStartSet;
     DockItem* GetCurrent();
     DockItem* GetNext();
     WnckWindow *m_window;
@@ -50,8 +56,10 @@ public:
     
     std::string getTitle();
     std::string getDesktopFileName();
+    gboolean isReloadRequired(GdkPixbuf *pixbuf);
 private:
-    //TODO: setters getters
+    bool m_pixbufPreviousPass;
+    
 
 };
 

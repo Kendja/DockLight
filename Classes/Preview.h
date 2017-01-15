@@ -31,58 +31,47 @@ public:
     Preview();
     virtual ~Preview();
     void hideMe();
+    void Activate(DockItem* item, int dockitemscount, int index);
     void setOwner(DockPanel& dockpanel)
     {
         m_dockpanelReference = &dockpanel;
     };
-    
-   
-    void Activate(DockItem* item,int dockitemscount, int index);
-    
-    
+
 protected:
     //Override default signal handler:
-    // Signal handlers:
-    // Note that on_draw is actually overriding a virtual function
-    // from the Gtk::Window class. I set it as virtual here in case
-    // someone wants to override it again in a derived class.
     virtual bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
     bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     bool on_leave_notify_event(GdkEventCrossing* crossing_event);
     bool on_timeoutDraw();
-
     bool on_motion_notify_event(GdkEventMotion*event);
     bool on_scroll_event(GdkEventScroll *event);
     bool on_button_press_event(GdkEventButton *event);
-    
-   void init(DockItem* item/*, int &width, int &height,int &windowWidth*/);
-   void updatePosition();
-   
+    void init(DockItem* item);
+
+
 private:
-    
+    static Gtk::Window* m_thisInstance;
+    static void on_window_opened(WnckScreen *screen, WnckWindow *window, gpointer data);
     static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
-    int m_dockItemIndex;
-    int m_dockItemsCount;
-    
-    
-    int m_previewWidth;
-    int m_previewHeight;
-     
-    bool m_canLeave;
-    bool m_mouseIn;
+    static int m_dockItemIndex;
+    static int m_dockItemsCount;
+    static std::string m_instancename;
+    static int m_previewWidth;
+    static int m_previewHeight;
+    static bool m_canLeave;
+    bool m_isVisible;
+    static bool m_mouseIn;
     static bool m_isActive;
-    int m_currentIndex;
+    static int m_currentIndex;
     std::string m_title;
     int m_initialItemMax;
     DockPanel* m_dockpanelReference;
-    
-    //DockItem* m_dockItemReference;
     static std::vector<DockItem*> m_previewtems;
-    
     Glib::Timer m_timer;
     Pango::FontDescription font;
-
     int getIndex(int x, int y);
+    GdkPixbuf* getScaledPixbuf(DockItem* item);
+    void showPreview(const Cairo::RefPtr<Cairo::Context>& cr, GdkPixbuf *scaledpb, int index);
 };
 
 #endif /* PREVIEW_H */

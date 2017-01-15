@@ -21,8 +21,8 @@
 #ifndef DOCKPOSITION_H
 #define DOCKPOSITION_H
 
+#include <gtkmm/window.h> 
 #include "Defines.h"
-
 
 namespace DockPosition
 {
@@ -37,6 +37,11 @@ namespace DockPosition
     void setAutoHide(bool autohide);
     bool isVisible();
     void setVisibleState(bool visible);
+        
+    void updatePreviewPosition(Gtk::Window* instance, 
+            int dockItemsCount, 
+            int dockItemIndex, 
+            int windowWidth,int previewWidth, int previewHeight);
 }
 
 #endif /* DOCKPOSITION_H */

@@ -233,6 +233,9 @@ void DockPanel::postInit()
     g_signal_connect(wnckscreen, "active_window_changed",
             G_CALLBACK(DockPanel::on_active_window_changed_callback), NULL);
 
+    g_signal_connect(G_OBJECT(wnckscreen), "state-changed",
+            G_CALLBACK(DockPanel::on_windowStateChange_callback), NULL);
+
 }
 
 DockPanel::~DockPanel()
@@ -433,8 +436,11 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         SelectWindow(m_currentMoveIndex, event);
         m_mouseLeftButtonDown = false;
 
-        // The event has been handled.
-        return true;
+        // Returning TRUE means we handled the event, so the signal
+        // emission should be stopped (don’t call any further callbacks
+        // that may be connected). Return FALSE to continue invoking callbacks.
+        return TRUE;
+
     }
 
     if (m_mouseRightButtonDown) {
@@ -466,7 +472,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
                 m_Menu_Popup.attach_to_widget(*this);
 
 
-            m_HomeMenu_Popup.resize_children();
+            //m_HomeMenu_Popup.resize_children();
             m_Menu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             m_Menu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_menu_position), 1, event->time);
@@ -478,20 +484,20 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         if (m_currentMoveIndex == 0) {
 
             int wincount = WindowControl::windowscount();
-            int minimized = WindowControl::minimizedWindowscount();
+            int minimizedexitst = WindowControl::isExistsMinimizedWindows();
             int unminimized = WindowControl::unMinimizedWindowsCount();
 
             m_HomeCloseAllWindowsMenuItem.set_sensitive(wincount > 0);
             m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 0);
             m_HomeMinimizeAllWindowsMenuItem.set_sensitive(unminimized > 0);
-            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(minimized > 0);
+            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(minimizedexitst);
             m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 0);
 
 
             if (!m_HomeMenu_Popup.get_attach_widget())
                 m_HomeMenu_Popup.attach_to_widget(*this);
 
-            m_HomeMenu_Popup.resize_children();
+            //m_HomeMenu_Popup.resize_children();
             m_HomeMenu_Popup.set_halign(Gtk::Align::ALIGN_CENTER);
             m_HomeMenu_Popup.popup(sigc::mem_fun(*this,
                     &DockPanel::on_popup_homemenu_position), 1, event->time);
@@ -501,11 +507,16 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             return true;
         }
 
-        // Propagate the event further.
-        return false;
+        // Returning TRUE means we handled the event, so the signal
+        // emission should be stopped (don’t call any further callbacks
+        // that may be connected). Return FALSE to continue invoking callbacks.
+        return TRUE;
     }
 
-    return false;
+    // Returning TRUE means we handled the event, so the signal
+    // emission should be stopped (don’t call any further callbacks
+    // that may be connected). Return FALSE to continue invoking callbacks.
+    return TRUE;
 }
 
 /**
@@ -792,8 +803,7 @@ bool DockPanel::on_timeoutDraw()
  */
 void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointer data)
 {
-
-    Update(window, Window_action::OPEN);
+        Update(window, Window_action::OPEN);
 }
 
 /**
@@ -804,7 +814,7 @@ void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointe
  */
 void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
-
+       
     Update(window, Window_action::CLOSE);
 }
 
@@ -817,6 +827,7 @@ void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointe
 void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
+   
     if (m_previewWindowActive)
         return;
 
@@ -828,6 +839,14 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
     }
 
     DockPanel::setItemImdexFromActiveWindow(window);
+}
+
+void DockPanel::on_windowStateChange_callback(WnckWindow *window,
+        WnckWindowState changed_mask,
+        WnckWindowState new_state,
+        gpointer user_data)
+{
+
 }
 
 void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)

@@ -27,27 +27,36 @@
 
 #include <gdk/gdkx.h>
 
-
-
 // Static members
 std::vector<DockItem*> Preview::m_previewtems;
 bool Preview::m_isActive;
+std::string Preview::m_instancename;
+int Preview::m_previewWidth;
+int Preview::m_previewHeight;
+Gtk::Window* Preview::m_thisInstance;
+int Preview::m_dockItemIndex;
+int Preview::m_dockItemsCount;
+bool Preview::m_canLeave;
+int Preview::m_currentIndex;
+bool Preview::m_mouseIn;
 
 /**
- * Handles the Preview 
- * ctor
+ * The “DockLight” preview allows more control over the opened windows you can 
+ * navigate to a specific window much easier. Select the window or close the desired 
+ * application, the real time preview make that very easy. 
  */
-Preview::Preview() :
-Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
-m_mouseIn(false),
-m_currentIndex(0),
-m_initialItemMax(0),
-m_dockItemIndex(-1),
-m_dockItemsCount(0),
-m_canLeave(true),
-m_previewWidth(DEF_PREVIEW_WIDTH),
-m_previewHeight(DEF_PREVIEW_HEIGHT)
+Preview::Preview()
+: Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
+m_initialItemMax(0)
 {
+    m_mouseIn = false;
+    m_canLeave = true;
+    m_currentIndex = -1;
+    m_thisInstance = (Gtk::Window*)this;
+    m_dockItemIndex = -1;
+    m_dockItemsCount = 0;
+    m_previewWidth = DEF_PREVIEW_WIDTH;
+    m_previewHeight = DEF_PREVIEW_HEIGHT;
     m_isActive = false;
 
     // Set up the top-level window.
@@ -75,6 +84,9 @@ m_previewHeight(DEF_PREVIEW_HEIGHT)
 
     WnckScreen *wnckscreen = wnck_screen_get_default();
 
+    g_signal_connect(G_OBJECT(wnckscreen), "window-opened",
+            G_CALLBACK(Preview::on_window_opened), NULL);
+
     g_signal_connect(wnckscreen, "window_closed",
             G_CALLBACK(Preview::on_window_closed), NULL);
 
@@ -97,7 +109,14 @@ Preview::~Preview()
 void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/)
 {
 
+    if (item == NULL)
+        return;
+
+    if (item->m_items.size() == 0)
+        return;
+
     m_previewtems.clear();
+    this->m_instancename = item->m_items.at(0)->m_instancename;
 
     for (DockItem* child : item->m_items) {
 
@@ -106,7 +125,6 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
 
         DockItem* newchild = new DockItem();
 
-        newchild->m_image = NULLPB;
         newchild->m_window = child->m_window;
         newchild->m_xid = child->m_xid;
 
@@ -121,44 +139,53 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
 void Preview::Activate(DockItem* item, int dockitemscount, int index)
 {
     m_isActive = false;
+    m_canLeave = false;
 
     init(item);
+
     m_dockItemIndex = index;
     m_dockItemsCount = dockitemscount;
-    updatePosition();
+    // update position
 
-    m_isActive = true;
-}
-
-void Preview::updatePosition()
-{
+    // save the current window size
     m_previewWidth = DEF_PREVIEW_WIDTH;
     m_previewHeight = DEF_PREVIEW_HEIGHT;
 
     int itemsize = (int) m_previewtems.size();
 
+    // read the new geometry for m_previewWidth, m_previewHeight
     DockPosition::getPreviewItemGeometry(itemsize, m_previewWidth, m_previewHeight);
     int windowWidth = (m_previewWidth * itemsize) + DEF_PREVIEW_RIGHT_MARGING;
 
-    // calculate the preview position. 
-    int centerpos = DockPosition::getDockItemCenterPos(
-            m_dockItemsCount, m_dockItemIndex, windowWidth);
+    // Calculates the center position of the then window
+    // resizes and center it.
+    DockPosition::updatePreviewPosition(m_thisInstance,
+            m_dockItemsCount,
+            m_dockItemIndex,
+            windowWidth,
+            m_previewWidth,
+            m_previewHeight);
 
-    m_canLeave = false;
-    hide();
 
-    move(centerpos, MonitorGeometry::getAppWindowTopPosition() - m_previewHeight);
-    resize(windowWidth, m_previewHeight);
+    // After remove the window we set the index to 0. 
+    m_currentIndex = 0;
+
     show_all();
+    m_isActive = true;
+    m_isVisible = true;
 
 }
 
 /**
  * handles on_enter_notify_event 
+ * Event triggered by pointer enter widget area.
+ * The signal will be emitted when the pointer enters the widget's window.
+ * This signal will be sent to the grab widget if there is one.
+ * 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  * @param crossing_event
- * @return 
+ * @return true to stop other handlers from being invoked for the event. false to propagate the event further
  */
 bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
 {
@@ -170,21 +197,24 @@ bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
 
 /**
  * handles on_leave_notify_event 
- * true to stop other handlers from being invoked for the event.
- * false to propagate the event further. 
+ * Event triggered by pointer leaving widget area.
+ * The signal_leave_notify_event() will be emitted when the pointer leaves the widget's window.
+ * To receive this signal, the Gdk::Window associated to the widget needs to enable the Gdk::LEAVE_NOTIFY_MASK mask.
+ * This signal will be sent to the grab widget if there is one.
+ * 
  * @param crossing_event
- * @return 
+ * @return true to stop other handlers from being invoked for the event. false to propagate the event further
  */
 bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
     if (!m_canLeave) {
-        return false;
+        return true;
     }
 
-    m_isActive = false;
     this->hideMe();
-    m_dockpanelReference->previewWindowClosed();
 
+    // tell the caller that we are leaving... 
+    m_dockpanelReference->previewWindowClosed();
     return true;
 }
 
@@ -193,38 +223,41 @@ bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
  */
 void Preview::hideMe()
 {
-
     hide();
+
     m_canLeave = true;
     m_isActive = false;
+    m_isVisible = false;
     m_mouseIn = false;
     m_dockpanelReference->m_previewWindowActive = false;
+
+    // g_object_unref static items
+    for (DockItem* item : m_previewtems) {
+        if (item->m_scaledPixbuf != nullptr) {
+            g_object_unref(item->m_scaledPixbuf);
+        }
+    }
+
     m_previewtems.clear();
 }
 
 /**
  * Timeout handler to regenerate the frame. 
  * force to redraw the entire content.
+ * 
+ * If  the flag m_canLeave is set to FALSE we need to check the mouseY coordinate.
+ * If the mouseY value is less the the window height then we hide the Preview  
  */
 bool Preview::on_timeoutDraw()
 {
-    //    int x,y;
-    //    if (Utilities::getMousePosition(x, y)){
-    //         g_print("%d %d \n",x,m_previewWidth + 16 );
-    //    }
-
-
-
-
-
-    if (!m_canLeave && m_currentIndex == -1) {
+    if (!m_canLeave) {
 
         int mouseX;
         int mouseY;
 
         if (Utilities::getMousePosition(mouseX, mouseY)) {
             if (mouseY < (MonitorGeometry::getAppWindowTopPosition() - m_previewHeight))
-                hideMe();
+                this->hideMe();
         }
     }
 
@@ -295,7 +328,39 @@ bool Preview::on_scroll_event(GdkEventScroll * event)
 }
 
 /**
+ * If a window opens then we need to check if it is the same instance.
+ * This can happen wen a Window open a dialog asking for cancel or continue.
+ * In this case we need to hide the preview.
+ * 
+ * @param WnckScreen* screen
+ * @param WnckWindow* window
+ * @param gpointer data
+ */
+void Preview::on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer data)
+{
+    if (!m_mouseIn)
+        return;
+
+    
+    const char* _instancename = wnck_window_get_class_instance_name(window);
+    if (_instancename == NULL) {
+        return;
+    }
+
+    const std::string extensions[] = {".py", ".exe", ".sh"};
+    std::string instancename = Utilities::removeExtension(_instancename, extensions);
+
+    if (m_instancename == instancename) {
+        m_isActive = false;
+        WindowControl::hideWindow(m_thisInstance);
+    }
+}
+
+/**
  * Handles window close.
+ * Wen a Window gets close we remove it from the vector list.
+ * calculate the new position and size and in case that the window size has change 
+ * we resize all the windows ind the preview. 
  * 
  * @param WnckScreen screen
  * @param WnckWindow window
@@ -303,19 +368,63 @@ bool Preview::on_scroll_event(GdkEventScroll * event)
  */
 void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
+    if ((int) m_previewtems.size() == 0) {
+        return;
+    }
 
-
+    // don't draw anything
     m_isActive = false;
+
     int idx = 0;
-    for (DockItem* item : m_previewtems) {
-        int cxid = wnck_window_get_xid(window);
+    int cxid = wnck_window_get_xid(window);
+    for (idx = (int) m_previewtems.size() - 1; idx >= 0; idx--) {
+        DockItem* item = m_previewtems.at(idx);
         if (cxid == item->m_xid) {
             m_previewtems.erase(m_previewtems.begin() + idx);
             break;
         }
-        idx++;
     }
 
+    m_canLeave = false;
+
+    // save the current window size
+    int oldresizeWidth = m_previewWidth;
+    int oldresizeHeight = m_previewHeight;
+
+    int itemsize = (int) m_previewtems.size();
+
+    // read the new geometry for m_previewWidth, m_previewHeight
+    DockPosition::getPreviewItemGeometry(itemsize, m_previewWidth, m_previewHeight);
+    int windowWidth = (m_previewWidth * itemsize) + DEF_PREVIEW_RIGHT_MARGING;
+
+    // Calculates the center position of the then window
+    // resizes and center it.
+    DockPosition::updatePreviewPosition(m_thisInstance,
+            m_dockItemsCount,
+            m_dockItemIndex,
+            windowWidth,
+            m_previewWidth,
+            m_previewHeight);
+
+
+    // After remove the window we set the index to 0. 
+    m_currentIndex = 0;
+
+    // in case that the window size has change we need to resize all the windows. 
+    if (oldresizeHeight != m_previewHeight || oldresizeWidth != m_previewWidth) {
+
+        for (DockItem* item : m_previewtems) {
+
+            if (item->m_isDynamic)
+                continue;
+
+            item->m_imageLoadedRequired = true;
+            item->m_timerStartSet = false;
+            item->m_isDynamic = false;
+        }
+    }
+
+    // OK we can use the render again
     m_isActive = true;
 
 }
@@ -326,6 +435,7 @@ void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer 
  * false to propagate the event further.
  * @param event
  * @return true to stop other handlers,false to propagate the event further.
+ * here we acivate the window and also close the window. 
  */
 bool Preview::on_button_press_event(GdkEventButton *event)
 {
@@ -333,30 +443,23 @@ bool Preview::on_button_press_event(GdkEventButton *event)
     if ((event->type == GDK_BUTTON_PRESS)) {
         // Check if the event is a left button click.
         if (event->button == 1) {
-
             if (m_currentIndex < 0)
                 return true;
 
             DockItem *item = m_previewtems.at(m_currentIndex);
-            int ct = gtk_get_current_event_time();
 
             // Handle close preview window
             int pos_x = (m_previewWidth - 5) + (m_previewWidth * m_currentIndex);
-            if (event->x >= pos_x && event->x <= pos_x + 14 && // FIXTHIS: use rectangle instead.
-                    event->y >= 19 && event->y <= 19 + 14) {
+            if (event->x >= pos_x && event->x <= pos_x + DEF_PREVIEW_LEFT_MARGING && // FIXTHIS: use rectangle instead.
+                    event->y >= 19 && event->y <= 19 + DEF_PREVIEW_LEFT_MARGING) {
 
-                wnck_window_close(item->m_window, (guint32) ct);
-
-                // delete the item here, so the Draw method can't paint it anymore
-                m_previewtems.erase(m_previewtems.begin() + m_currentIndex);
-                m_currentIndex = getIndex(event->x, event->y);
+                wnck_window_close(item->m_window, gtk_get_current_event_time());
                 m_isActive = false;
-
-                updatePosition();
 
                 return true;
             }
 
+            wnck_window_make_above(item->m_window);
             WindowControl::ActivateWindow(item->m_window);
 
             // The event has been handled.
@@ -420,6 +523,9 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         cr->set_line_width(1);
         cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
+        if (item->m_imageLoadedRequired)
+            cr->set_source_rgba(1.0, 1.0, 1.0, 1.2);
+
         Utilities::RoundedRectangle(cr,
                 DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx),
                 16, m_previewWidth,
@@ -436,6 +542,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         // get the current window title and Draw the pango text.
         m_title = wnck_window_get_name(item->m_window);
+        //m_title = /*item->m_isDinamic && */ item->m_imageLoadedRequired ? " Dynamic" : "Static";
         auto layout = create_pango_layout(m_title);
         layout->set_font_description(font);
         cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
@@ -479,68 +586,122 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         }
 
-        // get the GdkWindow for the preview.
-        GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
-                gdk_display_get_default(), item->m_xid);
+        if (item->m_imageLoadedRequired) {
+            GdkPixbuf *scaledpb = getScaledPixbuf(item);
 
-        // Obtains the bounding box of the window, including window manager 
-        // titlebar/borders if any.
-        GdkRectangle boundingbox;
-        gdk_window_get_frame_extents(wm_window, &boundingbox);
+            if (scaledpb == nullptr) {
+                continue;
+            }
 
-        // create the image SLOW!!!
-        GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
-                0, 0, boundingbox.width - 10, boundingbox.height - 24);
-        if (pb == NULL)
-            continue;
+            // show the loaded image. 
+            showPreview(cr, scaledpb, idx);
 
-        // FIXME: Scale don't work well
-        int height = m_previewHeight - DEF_PREVIEW_SCALE_HEIGHT_OFFSET;
-        int width = m_previewWidth - DEF_PREVIEW_SCALE_WIDTH_OFFSET;
-        int scale_heght = height;
+            if (!item->m_timerStartSet) {
+                item->m_timerStartSet = true;
+                item->m_timer.start();
+            }
 
-        // https://mail.gnome.org/archives/commits-list/2014-February/msg06954.html
-        /*
-        GValue scaleFactor = G_VALUE_INIT;
-        GdkScreen *screen = gdk_screen_get_default();
-        gdk_screen_get_setting (screen, "gdk-window-scaling-factor", &scaleFactor);
-        
-        double scaleFactor = 0.1;
-        auto wfactor = width * 1.3 * scaleFactor;
-        auto hfactor = height * 1.3 * scaleFactor;
-         */
-        int windowheight = gdk_window_get_height(wm_window);
+            // Checks if the image have movement.
+            if (item->isReloadRequired(scaledpb) && !item->m_isDynamic) {
+                item->m_isDynamic = true;
+            }
 
-        int heightHalf = (height / 2);
+            // if no movement has been detected, means that the image 
+            // is static and we don't need to reload it again 
+            if (item->m_timer.elapsed() > 0.5 && !item->m_isDynamic) {
+                item->m_scaledPixbuf = scaledpb;
+                item->m_timerStartSet = false;
+                item->m_timer.stop();
+                item->m_imageLoadedRequired = false;
+            }
 
-        if (windowheight < 300)
-            scale_heght = heightHalf;
-        if (windowheight < 200)
-            scale_heght = heightHalf - 20;
-        if (windowheight < 100)
-            scale_heght = heightHalf - 40;
-        if (windowheight < 50)
-            scale_heght = heightHalf - 60;
+            // if the image is static do not unreferecnce the Pixbuf.
+            if (item->m_imageLoadedRequired)
+                g_object_unref(scaledpb);
 
-        if (scale_heght < 10)
-            scale_heght = height;
+        } else {
+            // show the loaded static image. 
+            showPreview(cr, item->m_scaledPixbuf, idx);
 
-
-        GdkPixbuf *scaledpb = gdk_pixbuf_scale_simple(pb,width,scale_heght,
-                GDK_INTERP_BILINEAR); // offers reasonable quality and speed.
-
-        Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
-        Gdk::Cairo::set_source_pixbuf(cr, preview, (m_previewWidth * idx) +
-                20, DEF_PREVIEW_PIXBUF_TOP);
-        cr->paint();
-
-        // unreferenced release memory. 
-        g_object_unref(scaledpb);
-        g_object_unref(pb);
+        }
 
         idx++;
     }
-
-
     return Gtk::Window::on_draw(cr);
+}
+
+/**
+ * Paint the scaledpb GdkPixbuf to the cairo context/
+ * @param Cairo::Context cr
+ * @param GdkPixbuf* scaledpb
+ * @param the current idx
+ */
+void Preview::showPreview(const Cairo::RefPtr<Cairo::Context>& cr, GdkPixbuf* scaledpb, int idx)
+{
+    Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
+    Gdk::Cairo::set_source_pixbuf(cr, preview, (m_previewWidth * idx) +
+            20, DEF_PREVIEW_PIXBUF_TOP);
+
+    cr->paint();
+}
+
+/**
+ * Transfers image data from a GdkWindow and converts it to an RGB(A) 
+ * representation inside a GdkPixbuf. In other words, copies image data 
+ * from a server-side drawable to a client-side RGB(A) buffer. 
+ * This allows to efficiently read individual pixels on the client side.
+ *  
+ * Create a new GdkPixbuf containing a copy of src scaled to dest_width x dest_height . 
+ * Leaves src unaffected. interp_type should be GDK_INTERP_NEAREST 
+ * if you want maximum speed (but when scaling down GDK_INTERP_NEAREST is usually unusably ugly). 
+ * The default interp_type should be GDK_INTERP_BILINEAR which offers reasonable quality and speed.
+ * 
+ * @param DockItem*  item
+ * @return GdkPixbuf* 
+ * 
+ */
+GdkPixbuf* Preview::getScaledPixbuf(DockItem* item)
+{
+    GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
+            gdk_display_get_default(), item->m_xid);
+    GdkRectangle boundingbox;
+    gdk_window_get_frame_extents(wm_window, &boundingbox);
+
+
+    GdkPixbuf *pb = gdk_pixbuf_get_from_window(wm_window,
+            0, 0, boundingbox.width - 10, boundingbox.height - 30);
+
+
+    if (pb == NULL) {
+        return nullptr;
+    }
+
+    int height = m_previewHeight - DEF_PREVIEW_SCALE_HEIGHT_OFFSET;
+    int width = m_previewWidth - DEF_PREVIEW_SCALE_WIDTH_OFFSET;
+    int scale_heght = height;
+
+    int windowheight = gdk_window_get_height(wm_window);
+
+    int heightHalf = (height / 2);
+
+    if (windowheight < 300)
+        scale_heght = heightHalf;
+    if (windowheight < 200)
+        scale_heght = heightHalf - 20;
+    if (windowheight < 100)
+        scale_heght = heightHalf - 40;
+    if (windowheight < 50)
+        scale_heght = heightHalf - 60;
+
+    if (scale_heght < 10)
+        scale_heght = height;
+
+    // offers reasonable quality and speed.
+    GdkPixbuf* scaledpb = gdk_pixbuf_scale_simple(pb, width, scale_heght,
+            GDK_INTERP_BILINEAR);
+
+    g_object_unref(pb);
+
+    return scaledpb;
+
 }

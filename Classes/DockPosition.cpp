@@ -130,21 +130,20 @@ namespace DockPosition
 
     }
 
-    void getCenterScreenPos(int targetwidth,int targetheight, int &posx, int &posy)
+    void getCenterScreenPos(int targetwidth, int targetheight, int &posx, int &posy)
     {
-         int monitorWidth = MonitorGeometry::getGeometry().width;
-         int monitorHeight = MonitorGeometry::getGeometry().height;
-         
-         int monitorcenterWidth = monitorWidth / 2;
-         int monitorcenterHeight = monitorHeight / 2;
-         
-         
-         posx = monitorcenterWidth - (targetwidth/2); 
-         posy = monitorcenterHeight - (targetheight/2);
-         
+        int monitorWidth = MonitorGeometry::getGeometry().width;
+        int monitorHeight = MonitorGeometry::getGeometry().height;
+
+        int monitorcenterWidth = monitorWidth / 2;
+        int monitorcenterHeight = monitorHeight / 2;
+
+
+        posx = monitorcenterWidth - (targetwidth / 2);
+        posy = monitorcenterHeight - (targetheight / 2);
+
     }
-    
-    
+
     /**
      * Calculates the center position required to center a target window
      * on top of a DockItem. 
@@ -164,7 +163,7 @@ namespace DockPosition
         int lastItempos = monitorX + (monitorcenter + (intemcenter - m_cellwidth));
         int cellleftpos = monitorX + firstItempos + (m_cellwidth * currentindex);
         int centerpos = cellleftpos - ((targetwidth / 2) -(m_cellwidth / 2)) - monitorX;
-      
+
         // checks left monitor limit
         if (centerpos < monitorX)
             centerpos = firstItempos;
@@ -172,11 +171,11 @@ namespace DockPosition
         // checks right monitor limit
         if ((centerpos - monitorX) + targetwidth > monitorWidth)
             centerpos = (lastItempos - targetwidth) + m_cellwidth;
-        
+
         // centerpos < 0  then center on screen
-        if( centerpos < 0 ) {
-            centerpos = monitorcenter - (targetwidth/2);
-            
+        if (centerpos < 0) {
+            centerpos = monitorcenter - (targetwidth / 2);
+
         }
 
         return centerpos;
@@ -225,6 +224,17 @@ namespace DockPosition
         return position;
     }
 
+    void updatePreviewPosition(Gtk::Window* instance, int dockItemsCount,
+            int dockItemIndex, int windowWidth, int previewWidth, int previewHeight)
+    {
+        // calculate the preview position. 
+        int centerpos = getDockItemCenterPos(dockItemsCount, dockItemIndex, windowWidth);
+        
+        instance->hide();
+        instance->resize(windowWidth, previewHeight);
+        instance->move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);
+        instance->show_all();
 
+    }
 }
 
