@@ -82,7 +82,7 @@ namespace Launcher
     {
         if (desktopfile.empty())
             return "";
-        
+
         if (desktopfile == "untitled window")
             return "";
 
@@ -92,17 +92,17 @@ namespace Launcher
         // build the desktop file path 
         desktopfile = Utilities::stringToLower(desktopfile.c_str());
         std::replace(desktopfile.begin(), desktopfile.end(), ' ', '-');
-        
+
         if (dictionary.count(desktopfile) == 1) {
             return dictionary.at(desktopfile);
         }
-        
+
         char filepath[PATH_MAX];
         sprintf(filepath, "/usr/share/applications/%s.desktop", desktopfile.c_str());
 
         GError *error = NULL;
         GKeyFile *key_file = g_key_file_new();
-        
+
         gboolean found = g_key_file_load_from_file(key_file,
                 filepath, GKeyFileFlags::G_KEY_FILE_NONE, &error);
 
@@ -134,16 +134,16 @@ namespace Launcher
 
         dictionary[desktopfile] = titlename;
         g_key_file_free(key_file);
-        
+
         return titlename;
     }
 
-    std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2 )
+    std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2)
     {
-        std::string result =  getTitleNameFromDesktopFile( desktopfile );
-        if( result == "")
-            result =  getTitleNameFromDesktopFile( desktopfile2 );
-        
+        std::string result = getTitleNameFromDesktopFile(desktopfile);
+        if (result == "")
+            result = getTitleNameFromDesktopFile(desktopfile2);
+
         return result;
     }
 }

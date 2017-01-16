@@ -43,7 +43,7 @@ class DockPanel : public Gtk::DrawingArea
 public:
 
     DockPanel();
-    int preInit(Gtk::Window* window,bool autohide);
+    int preInit(Gtk::Window* window, bool autohide);
     void postInit();
 
     virtual ~DockPanel();
@@ -59,25 +59,25 @@ public:
     //static bool m_launcherWnckWindowSet;
     //static WnckWindow* m_launcherWnckWindow;
     LauncherWindow* m_launcherWindow;
-     
+
     bool ispopupMenuActive();
 private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;
-    
-   
+
+
     Preview m_preview;
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
 
-   // Gtk::MessageDialog m_messageDialog;
-    
+    // Gtk::MessageDialog m_messageDialog;
+
     std::string m_applicationpath;
     std::string m_applicationDatapath;
-    
+
     sigc::connection m_TimeoutConnection;
 
     double m_last_time;
@@ -91,15 +91,15 @@ private:
     gdouble m_titleElapsedSeconds;
     int m_titleItemOldindex = 0;
     bool m_titleShow = false;
-    
+
 
     void loadAttachedItems();
     void SelectWindow(int index, GdkEventButton * event);
-   
-    
+
+
     void createLauncher(DockItem* item);
-    
-    
+
+
 
 
     void on_QuitMenu_event();
@@ -107,24 +107,23 @@ private:
     void on_DetachFromDock_event();
     void on_AttachToDock_event();
     void on_CloseAll_event();
-    void on_MinimieAll_event();
+    void on_CloseAllExceptActive_event();
+
+
     void on_UnMinimieAll_event();
-    
+    void on_MinimieAll_event();
+    void on_MinimieAllExceptActive_event();
+
     void on_HomeCloseAllWindows_event();
     void on_HomeCloseAllWindowsExceptActive_event();
-    
-    
     void on_HomeMinimizeAllWindows_event();
     void on_HomeUnMinimizeAllWindows_event();
     void on_HomeMinimizeAllWindowsExceptActive_event();
-    
-    
+
     void on_AutohideToggled_event();
-    
     void on_MenuDeactivated_event();
     //bool on_MenuEnterNotify_event (GdkEventCrossing* crossing_event);
-    
-    
+
 
 
     // Mome menu 
@@ -138,23 +137,29 @@ private:
     Gtk::MenuItem m_MenuItemAttach;
     Gtk::MenuItem m_MenuItemDetach;
     Gtk::MenuItem m_MenuItemCloseAll;
-    Gtk::MenuItem m_MenuItemMinimizedAll;
+    Gtk::MenuItem m_MenuItemCloseAllExceptActive;
+
+    
     Gtk::MenuItem m_MenuItemUnMinimizedAll;
-    
-    
+    Gtk::MenuItem m_MenuItemMinimizedAllExceptActive;
+    Gtk::MenuItem m_MenuItemMinimizedAll;
+
+
     Gtk::MenuItem m_HomeCloseAllWindowsMenuItem;
     Gtk::MenuItem m_HomeCloseAllWindowsExceptActiveMenuItem;
-    
+
     Gtk::MenuItem m_HomeMinimizeAllWindowsMenuItem;
     Gtk::MenuItem m_HomeUnMinimizeAllWindowsMenuItem;
     Gtk::MenuItem m_HomeMinimizeAllWindowsExceptActiveMenuItem;
-    
+
     Gtk::SeparatorMenuItem m_separatorMenuItem0;
     Gtk::SeparatorMenuItem m_separatorMenuItem1;
     Gtk::SeparatorMenuItem m_separatorMenuItem2;
     Gtk::SeparatorMenuItem m_separatorMenuItem3;
     Gtk::SeparatorMenuItem m_separatorMenuItem4;
     Gtk::SeparatorMenuItem m_separatorMenuItem5;
+    Gtk::SeparatorMenuItem m_separatorMenuItem6;
+    Gtk::SeparatorMenuItem m_separatorMenuItem7;
 
     gboolean m_mouseLeftButtonDown;
     gboolean m_mouseRightButtonDown;

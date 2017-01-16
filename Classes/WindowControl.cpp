@@ -37,7 +37,7 @@ namespace WindowControl
 
 
             wnck_window_close(window, gtk_get_current_event_time());
-            
+
         }
     }
 
@@ -68,9 +68,9 @@ namespace WindowControl
 
             if (wnck_window_is_active(window))
                 continue;
-            
+
             wnck_window_close(window, gtk_get_current_event_time());
-            
+
         }
     }
 
@@ -103,7 +103,7 @@ namespace WindowControl
                 continue;
 
             wnck_window_minimize(window);
-            
+
         }
     }
 
@@ -133,7 +133,7 @@ namespace WindowControl
             }
 
             wnck_window_minimize(window);
-            
+
         }
     }
 
@@ -162,7 +162,12 @@ namespace WindowControl
                 continue;
             }
 
-            wnck_window_unminimize(window, gtk_get_current_event_time());
+            auto ct = gtk_get_current_event_time();
+            if( wnck_window_is_minimized(window))
+                wnck_window_unminimize(window, ct);
+            
+            wnck_window_activate(window,ct);
+            
         }
     }
 
@@ -173,12 +178,16 @@ namespace WindowControl
 
         int ct = gtk_get_current_event_time();
 
+        if( wnck_window_is_active( window ) ) {
+            wnck_window_minimize(window);
+            return;
+        }
+            
         wnck_window_activate(window, ct);
 
         if (wnck_window_is_minimized(window))
             wnck_window_unminimize(window, ct);
 
-       // wnck_window_activate_transient(window, ct);
     }
 
     bool isExistsUnMaximizedWindowsByDockItem(DockItem* dockitem)
@@ -208,15 +217,53 @@ namespace WindowControl
             if (window == NULL)
                 continue;
 
-            if (wnck_window_is_minimized(window) == TRUE) {
+                    
+            if (wnck_window_is_minimized(window)) {
                 result = true;
-
                 break;
             }
 
         }
 
         return result;
+    }
+
+    
+    void closeAllExceptActiveByDockItem(DockItem* dockitem)
+    {
+        for (auto item : dockitem->m_items) {
+            if (item->m_window == NULL)
+                continue;
+            if (wnck_window_is_active(item->m_window))
+                continue;
+
+            wnck_window_close(item->m_window,gtk_get_current_event_time());
+        }
+    }
+    void closeAllByDockItem(DockItem* dockitem)
+    {
+        for (auto item : dockitem->m_items) {
+            if (item->m_window == NULL)
+                continue;
+
+            wnck_window_close(item->m_window,gtk_get_current_event_time());
+        }
+    }
+
+    void minimizeAllExceptActiveByDockItem(DockItem* dockitem)
+    {
+        for (auto item : dockitem->m_items) {
+
+            WnckWindow *window = item->m_window;
+            if (window == NULL)
+                continue;
+
+            if (wnck_window_is_active(item->m_window))
+                continue;
+
+            if (wnck_window_is_minimized(window) == false)
+                wnck_window_minimize(window);
+        }
     }
 
     void minimizeAllByDockItem(DockItem* dockitem)
@@ -239,23 +286,49 @@ namespace WindowControl
             WnckWindow *window = item->m_window;
             if (window == NULL)
                 continue;
-
-            wnck_window_unminimize(window, gtk_get_current_event_time());
+           
+           auto ct = gtk_get_current_event_time(); 
+           if (wnck_window_is_minimized(window))
+            wnck_window_unminimize(window, ct);
+           
+           wnck_window_activate(window,ct);
+           
         }
     }
 
-    void unminimizeAllByDockItem(DockItem* dockitem)
+//    void unminimizeAllByDockItem(DockItem* dockitem)
+//    {
+//        for (auto item : dockitem->m_items) {
+//            WnckWindow *window = item->m_window;
+//            if (window == NULL)
+//                continue;
+//
+//            if (wnck_window_is_minimized(window))
+//                wnck_window_unminimize(window, gtk_get_current_event_time());
+//        }
+//    }
+
+    
+    bool isExitsActivetWindowByDockItem(DockItem* dockitem)
     {
         for (auto item : dockitem->m_items) {
             WnckWindow *window = item->m_window;
             if (window == NULL)
                 continue;
-
-            if (wnck_window_is_minimized(window))
-                wnck_window_unminimize(window, gtk_get_current_event_time());
+            
+            
+            if (wnck_window_is_active(window))
+                return true;
         }
+        
+        return false;
     }
-
+    
+    bool isExitstWindowsByDockItem(DockItem* dockitem)
+    {
+        return dockitem->m_items.size() > 0;
+    }
+    
     int windowscount()
     {
         int count = 0;
@@ -297,7 +370,7 @@ namespace WindowControl
     {
         WnckScreen *screen;
         GList *window_l;
-        
+
         screen = wnck_screen_get_default();
         wnck_screen_force_update(screen);
 
@@ -308,7 +381,7 @@ namespace WindowControl
             if (window == NULL)
                 continue;
 
-             WnckWindowType wt = wnck_window_get_window_type(window);
+            WnckWindowType wt = wnck_window_get_window_type(window);
 
             if (wt == WNCK_WINDOW_DESKTOP ||
                     wt == WNCK_WINDOW_DOCK ||
@@ -317,20 +390,20 @@ namespace WindowControl
 
                 continue;
             }
-             
-            if( wnck_window_is_active( window ) ) {
+
+            if (wnck_window_is_active(window)) {
                 return window;
             }
         }
 
         return nullptr;
     }
-    
+
     bool isWindowExists(XID xid)
     {
         WnckScreen *screen;
         GList *window_l;
-        
+
         screen = wnck_screen_get_default();
         wnck_screen_force_update(screen);
 
@@ -341,16 +414,17 @@ namespace WindowControl
             if (window == NULL)
                 continue;
 
-            if( wnck_window_get_xid(window) == xid )
+            if (wnck_window_get_xid(window) == xid)
                 return true;
-            
+
         }
 
         return false;
     }
+
     bool isExistsMinimizedWindows()
     {
-        
+
         WnckScreen *screen;
         GList *window_l;
 
@@ -428,8 +502,7 @@ namespace WindowControl
     {
         return windowscount() - minimizedWindowscount();
     }
-    
-    
+
     void hideWindow(Gtk::Window* instance)
     {
         instance->hide();

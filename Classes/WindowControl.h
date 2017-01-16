@@ -22,8 +22,17 @@ namespace WindowControl
     void HomeUnMinimizeAll();
     
     void ActivateWindow(WnckWindow* window);
-    void unminimizeAllByDockItem(DockItem* dockitem);
+    
+    void closeAllExceptActiveByDockItem(DockItem* dockitem);
+    void closeAllByDockItem(DockItem* dockitem);
+    
+    bool isExitstWindowsByDockItem(DockItem* dockitem);
+    bool isExitsActivetWindowByDockItem(DockItem* dockitem);
+
+    
+    void minimizeAllExceptActiveByDockItem(DockItem* dockitem);
     void minimizeAllByDockItem(DockItem* dockitem);
+    
     void unMinimizeAllByDockItem(DockItem* dockitem);
     
     bool isExistsUnMaximizedWindowsByDockItem(DockItem* dockitem);

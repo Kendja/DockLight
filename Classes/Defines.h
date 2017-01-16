@@ -60,6 +60,7 @@ typedef enum StrutsPosition_t
 #define DEF_ICONFILE    "docklight.ico"
 #define DEF_LAUNCHER_DIR "/usr/share/applications/"
 
+#define DEF_FRAMERATE 1000/30
 
 #define DEF_CELLWIDTH 58                    // Cell Width
 #define DEF_CELLHIGHT 62                    // Cell Height
@@ -70,8 +71,6 @@ typedef enum StrutsPosition_t
 
 // Icon top Margin from the cell
 #define DEF_ICONTOPCELLMARGIN DEF_ICONTOPMARGIN -DEF_CELLTOPMARGIN                
-
-
 
 #define DEF_PANELHIGHTHIDE  4                 
 #define DEF_PANELHIGHT 72 

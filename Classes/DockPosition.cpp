@@ -210,14 +210,14 @@ namespace DockPosition
 
         if (m_autoHide) {
 
-            position -= 148;
+            position -= 198;
 
         } else {
 
             // This is a fix for a BUG! in  Gtk::Menu.
             // The position don't work on resolution smaller or equal then 768 height.
             if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 150; // Modify this value depend of the menu children count
+                position -= 200; // Modify this value depend of the menu children count
             }
         }
 

@@ -80,7 +80,7 @@ m_initialItemMax(0)
     font.set_weight(Pango::WEIGHT_NORMAL);
 
     Glib::signal_timeout().
-            connect(sigc::mem_fun(*this, &Preview::on_timeoutDraw), 1000 / 60);
+            connect(sigc::mem_fun(*this, &Preview::on_timeoutDraw), DEF_FRAMERATE);
 
     WnckScreen *wnckscreen = wnck_screen_get_default();
 
@@ -250,6 +250,9 @@ void Preview::hideMe()
  */
 bool Preview::on_timeoutDraw()
 {
+    if (!m_isVisible)
+        return true;
+
     if (!m_canLeave) {
 
         int mouseX;
@@ -362,6 +365,7 @@ void Preview::on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer 
  */
 void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
+
     if ((int) m_previewtems.size() == 0) {
         return;
     }
@@ -452,7 +456,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
 
                 return true;
             }
-            
+
             WindowControl::ActivateWindow(item->m_window);
 
             // The event has been handled.

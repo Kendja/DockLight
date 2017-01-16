@@ -90,7 +90,7 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
         g_critical("init: docklight.ico could not be found!\n");
         return -1;
     }
-    
+
     DockItem* dockItem = new DockItem();
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONFILE).c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
@@ -112,25 +112,25 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
 
-    m_HomeUnMinimizeAllWindowsMenuItem.set_label("Unminimize all Windows");
+    m_HomeUnMinimizeAllWindowsMenuItem.set_label("Show all");
     m_HomeUnMinimizeAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeUnMinimizeAllWindows_event));
 
-    m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_label("Minimize all Windows except active");
+    m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_label("Minimize all except active");
     m_HomeMinimizeAllWindowsExceptActiveMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeMinimizeAllWindowsExceptActive_event));
 
 
-    m_HomeMinimizeAllWindowsMenuItem.set_label("Minimize all Windows");
+    m_HomeMinimizeAllWindowsMenuItem.set_label("Minimize all");
     m_HomeMinimizeAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeMinimizeAllWindows_event));
 
-    m_HomeCloseAllWindowsExceptActiveMenuItem.set_label("Close all Windows except active");
+    m_HomeCloseAllWindowsExceptActiveMenuItem.set_label("Close all except active");
     m_HomeCloseAllWindowsExceptActiveMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeCloseAllWindowsExceptActive_event));
 
 
-    m_HomeCloseAllWindowsMenuItem.set_label("Close all Windows");
+    m_HomeCloseAllWindowsMenuItem.set_label("Close all");
     m_HomeCloseAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeCloseAllWindows_event));
 
@@ -181,22 +181,35 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
 
     m_Menu_Popup.append(m_separatorMenuItem3);
 
-    m_MenuItemUnMinimizedAll.set_label("Unminimize all");
+    m_MenuItemUnMinimizedAll.set_label("Show all");
     m_MenuItemUnMinimizedAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_UnMinimieAll_event));
 
+    m_MenuItemMinimizedAllExceptActive.set_label("Minimize all except active");
+    m_MenuItemMinimizedAllExceptActive.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_MinimieAllExceptActive_event));
 
     m_MenuItemMinimizedAll.set_label("Minimize all");
     m_MenuItemMinimizedAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_MinimieAll_event));
 
     m_Menu_Popup.append(m_MenuItemUnMinimizedAll);
+
+    m_Menu_Popup.append(m_separatorMenuItem7);
+    m_Menu_Popup.append(m_MenuItemMinimizedAllExceptActive);
     m_Menu_Popup.append(m_MenuItemMinimizedAll);
 
+    m_MenuItemCloseAllExceptActive.set_label("Close all except active");
+    m_MenuItemCloseAllExceptActive.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllExceptActive_event));
 
     m_MenuItemCloseAll.set_label("Close all");
     m_MenuItemCloseAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAll_event));
+
+
+    m_Menu_Popup.append(m_separatorMenuItem6);
+    m_Menu_Popup.append(m_MenuItemCloseAllExceptActive);
     m_Menu_Popup.append(m_MenuItemCloseAll);
 
     m_Menu_Popup.signal_deactivate().
@@ -219,7 +232,7 @@ void DockPanel::postInit()
     // m_titleTimer.start();
 
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &DockPanel::on_timeoutDraw), 1000 / 60);
+            &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
 
     // Gets the default WnckScreen on the default display.
     WnckScreen *wnckscreen = wnck_screen_get_default();
@@ -450,16 +463,26 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         // Items 
         if (m_currentMoveIndex > 0) {
             DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
+            bool isExitstWindows = 
+                    WindowControl::isExitstWindowsByDockItem(dockitem );
+            bool isExitstActiveWindow = 
+                    WindowControl::isExitsActivetWindowByDockItem(dockitem);
             bool maximizedexistst =
                     WindowControl::isExistsUnMaximizedWindowsByDockItem(dockitem);
-            bool minizedexitst =
-                    WindowControl::isExistsMinimizedWindowsByDockItem(dockitem);
+            //bool minizedexitst =
+            //        WindowControl::isExistsMinimizedWindowsByDockItem(dockitem);
 
 
-            m_MenuItemMinimizedAll.set_sensitive(dockitem->m_items.size() > 0 && maximizedexistst);
-            m_MenuItemUnMinimizedAll.set_sensitive(dockitem->m_items.size() > 0 && minizedexitst);
+            m_MenuItemMinimizedAll.set_sensitive(isExitstWindows && maximizedexistst);
+            
+            m_MenuItemMinimizedAllExceptActive.set_sensitive(isExitstWindows 
+            && maximizedexistst && isExitstActiveWindow);
+            m_MenuItemUnMinimizedAll.set_sensitive(isExitstWindows);
+            
 
-            m_MenuItemCloseAll.set_sensitive(dockitem->m_items.size() > 0);
+            m_MenuItemCloseAllExceptActive.set_sensitive(isExitstActiveWindow);
+            m_MenuItemCloseAll.set_sensitive(isExitstWindows);
+            
             m_MenuItemAttach.set_sensitive(dockitem->m_isAttached == false);
             m_MenuItemDetach.set_sensitive(dockitem->m_isAttached &&
                     dockitem->m_items.size() == 0);
@@ -481,15 +504,14 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         if (m_currentMoveIndex == 0) {
 
             int wincount = WindowControl::windowscount();
-            int minimizedexitst = WindowControl::isExistsMinimizedWindows();
+            //int minimizedexitst = WindowControl::isExistsMinimizedWindows();
             int unminimized = WindowControl::unMinimizedWindowsCount();
 
             m_HomeCloseAllWindowsMenuItem.set_sensitive(wincount > 0);
             m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 0);
             m_HomeMinimizeAllWindowsMenuItem.set_sensitive(unminimized > 0);
-            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(minimizedexitst);
+            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(wincount>0);
             m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 0);
-
 
             if (!m_HomeMenu_Popup.get_attach_widget())
                 m_HomeMenu_Popup.attach_to_widget(*this);
@@ -640,23 +662,22 @@ void DockPanel::on_DetachFromDock_event()
 
 }
 
-void DockPanel::on_CloseAll_event()
+void DockPanel::on_CloseAllExceptActive_event()
 {
-
-
     if (m_currentMoveIndex < 0)
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
-    for (auto item : dockitem->m_items) {
-        WnckWindow *window = item->m_window;
-        if (window == NULL)
+    WindowControl::closeAllExceptActiveByDockItem(dockitem);
+}
 
-            continue;
+void DockPanel::on_CloseAll_event()
+{
+    if (m_currentMoveIndex < 0)
+        return;
 
-        int ct = gtk_get_current_event_time();
-        wnck_window_close(window, (guint32) ct);
-    }
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
+    WindowControl::closeAllByDockItem(dockitem);
 }
 
 void DockPanel::on_UnMinimieAll_event()
@@ -666,6 +687,15 @@ void DockPanel::on_UnMinimieAll_event()
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
     WindowControl::unMinimizeAllByDockItem(dockitem);
+}
+
+void DockPanel::on_MinimieAllExceptActive_event()
+{
+    if (m_currentMoveIndex < 0)
+        return;
+
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
+    WindowControl::minimizeAllExceptActiveByDockItem(dockitem);
 }
 
 void DockPanel::on_MinimieAll_event()
@@ -800,7 +830,7 @@ bool DockPanel::on_timeoutDraw()
  */
 void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointer data)
 {
-        Update(window, Window_action::OPEN);
+    Update(window, Window_action::OPEN);
 }
 
 /**
@@ -811,7 +841,7 @@ void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointe
  */
 void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
-       
+
     Update(window, Window_action::CLOSE);
 }
 
@@ -824,7 +854,7 @@ void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointe
 void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
-   
+
     if (m_previewWindowActive)
         return;
 
@@ -837,7 +867,6 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
 
     DockPanel::setItemImdexFromActiveWindow(window);
 }
-
 
 void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
 {
@@ -914,8 +943,8 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     std::string realgroupname(_realgroupname);
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
-    std::string titlename = 
-            Launcher::getTitleNameFromDesktopFile(instancename,realgroupname);
+    std::string titlename =
+            Launcher::getTitleNameFromDesktopFile(instancename, realgroupname);
 
     if (realgroupname == "Wine")
         realgroupname = instancename;
@@ -1155,20 +1184,24 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->stroke();
     }
 
-
-
-
     for (auto item : m_dockitems) {
         if (item->m_image == NULLPB)
             continue;
 
         // Draw circles
+        double radius = 2.0;
+        int margin = 4;
+        
+        if( m_iconsize <= 25 ) {
+            radius = 1.5;
+            margin = 3;
+        }
         cr->set_source_rgb(1.0, 1.0, 1.0);
         if (item->m_items.size() == 1) {
-            cr->arc(col + (m_cellwidth / 2), m_cellheight, 2, 0, 2 * M_PI);
+            cr->arc(col + (m_cellwidth / 2), m_cellheight, radius, 0, 2 * M_PI);
         } else if (item->m_items.size() > 1) {
-            cr->arc((col + (m_cellwidth / 2)) - 4, m_cellheight, 2, 0, 2 * M_PI);
-            cr->arc((col + (m_cellwidth / 2)) + 4, m_cellheight, 2, 0, 2 * M_PI);
+            cr->arc((col + (m_cellwidth / 2)) - margin, m_cellheight, radius, 0, 2 * M_PI);
+            cr->arc((col + (m_cellwidth / 2)) + margin, m_cellheight, radius, 0, 2 * M_PI);
         }
         cr->fill();
 
