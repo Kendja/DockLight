@@ -112,7 +112,7 @@ std::string DockItem::getDesktopFileName()
  * @param GdkPixbuf* pixbuf
  * @return true is a movement detected or false is none.
  */
-gboolean DockItem::isReloadRequired(GdkPixbuf* pixbuf)
+gboolean DockItem::isMovementDetected(GdkPixbuf* pixbuf)
 {
     gint x, y;
     int w = gdk_pixbuf_get_width(pixbuf);

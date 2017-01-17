@@ -56,7 +56,7 @@ public:
     
     std::string getTitle();
     std::string getDesktopFileName();
-    gboolean isReloadRequired(GdkPixbuf *pixbuf);
+    gboolean isMovementDetected(GdkPixbuf *pixbuf);
 private:
     bool m_pixbufPreviousPass;
     

@@ -163,11 +163,11 @@ namespace WindowControl
             }
 
             auto ct = gtk_get_current_event_time();
-            if( wnck_window_is_minimized(window))
+            if (wnck_window_is_minimized(window))
                 wnck_window_unminimize(window, ct);
-            
-            wnck_window_activate(window,ct);
-            
+
+            wnck_window_activate(window, ct);
+
         }
     }
 
@@ -176,13 +176,13 @@ namespace WindowControl
         if (window == NULL)
             return;
 
-        int ct = gtk_get_current_event_time();
 
-        if( wnck_window_is_active( window ) ) {
+        if (wnck_window_is_active(window)) {
             wnck_window_minimize(window);
             return;
         }
-            
+        
+        int ct = gtk_get_current_event_time();
         wnck_window_activate(window, ct);
 
         if (wnck_window_is_minimized(window))
@@ -217,7 +217,7 @@ namespace WindowControl
             if (window == NULL)
                 continue;
 
-                    
+
             if (wnck_window_is_minimized(window)) {
                 result = true;
                 break;
@@ -228,7 +228,6 @@ namespace WindowControl
         return result;
     }
 
-    
     void closeAllExceptActiveByDockItem(DockItem* dockitem)
     {
         for (auto item : dockitem->m_items) {
@@ -237,16 +236,17 @@ namespace WindowControl
             if (wnck_window_is_active(item->m_window))
                 continue;
 
-            wnck_window_close(item->m_window,gtk_get_current_event_time());
+            wnck_window_close(item->m_window, gtk_get_current_event_time());
         }
     }
+
     void closeAllByDockItem(DockItem* dockitem)
     {
         for (auto item : dockitem->m_items) {
             if (item->m_window == NULL)
                 continue;
 
-            wnck_window_close(item->m_window,gtk_get_current_event_time());
+            wnck_window_close(item->m_window, gtk_get_current_event_time());
         }
     }
 
@@ -286,49 +286,48 @@ namespace WindowControl
             WnckWindow *window = item->m_window;
             if (window == NULL)
                 continue;
-           
-           auto ct = gtk_get_current_event_time(); 
-           if (wnck_window_is_minimized(window))
-            wnck_window_unminimize(window, ct);
-           
-           wnck_window_activate(window,ct);
-           
+
+            auto ct = gtk_get_current_event_time();
+            if (wnck_window_is_minimized(window))
+                wnck_window_unminimize(window, ct);
+
+            wnck_window_activate(window, ct);
+
         }
     }
 
-//    void unminimizeAllByDockItem(DockItem* dockitem)
-//    {
-//        for (auto item : dockitem->m_items) {
-//            WnckWindow *window = item->m_window;
-//            if (window == NULL)
-//                continue;
-//
-//            if (wnck_window_is_minimized(window))
-//                wnck_window_unminimize(window, gtk_get_current_event_time());
-//        }
-//    }
+    //    void unminimizeAllByDockItem(DockItem* dockitem)
+    //    {
+    //        for (auto item : dockitem->m_items) {
+    //            WnckWindow *window = item->m_window;
+    //            if (window == NULL)
+    //                continue;
+    //
+    //            if (wnck_window_is_minimized(window))
+    //                wnck_window_unminimize(window, gtk_get_current_event_time());
+    //        }
+    //    }
 
-    
     bool isExitsActivetWindowByDockItem(DockItem* dockitem)
     {
         for (auto item : dockitem->m_items) {
             WnckWindow *window = item->m_window;
             if (window == NULL)
                 continue;
-            
-            
+
+
             if (wnck_window_is_active(window))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     bool isExitstWindowsByDockItem(DockItem* dockitem)
     {
         return dockitem->m_items.size() > 0;
     }
-    
+
     int windowscount()
     {
         int count = 0;

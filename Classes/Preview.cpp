@@ -457,7 +457,17 @@ bool Preview::on_button_press_event(GdkEventButton *event)
                 return true;
             }
 
+            // Activate and/or minimize the window
             WindowControl::ActivateWindow(item->m_window);
+
+            // reload the image and checks if its have movement.
+            // In this case it will change from static to Dynamic.
+            // This can happen when a browser play a video and gets minimized and 
+            // stops playing. When it gets unminimized should play again in the preview.
+            if (!item->m_isDynamic) {
+                item->m_timerStartSet = false;
+                item->m_imageLoadedRequired = true;
+            }
 
             // The event has been handled.
             return true;
@@ -599,20 +609,20 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             }
 
             // Checks if the image have movement.
-            if (item->isReloadRequired(scaledpb) && !item->m_isDynamic) {
+            if (item->isMovementDetected(scaledpb) && !item->m_isDynamic) {
                 item->m_isDynamic = true;
             }
 
             // if no movement has been detected, means that the image 
             // is static and we don't need to reload it again 
-            if (item->m_timer.elapsed() > 0.5 && !item->m_isDynamic) {
+            if (item->m_timer.elapsed() > 0.2 && !item->m_isDynamic) {
                 item->m_scaledPixbuf = scaledpb;
-                item->m_timerStartSet = false;
+                // item->m_timerStartSet = false;
                 item->m_timer.stop();
                 item->m_imageLoadedRequired = false;
             }
 
-            // if the image is static do not unreferecnce the Pixbuf.
+            // if the image is static do not unreference the scaledpb.
             if (item->m_imageLoadedRequired)
                 g_object_unref(scaledpb);
 
@@ -628,7 +638,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 }
 
 /**
- * Paint the scaledpb GdkPixbuf to the cairo context/
+ * Paint the scaledpb GdkPixbuf to the cairo context.
  * @param Cairo::Context cr
  * @param GdkPixbuf* scaledpb
  * @param the current idx

@@ -1360,8 +1360,5 @@ void DockPanel::createLauncher(DockItem* item)
         m_launcherWindow->show_all();
     }
 
-    //
-    //    if (m_launcherWnckWindow != nullptr)
-    //        wnck_window_activate(m_launcherWnckWindow, gtk_get_current_event_time());
 }
 
