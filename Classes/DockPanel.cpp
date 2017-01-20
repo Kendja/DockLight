@@ -152,10 +152,23 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     // m_HomeMenu_Popup.signal_enter_notify_event().
     //        connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
 
+    m_HelpMenuItem.set_label("Help");
+    m_HelpMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HelpMenu_event));
+
+
+    m_AboutMenuItem.set_label("About");
+    m_AboutMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_AboutMenu_event));
 
     m_QuitMenuItem.set_label("Quit");
     m_QuitMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
+
+
+    m_HomeMenu_Popup.append(m_HelpMenuItem);
+    m_HomeMenu_Popup.append(m_AboutMenuItem);
+    m_HomeMenu_Popup.append(m_separatorMenuItem8);
     m_HomeMenu_Popup.append(m_QuitMenuItem);
     m_HomeMenu_Popup.show_all();
     m_HomeMenu_Popup.accelerate(*this);
@@ -463,9 +476,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         // Items 
         if (m_currentMoveIndex > 0) {
             DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
-            bool isExitstWindows = 
-                    WindowControl::isExitstWindowsByDockItem(dockitem );
-            bool isExitstActiveWindow = 
+            bool isExitstWindows =
+                    WindowControl::isExitstWindowsByDockItem(dockitem);
+            bool isExitstActiveWindow =
                     WindowControl::isExitsActivetWindowByDockItem(dockitem);
             bool maximizedexistst =
                     WindowControl::isExistsUnMaximizedWindowsByDockItem(dockitem);
@@ -474,15 +487,15 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 
 
             m_MenuItemMinimizedAll.set_sensitive(isExitstWindows && maximizedexistst);
-            
-            m_MenuItemMinimizedAllExceptActive.set_sensitive(isExitstWindows 
-            && maximizedexistst && isExitstActiveWindow);
+
+            m_MenuItemMinimizedAllExceptActive.set_sensitive(isExitstWindows
+                    && maximizedexistst && isExitstActiveWindow);
             m_MenuItemUnMinimizedAll.set_sensitive(isExitstWindows);
-            
+
 
             m_MenuItemCloseAllExceptActive.set_sensitive(isExitstActiveWindow);
             m_MenuItemCloseAll.set_sensitive(isExitstWindows);
-            
+
             m_MenuItemAttach.set_sensitive(dockitem->m_isAttached == false);
             m_MenuItemDetach.set_sensitive(dockitem->m_isAttached &&
                     dockitem->m_items.size() == 0);
@@ -510,7 +523,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             m_HomeCloseAllWindowsMenuItem.set_sensitive(wincount > 0);
             m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 0);
             m_HomeMinimizeAllWindowsMenuItem.set_sensitive(unminimized > 0);
-            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(wincount>0);
+            m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(wincount > 0);
             m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 0);
 
             if (!m_HomeMenu_Popup.get_attach_widget())
@@ -546,31 +559,36 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
  */
 void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 {
-
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
 
     int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
-    x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex);
+    x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) +
+            (m_cellwidth * m_currentMoveIndex);
     y = DockPosition::getHomeMenuTopPosition();
-
 }
 
 void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 {
-
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_Menu_Popup.get_allocated_width() / 2);
 
-
-
-
     int col = center - (m_dockitems.size() * m_cellwidth) / 2;
 
-    x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex);
+    x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) +
+            (m_cellwidth * m_currentMoveIndex);
     y = DockPosition::getItemMenuTopPosition();
+}
 
+void DockPanel::on_HelpMenu_event()
+{
+
+}
+
+void DockPanel::on_AboutMenu_event()
+{
+    m_about.show();
 }
 
 void DockPanel::on_QuitMenu_event()
@@ -1191,8 +1209,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         // Draw circles
         double radius = 2.0;
         int margin = 4;
-        
-        if( m_iconsize <= 25 ) {
+
+        if (m_iconsize <= 25) {
             radius = 1.5;
             margin = 3;
         }

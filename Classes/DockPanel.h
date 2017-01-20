@@ -37,6 +37,8 @@
 #include "Preview.h"
 #include "DockPosition.h"
 #include "LauncherWindow.h"
+#include "About.h"
+
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -66,7 +68,7 @@ private:
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;
 
-
+    About m_about;
     Preview m_preview;
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
@@ -103,6 +105,9 @@ private:
 
 
     void on_QuitMenu_event();
+    void on_AboutMenu_event();
+    void on_HelpMenu_event();
+    
     void on_menuNew_event();
     void on_DetachFromDock_event();
     void on_AttachToDock_event();
@@ -128,6 +133,8 @@ private:
 
     // Mome menu 
     Gtk::Menu m_HomeMenu_Popup;
+    Gtk::MenuItem m_HelpMenuItem;
+    Gtk::MenuItem m_AboutMenuItem;
     Gtk::MenuItem m_QuitMenuItem;
     Gtk::CheckMenuItem m_AutohideMenuItem;
 
@@ -160,6 +167,7 @@ private:
     Gtk::SeparatorMenuItem m_separatorMenuItem5;
     Gtk::SeparatorMenuItem m_separatorMenuItem6;
     Gtk::SeparatorMenuItem m_separatorMenuItem7;
+    Gtk::SeparatorMenuItem m_separatorMenuItem8;
 
     gboolean m_mouseLeftButtonDown;
     gboolean m_mouseRightButtonDown;

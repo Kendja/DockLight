@@ -24,6 +24,9 @@
 
 
 #define APPNAME "DockLight"
+#define ICONNAME "docklight.ico"
+
+#define VERSION "1.0"
 #define DOCKLIGHT_INSTANCENAME "docklight"
 #define DOCKLIGHTLAUNCHER "DockLight Launcher"
 

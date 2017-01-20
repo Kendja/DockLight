@@ -23,6 +23,8 @@
 #include <sstream>
 #include "Utilities.h"
 
+#include  <glibmm/i18n.h>
+
 /**
  * The Entry Point.
  * @param argc
@@ -31,6 +33,12 @@
  */
 int main(int argc, char *argv[])
 {
+    /*
+    bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
+    */
+    
     Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
 
@@ -47,7 +55,7 @@ int main(int argc, char *argv[])
     if (found) {
         // read the Autohide Entry 
         found = g_key_file_get_boolean(key_file, "DockLight", "Autohide", &error);
-        autohide = (int)found;
+        autohide = (int) found;
         if (error) {
             g_warning("Autohide Entry not found. %s\n", error->message);
             g_error_free(error);

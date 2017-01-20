@@ -5,6 +5,8 @@
 #include "DockItem.h"
 #include "DockPanel.h"
 
+#include  <glibmm/i18n.h>
+
 LaucherButtonBox::LaucherButtonBox(bool horizontal,
         const Glib::ustring& title,
         gint spacing,
@@ -12,7 +14,7 @@ LaucherButtonBox::LaucherButtonBox(bool horizontal,
 : Gtk::Frame(title),
 m_Button_createLauncher("Create Launcher"),
 m_Button_testLauncher("Test Launcher"),
-m_Button_Cancel("Cancel")
+m_Button_Cancel(_("Cancel"))
 {
     Gtk::ButtonBox* bbox = nullptr;
 
@@ -33,6 +35,7 @@ m_Button_Cancel("Cancel")
     bbox->add(m_Button_testLauncher);
     bbox->add(m_Button_Cancel);
 
+    
 
 }
 
@@ -190,6 +193,8 @@ void LauncherWindow::init(DockPanel& dockpanel, DockItem* dockitem)
     m_EntryFile.set_text("");
     m_EntryIcon.set_text("");
     m_EntryCategories.set_text("Other");
+    
+    
 }
 
 void LauncherWindow::on_button_testLauncher_clicked()
@@ -217,6 +222,7 @@ void LauncherWindow::on_button_testLauncher_clicked()
             "and trying the command from there...");
 
     dialog.run();
+    
 }
 
 void LauncherWindow::on_button_createLauncher_clicked()
@@ -320,7 +326,7 @@ void LauncherWindow::on_button_createLauncher_clicked()
     sprintf(command, "pkexec %s %s",
     Utilities::getExecPath("createlauncher.sh").c_str(),desktopfileLocal.c_str());
     if(system(command) != 0 ){
-        Gtk::MessageDialog dialog(*this, "\n\nError in command. Please try again!\n\n", false, Gtk::MESSAGE_INFO);
+        Gtk::MessageDialog dialog(*this, "\n\nPermissions required. Please try again!\n\n", false, Gtk::MESSAGE_INFO);
         dialog.run();
         return;
     }
