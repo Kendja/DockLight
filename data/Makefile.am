@@ -1,6 +1,6 @@
 
 EXTRA_DIST = \
-	docklight.menu.desktop \
+	docklight.menu.desktop.in \
 	org.freedesktop.docklight.policy \
 	docklight.home.ico \
 	docklight.ini \
@@ -14,7 +14,8 @@ policy_DATA = org.freedesktop.docklight.policy
 
 #/usr/local/share
 applicationsdir = $(datadir)/applications
-applications_DATA = docklight.menu.desktop
+applications_in_files = docklight.menu.desktop.in
+applications_DATA = $(applications_in_files:.desktop.in=.desktop)
 
 #/docklight.data
 docklightdatadir = $(bindir)/docklight.data
@@ -31,5 +32,9 @@ uninstall-hook:
 	if test -d $(bindir)/docklight.data; then rm -fr $(bindir)/docklight.data; fi
 
 
-
+#desktopdir = $(datadir)/applications
+#desktop_in_files = docklight.menu.desktop.in
+#desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 #@INTLTOOL_DESKTOP_RULE@
+
+

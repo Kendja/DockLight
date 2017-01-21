@@ -27,9 +27,6 @@ DISTCLEANFILES = ... intltool-extract \
 #@INTLTOOL_DESKTOP_RULE@
 
 
-
-
-
 		
 #dist_doc_DATA = README
 #DIST_SUBDIRS = data
