@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=DockLight
+Version=1.0
+Exec= docklight
+Comment=this programm shows a simple Dock Panel with window preview.
+Icon=/usr/lib/docklight.data/docklight.home.ico
+Type=Application
+Terminal=false
+StartupNotify=false
+Encoding=UTF-8
+Categories=Utility;
+
