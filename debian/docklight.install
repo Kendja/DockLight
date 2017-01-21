@@ -1,0 +1,11 @@
+bin/docklight /usr/lib/DockLight
+bin/docklight.ico /usr/lib/DockLight
+bin/createlauncher.sh /usr/lib/DockLight
+debian/docklight.ini /usr/lib/DockLight
+debian/docklight.desktop /usr/share/applications/
+debian/template.desktop /usr/lib/DockLight/data
+debian/org.freedesktop.docklight.policy /usr/share/polkit-1/actions
+
+
+
+
