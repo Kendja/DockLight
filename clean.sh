@@ -5,7 +5,7 @@ rm -f src/docklight
 rm -f src/*.o
 rm -f src/Makefile src/Makefile.in 
 
-ls -1 | egrep -v "^(debian|m4|bin|po|src|data|man|clean.sh|configure.ac|autogen.sh|autogen2.sh|Makefile.am|nbproject|README.md|LICENSE)$"  | xargs rm -r
+ls -1 | egrep -v "^(debian|package|m4|bin|po|src|data|man|clean.sh|configure.ac|autogen.sh|autogen2.sh|Makefile.am|nbproject|README.md|LICENSE)$"  | xargs rm -r
 
 cd m4
 ls -1 | egrep -v "^(NOTES)$"  | xargs rm -r	
@@ -19,6 +19,6 @@ ls -1 | egrep -v "^(docklight.home.ico|docklight.ini|docklight.logo.png|dockligh
 
 
 
-exit 1
+exit 0
 
 
