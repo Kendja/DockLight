@@ -1,11 +1,21 @@
-#bin/docklight /usr/lib/DockLight
-#bin/docklight.ico /usr/lib/DockLight
-#bin/createlauncher.sh /usr/lib/DockLight
-#debian/docklight.ini /usr/lib/DockLight
-#debian/docklight.desktop /usr/share/applications/
-#debian/template.desktop /usr/lib/DockLight/data
-#debian/org.freedesktop.docklight.policy /usr/share/polkit-1/actions
+src/docklight /usr/lib/docklight
+data/docklight.home.ico /usr/lib/docklight/docklight.data
+data/docklight.ini /usr/lib/docklight/docklight.data
+data/docklight.launcher.sh /usr/lib/docklight/docklight.data
+data/docklight.logo.png /usr/lib/docklight/docklight.data
+data/docklight.menu.desktop /usr/share/applications/
+data/docklight.template.desktop /usr/lib/docklight/docklight.data
+data/org.freedesktop.docklight.policy /usr/share/polkit-1/actions
+data/docklight.home.ico /usr/share/pixmaps
+po/*.po /usr/lib/docklight/docklight.data/tmp
 
 
+#data/docklight.home.ico /usr/share/icons/hicolor/16x16/apps
+#data/docklight.home.ico /usr/share/icons/hicolor/22x22/apps
+#data/docklight.home.ico /usr/share/icons/hicolor/24x24/apps
+#data/docklight.home.ico /usr/share/icons/hicolor/32x32/apps
+#data/docklight.home.ico /usr/share/icons/hicolor/48x48/apps
+#data/docklight.home.ico /usr/share/icons/hicolor/64x64/apps
+#data/docklight.home.ico /usr/share/icons/hicolor/128x128/apps
 
 

@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+if [ "$1" = "purge" ]; then
+
+# need to purge the translations files
+podir="/usr/lib/docklight/docklight.data/po"
+if [ -d ${podir} ]; then 
+	cd ${podir}
+	for p in *.po
+	do
+		d=${p%.*}
+		mofile="/usr/local/share/locale/$d/LC_MESSAGES/docklight.mo"
+		if [ -f ${mofile} ]; then 
+			rm -f ${mofile}
+		fi
+	done
+ fi
+
+
+  # purge docklight.
+  rm -fr /usr/lib/docklight	
+
+  # remove symblink	
+  rm -f /usr/local/bin/docklight
+fi
+
+if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
+    # Source debconf library.
+    . /usr/share/debconf/confmodule
+   
+    # Remove my changes to the db.
+    db_purge
+fi
+
+exit 0
+
+
+

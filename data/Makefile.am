@@ -28,7 +28,7 @@ install-exec-hook:
 	
 	
 uninstall-hook:
-	if test -d $(DESTDIR)$(bindir)/docklight.data; then rm -fr $(DESTDIR)$(bindir)/docklight.data; fi
+	if test -d $(bindir)/docklight.data; then rm -fr $(bindir)/docklight.data; fi
 
 
 #desktopdir = $(datadir)/applications
