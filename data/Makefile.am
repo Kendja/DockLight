@@ -1,3 +1,6 @@
+SUBDIRS = \
+	icons \
+	$(NULL)
 
 EXTRA_DIST = \
 	docklight.menu.desktop \
