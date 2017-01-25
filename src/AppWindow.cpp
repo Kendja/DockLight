@@ -20,6 +20,7 @@
 
 #include "AppWindow.h"
 #include "MonitorGeometry.h"
+#include "../config.h"
 
 /*
  * http://web.mit.edu/ghudson/dev/nokrb/third/libwnck/libwnck/test-wnck.c
@@ -51,7 +52,7 @@ AppWindow::AppWindow()
  */
 int AppWindow::Init(panel_locationType location, int autohide)
 {
-    this->set_title(DEF_APPNAME);
+    this->set_title(PACKAGE_NAME);
     
     // The App Logo
     std::string iconFile = Utilities::getExecPath(DEF_LOGONAME);

@@ -2,6 +2,10 @@ nbproject/
 bin/
 debian/.debhelper
 debian/docklight
+src/.deps/
+
+!package/*
+
 
 /ABOUT-NLS
 /Makefile
@@ -110,3 +114,5 @@ debian/docklight
 *.exe
 *.out
 *.app
+
+

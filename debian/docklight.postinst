@@ -44,6 +44,10 @@ if [ -d ${podir} ]; then
 	cd ${podir}
 	for p in *.po
 	do
+		# check for locale (LIVE SYSTEMS don't have it)
+		if [ ! -d "/usr/local/share/locale" ]; then
+			break;
+		fi
 		d=${p%.*}
 		mofile="/usr/local/share/locale/$d/LC_MESSAGES/docklight.mo"
 		localedir="/usr/local/share/locale/$d/LC_MESSAGES/"
@@ -52,6 +56,7 @@ if [ -d ${podir} ]; then
 		fi
 
 		msgfmt -c ${p} -o ${mofile}
+		
 	done
 fi
 

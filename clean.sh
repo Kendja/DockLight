@@ -1,6 +1,7 @@
 #! /bin/sh -e
 
 rm -rf debian/docklight 
+rm -rf debian/.debhelper
 rm -f src/docklight
 rm -f src/*.o
 rm -f src/Makefile src/Makefile.in 

@@ -1,8 +1,4 @@
-
-#ACLOCAL_AMFLAGS = --install -I m4 ${ACLOCAL_FLAGS}
-
 SUBDIRS = src po data 
-
 		
 # Add INTLTOOL_FILES to the EXTRA_DIST list of files.
 # This ensures that when you do a make dist, 
@@ -15,7 +11,7 @@ INTLTOOL_FILES = intltool-extract.in \
 
 
 
-DISTCLEANFILES = ... intltool-extract \
+DISTCLEANFILES = intltool-extract \
                  intltool-merge \
                  intltool-update \
                  po/.intltool-merge-cache	

@@ -3,9 +3,11 @@
 #include "Defines.h"
 #include "DockPosition.h"
 #include  <glibmm/i18n.h>
+#include  "../config.h"
+
 
 About::About()
-: m_appName(DEF_APPNAME),
+: m_appName(PACKAGE_NAME),
 m_appVersion(VERSION),
 m_isInitSet(false),
 m_logoPath(Utilities::getExecPath(DEF_LOGONAME))

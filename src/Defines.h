@@ -20,8 +20,6 @@
 
 #ifndef DEFINES_H
 #define DEFINES_H
-    
-#define DEF_APPNAME             "docklight"
 
 #define DEF_DATADIRNAME         "docklight.data/" 
 #define DEF_ATTACHMENTDIR       "docklight.data/attachments" 
@@ -35,10 +33,6 @@
 #define DEF_LAUCHERSCRIPTPATH   "docklight.data/docklight.launcher.sh"
 
 
-
-
-
-#define VERSION "1.0"
 #define DOCKLIGHT_INSTANCENAME "docklight"
 #define DOCKLIGHTLAUNCHER "DockLight Launcher"
 

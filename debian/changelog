@@ -1,3 +1,10 @@
+docklight (1.0-12) UNRELEASED; urgency=medium
+
+  * create autotools build system
+  * prepare for translations 
+
+ -- Juan R. González <j-gonzalez@email.de>  Sun, 22 Jan 2017 22:36:29 +0700
+
 docklight (1.0-11) UNRELEASED; urgency=medium
 
   * Modify the Preview.

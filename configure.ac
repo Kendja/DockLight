@@ -1,8 +1,8 @@
 PACKAGE=docklight
-VERSION=1.0-11
+VERSION=1.0-12
 
-
-AC_INIT([docklight], [1.0], [bug-automake@gnu.org])
+dnl ======================================================
+AC_INIT([docklight], [1.0.12], [bug-automake@gnu.org])
 # this flags are for automake
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 # find & probe c compiler
@@ -11,13 +11,6 @@ AC_PROG_CC
 AC_PROG_CXX
 # make config headers
 AC_CONFIG_HEADERS([config.h])
-# configure create makefiles
-AC_CONFIG_FILES([
- Makefile
- data/Makefile
- po/Makefile.in	
- src/Makefile
-])
 
 dnl ======================================================
 IT_PROG_INTLTOOL([0.35.0])  
@@ -28,22 +21,52 @@ AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.19])
 
+# This PROGRAMNAME_LOCALEDIR variable will be used later in the Makefile.am file,
+# to define a macro that will be used when you initialize gettext in your source code.
 PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
 AC_SUBST(PROGRAMNAME_LOCALEDIR)
+
+dnl ======================================================
+AC_CONFIG_MACRO_DIR([m4])
 dnl ======================================================
 
-AC_CONFIG_MACRO_DIR([m4])
+# This checks for the presence of gtkmm-3.0 and defines
+# GTKMM_LIBS and GTKMM_CFLAGS for use in Makefile.am files. 
+PKG_CHECK_MODULES([GTKMM], [gtkmm-3.0 >= 3.8.0])
 
+# This checks for the presence of libwnck-3.0  and defines
+# WNCK_LIBS and WNCK_CFLAGS for use in Makefile.am files. 
+PKG_CHECK_MODULES([WNCK], [libwnck-3.0 ] )
+
+#MM_PKG_CONFIG_SUBST([GTHREAD_LIBS], [--libs libwnck-3.0])
+AC_PATH_PROG(PKG_CONFIG, pkg-config)
+
+# check X11 this add -lX11 and substiture the X11_CFLAGS and X11_LIBS variables.
+AC_CHECK_LIB([X11], [XOpenDisplay])
+
+# check wnck-3 this add -lwnck-3 and substiture the wnck-3_CFLAGS and wnck-3_LIBS variables.
+AC_CHECK_LIB([wnck-3],[wnck_screen_get_default])
+
+dnl ======================================================
+#AC_SUBST_FILE([ouptput_bin])
+  ouptput_bin=$srcdir/bin/docklight
+#AC_DEFINE_UNQUOTED([DATADIR], ["$datadir"], [/usr/lib/DockLight])
+
+dnl ======================================================
+
+# configure create makefiles
+AC_CONFIG_FILES([
+ Makefile
+ data/Makefile
+ po/Makefile.in	
+ src/Makefile
+])
 
 
 #AC_SUBST_FILE([ouptput_bin])
-          ouptput_bin=$srcdir/bin/docklight
-
+#ouptput_bin=$srcdir/bin/docklight
 #AC_DEFINE_UNQUOTED([DATADIR], ["$datadir"], [/usr/lib/DockLight])
 
-
-# Checks for programs.
-AC_PROG_CXX
 
 dnl ==========================================================================
 echo "
@@ -53,7 +76,9 @@ echo "
 	compiler:		${CC}
 	top_srcdir  		${top_srcdir}
 	bin dir			$(bindir)
+        locale   		${datadir}/locale
 "
 
-
 AC_OUTPUT
+
+

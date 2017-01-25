@@ -1,18 +1,28 @@
 ACLOCAL_AMFLAGS = -I m4 --install
+bin_PROGRAMS = docklight
 
 
 # what flags you want to pass to the C compiler & linker
-AM_CPPFLAGS = -g -Wall -Wno-reorder -std=c++11 -DPROGRAMNAME_LOCALEDIR=\""$(datadir)/locale"\"  `pkg-config  --cflags gtkmm-3.0 libwnck-3.0` 
-AM_LDFLAGS = -static-libstdc++ -lX11  -lxcb  `pkg-config  --cflags --libs gtkmm-3.0 libwnck-3.0 ` 
+#AM_CPPFLAGS = -g -Wall -Wno-reorder -std=c++11 -DPROGRAMNAME_LOCALEDIR=\""$(datadir)/locale"\"  `pkg-#config  --cflags gtkmm-3.0 libwnck-3.0` 
+#AM_LDFLAGS = -static-libstdc++ -lX11  -lxcb  `pkg-config  --cflags --libs gtkmm-3.0 libwnck-3.0 ` 
+
+
+ALLCPPFLAGS = $(GTKMM_CFLAGS)
+ALLCPPFLAGS += $(WNCK_CFLAGS)
 
 #This macro will be used when you initialize gettext in your source code.
-#AM_CPPFLAGS = ... -DPROGRAMNAME_LOCALEDIR=\"${PROGRAMNAME_LOCALEDIR}\"
+ALLCPPFLAGS += -DPROGRAMNAME_LOCALEDIR=\""$(datadir)/locale"\" 
 
-# list of programs to be installed in bin directory
-bin_PROGRAMS = docklight
+docklight_CPPFLAGS = $(ALLCPPFLAGS)
 
-#keine regel fuer distribution
-#EXTRA_DIST = m4/NOTES
+ALLDADDLIBS = $(GTKMM_LIBS)
+ALLDADDLIBS +=$(WNCK_LIBS)
+docklight_LDADD = $(ALLDADDLIBS)
+
+
+#  flags for the C compiler & linker
+AM_CPPFLAGS = -g -Wall -Wno-reorder -std=c++11 
+
 
 # list of source files needed to generate target (docklight)
 docklight_SOURCES =  \
