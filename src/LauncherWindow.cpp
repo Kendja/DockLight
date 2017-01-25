@@ -407,7 +407,15 @@ void LauncherWindow::on_button_icon_clicked()
 void LauncherWindow::on_button_CategoriesLink_clicked()
 {
     //system("sensible-browser https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
-    system("xdg-open https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
+    if( system("xdg-open https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry") != 0 ){
+     
+        Gtk::MessageDialog dialog(*this, _("Browser could not be found!\n"), false,
+            Gtk::MESSAGE_INFO,
+            Gtk::BUTTONS_OK,
+            true
+            );
+        dialog.run();
+    }
      
 }
 

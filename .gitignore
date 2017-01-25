@@ -6,6 +6,7 @@ src/.deps/
 
 !package/*
 
+*.dh-orig
 
 /ABOUT-NLS
 /Makefile
@@ -23,6 +24,8 @@ src/.deps/
 /configure
 /data/Makefile
 /data/Makefile.in
+/data/icons/Makefile
+/data/icons/Makefile.in
 /depcomp
 /install-sh
 /intltool-extract.in
@@ -81,6 +84,9 @@ src/.deps/
 /src/Makefile.in
 /src/docklight
 /stamp-h1
+
+
+
 
 # Prerequisites
 *.d

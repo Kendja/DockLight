@@ -192,6 +192,12 @@ msgstr "Öffne_n"
 msgid "Image files"
 msgstr "Bilddateien"
 
+
+#: ../src/LauncherWindow.cpp:412
+msgid "Browser could not be found!\n"
+msgstr "Browser konnte nicht gefunden werden!\n"
+
+
 #: ../src/LauncherWindow.cpp:426
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "Felder Name und Befehl dürfen nicht leer sein!\n"
