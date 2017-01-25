@@ -1,4 +1,5 @@
-#! /bin/sh -e
+#!/bin/bash
+shopt -s extglob
 
 rm -rf debian/docklight 
 rm -rf debian/.debhelper
@@ -7,21 +8,17 @@ rm -f src/*.o
 rm -f src/Makefile src/Makefile.in 
 rm -f src/docklight.data/attachments/*
 
-
-ls -1 | egrep -v "^(debian|package|m4|bin|po|src|data|man|clean.sh|configure.ac|autogen.sh|autogen2.sh|Makefile.am|nbproject|README.md|LICENSE)$"  | xargs rm -r
+rm -rf !(clean.sh|autogen.sh|configure.ac|LICENSE|Makefile.am|README.md
+    |data|debian|m4|nbproject|package|po|src)
 
 cd m4
-ls -1 | egrep -v "^(NOTES)$"  | xargs rm -r	
-
+rm -rf !(NOTES)
 
 cd ../po
-ls -1 | egrep -v "^(de.po|hu.po|LINGUAS|POTFILES.in|compile_all.sh|deploymo.sh)$"  | xargs rm -r
+rm -rf !(*.po|LINGUAS|POTFILES.in|compile_all.sh|deploymo.sh)
 
-cd ../data
-ls -1 | egrep -v "^(docklight.home.ico|docklight.ini|docklight.logo.png|docklight.launcher.sh|Makefile.am|docklight.menu.desktop|org.freedesktop.docklight.policy|docklight.template.desktop)$"  | xargs rm -r
+cd ..
 
-
+shopt -u extglob
 
 exit 0
-
-

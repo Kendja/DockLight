@@ -2,8 +2,8 @@
 Name=DockLight
 Version=1.0
 Exec=/usr/lib/docklight/docklight
-Comment=this programm shows a simple Dock Panel with window preview.
-Icon=/usr/lib/docklight/docklight.data/docklight.home.ico
+Comment=This program is a lightweight Dock launcher for common Applications.
+Icon=/usr/share/pixmaps/docklight.home.ico
 Type=Application
 Terminal=false
 StartupNotify=false
