@@ -24,10 +24,15 @@ if [ -d ${podir} ]; then
 
 
   # purge docklight.
-  rm -fr /usr/lib/docklight	
+  if [ -d "/usr/lib/docklight" ]; then
+  	rm -fr /usr/lib/docklight	
+  fi	
 
-  # remove symblink	
+  # remove symblink
+ if [ -f "/usr/local/bin/docklight" ]; then	
   rm -f /usr/local/bin/docklight
+ fi
+
 fi
 
 if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then

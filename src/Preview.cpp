@@ -125,6 +125,8 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
 
         DockItem* newchild = new DockItem();
 
+        //the name of window , or a fallback name if no name is available.
+        newchild->m_titlename = wnck_window_get_name(child->m_window);
         newchild->m_window = child->m_window;
         newchild->m_xid = child->m_xid;
 
@@ -134,6 +136,29 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
     m_currentIndex = 0;
     m_initialItemMax = (int) m_previewtems.size();
 
+    // Sort by title name
+    int size = (int) m_previewtems.size();
+    int i, m, j ;
+
+    for (i = 0; i < size - 1; i = i + 1) {
+        m = i;
+        for ( j = i + 1; j < size; j = j + 1) {
+
+            std::string s1 = m_previewtems.at(j)->m_titlename.c_str();
+            std::string s2 = m_previewtems.at(m)->m_titlename.c_str();
+
+            s1 = s1.substr(0, 40);
+            s2 = s2.substr(0, 40);
+
+            std::string a = Utilities::stringToLower(s1.c_str());
+            std::string b = Utilities::stringToLower(s2.c_str());
+
+            if (a < b) {
+                m = j;
+            }
+        }
+        std::swap(m_previewtems.at(i), m_previewtems.at(m));
+    }
 }
 
 void Preview::Activate(DockItem* item, int dockitemscount, int index)
@@ -547,10 +572,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->clip_preserve();
         cr->stroke();
 
-        // get the current window title and Draw the pango text.
-        m_title = wnck_window_get_name(item->m_window);
-        //m_title = /*item->m_isDinamic && */ item->m_imageLoadedRequired ? " Dynamic" : "Static";
-        auto layout = create_pango_layout(m_title);
+        auto layout = create_pango_layout(item->m_titlename);
         layout->set_font_description(font);
         cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
         cr->move_to(pos_x, pos_y);

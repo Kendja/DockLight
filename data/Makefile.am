@@ -3,26 +3,38 @@ SUBDIRS = \
 	$(NULL)
 
 EXTRA_DIST = \
-	docklight.menu.desktop \
-	org.freedesktop.docklight.policy \
+	4autotools/docklight.menu.desktop \
+	4autotools/org.freedesktop.docklight.policy \
+	docklight.template.desktop \
 	docklight.home.ico \
 	docklight.ini \
 	docklight.launcher.sh \
 	docklight.logo.png \
 	$(NULL)
 
+#CLEANFILES = \
+#	docklight.menu.desktop \
+#	$(NULL)
+
 #/usr/share/polkit-1/actions
 policydir = /usr/share/polkit-1/actions
-policy_DATA = org.freedesktop.docklight.policy
+policy_DATA = 4autotools/org.freedesktop.docklight.policy
 
 #/usr/local/share
 applicationsdir = $(datadir)/applications
-applications_DATA = docklight.menu.desktop
+applications_DATA = 4autotools/docklight.menu.desktop
 
 #/docklight.data
 docklightdatadir = $(bindir)/docklight.data
-docklightdata_DATA = docklight.home.ico docklight.ini docklight.launcher.sh docklight.logo.png
+docklightdata_DATA = \
+		docklight.home.ico \
+		docklight.ini \
+		docklight.launcher.sh \
+		docklight.logo.png \
+		docklight.template.desktop \
+		$(NULL)
 
+@INTLTOOL_DESKTOP_RULE@
 
 install-exec-hook:
 	if test ! -d $(bindir)/docklight.data; then mkdir $(bindir)/docklight.data; fi

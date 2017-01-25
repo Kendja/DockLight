@@ -63,7 +63,6 @@ private:
     static bool m_mouseIn;
     static bool m_isActive;
     static int m_currentIndex;
-    std::string m_title;
     int m_initialItemMax;
     DockPanel* m_dockpanelReference;
     static std::vector<DockItem*> m_previewtems;
@@ -73,6 +72,8 @@ private:
     GdkPixbuf* getScaledPixbuf(DockItem* item);
     void showPreview(const Cairo::RefPtr<Cairo::Context>& cr, GdkPixbuf *scaledpb, int index);
 };
+
+
 
 #endif /* PREVIEW_H */
 

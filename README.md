@@ -1,10 +1,10 @@
-# DockLight
-This programm shows a simple Dock Panel with window preview.
+# Docklight
+Docklight is a lightweight Dock launcher for common Applications.
 
 Docklight” is a simple but effective dock launcher for GNOME 3 desktops e.g (cinnamon).
 It supports a Preview from all open Applications.
 
-The “DockLight” preview allows more control over the opened windows you can navigate to a specific window much easier.
+The “Docklight” preview allows more control over the opened windows you can navigate to a specific window much easier.
 Select the window or close the desired application the real time preview make that very easy.
 “Docklight” is written in C++ with “GTK 3” and “libwnck”. “Docklight” is open source width a GNU General Public License.
 
@@ -31,7 +31,7 @@ Select the window or close the desired application the real time preview make th
    
  Install from a debian package:
  
-  you can install “DockLight” direct from the debian Package/docklight_1.0-*_amd64.deb
+  you can install “Docklight” direct from the debian Package/docklight_1.0-*_amd64.deb
  
  Credits:
 

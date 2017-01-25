@@ -96,7 +96,7 @@ private:
     bool m_titleShow = false;
 
 
-    void loadAttachedItems();
+    int loadAttachments();
     void SelectWindow(int index, GdkEventButton * event);
 
 

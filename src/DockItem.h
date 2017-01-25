@@ -18,7 +18,7 @@
 //
 //****************************************************************
 #ifndef DOCKITEM_H
-#define	DOCKITEM_H
+#define DOCKITEM_H
 
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
@@ -32,7 +32,7 @@ class DockItem
 {
 public:
     DockItem();
-    virtual ~DockItem();
+   ~DockItem();
     Glib::RefPtr<Gdk::Pixbuf> m_image;
     guchar m_pixelsbuf[DEF_PREVIEW_WIDTH * DEF_PREVIEW_HEIGHT * 3] = {0};
     GdkPixbuf *m_scaledPixbuf;
@@ -53,15 +53,15 @@ public:
     bool m_isAttached = false;
     bool m_isDirty = false;
     bool visible = true;
-    
+
     std::string getTitle();
     std::string getDesktopFileName();
     gboolean isMovementDetected(GdkPixbuf *pixbuf);
 private:
     bool m_pixbufPreviousPass;
-    
 
 };
 
-#endif	/* DOCKITEM_H */
+
+#endif /* DOCKITEM_H */
 

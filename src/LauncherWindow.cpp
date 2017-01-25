@@ -12,8 +12,8 @@ LaucherButtonBox::LaucherButtonBox(bool horizontal,
         gint spacing,
         Gtk::ButtonBoxStyle layout)
 : Gtk::Frame(title),
-m_Button_createLauncher("Create Launcher"),
-m_Button_testLauncher("Test Launcher"),
+m_Button_createLauncher(_("Create Launcher")),
+m_Button_testLauncher(_("Test Launcher")),
 m_Button_Cancel(_("Cancel"))
 {
     Gtk::ButtonBox* bbox = nullptr;
@@ -46,21 +46,21 @@ Gtk::Window(Gtk::WindowType::WINDOW_TOPLEVEL),
 m_VBox(Gtk::ORIENTATION_VERTICAL),
 m_VPaned(Gtk::ORIENTATION_VERTICAL),
 m_ButtonBox(Gtk::ORIENTATION_VERTICAL),
-m_labelFile("Command: "),
-m_Button_File("Choose command"),
-m_Button_Icon("Choose Icon"),
-m_Button_create("Create Launcher"),
-m_Button_test("Test Launcher"),
-m_Button_CategoriesLink("Available"),
-m_labeInfo("Create Launcher."),
+m_labelFile(_("Command: ")),
+m_Button_File(_("Choose command")),
+m_Button_Icon(_("Choose Icon")),
+m_Button_create(_("Create Launcher")),
+m_Button_test("_(Test Launcher"),
+m_Button_CategoriesLink(_("Available")),
+m_labeInfo("_(Create Launcher."),
 m_labelName("Name: "),
-m_labelComment("Comment: "),
-m_labelIcon("Icon: "),
-m_labelCategories("Categories: "),
-m_Button_close("Close")
+m_labelComment(_("Comment: ")),
+m_labelIcon(_("Icon: ")),
+m_labelCategories(_("Categories: ")),
+m_Button_close(_("Close"))
 {
 
-    set_title("DockLight Launcher");
+    set_title(_("DockLight Launcher"));
     set_size_request(440, 300);
     this->set_resizable(false);
     this->set_keep_above(true);
@@ -183,12 +183,12 @@ void LauncherWindow::init(DockPanel& dockpanel, DockItem* dockitem)
     m_dockpanel = &dockpanel;
 
     char message[NAME_MAX];
-    sprintf(message, "Launcher for %s could not be found.\nYou need to create a Launcher for this Application.",
+    sprintf(message, _("Launcher for %s could not be found.\nYou need to create a Launcher for this Application."),
             dockitem->getTitle().c_str());
 
     m_labeInfo.set_text(message);
     m_EntryName.set_text(m_dockitem->getTitle().c_str());
-    std::string defaultcomment(m_dockitem->getTitle() + " Application");
+    std::string defaultcomment(m_dockitem->getTitle() + _(" Application") );
     m_EntryComment.set_text(defaultcomment.c_str());
     m_EntryFile.set_text("");
     m_EntryIcon.set_text("");
@@ -205,12 +205,12 @@ void LauncherWindow::on_button_testLauncher_clicked()
     }
 
 
-    if (Utilities::system(m_EntryFile.get_text().c_str()) == 0)
+    if (system(m_EntryFile.get_text().c_str()) == 0)
         return;
 
-    Gtk::MessageDialog dialog(*this, "Launcher test Failed!", false, Gtk::MESSAGE_INFO);
+    Gtk::MessageDialog dialog(*this, _("Launcher test Failed!"), false, Gtk::MESSAGE_INFO);
     //dialog.set_icon_name()
-    dialog.set_secondary_text("The command you enter is invalid.\n\n"
+    dialog.set_secondary_text(_("The command you enter is invalid.\n\n"
             "Some Applications are scripts files and others requires Administrator privileges:\n"
             "for scrips files you need to add the bash on the beginning:\n\n"
             "/bin/sh \"/usr/local/scriptfile.sh\"\n"
@@ -219,7 +219,7 @@ void LauncherWindow::on_button_testLauncher_clicked()
             "gksu gparted-pkexec\n\n"
             "Please make sure that the Application starts from the command line.\n"
             "Open a terminal and navigate to the directory where the application is locate\n"
-            "and trying the command from there...");
+            "and trying the command from there..."));
 
     dialog.run();
     
@@ -247,7 +247,7 @@ void LauncherWindow::on_button_createLauncher_clicked()
     char command[NAME_MAX];
     sprintf(command, "cp %s %s ",templatefileLocal.c_str(),desktopfileLocal.c_str());
     if(system(command) != 0 ){
-        Gtk::MessageDialog dialog(*this, "\n\nCopy template Error!\n\n", false, Gtk::MESSAGE_INFO);
+        Gtk::MessageDialog dialog(*this, _("\n\nCopy template Error!\n\n"), false, Gtk::MESSAGE_INFO);
         dialog.run();
         return;
     }
@@ -333,13 +333,13 @@ void LauncherWindow::on_button_createLauncher_clicked()
     
         
     if(system(command) != 0 ){
-        Gtk::MessageDialog dialog(*this, "\n\nPermissions required. Please try again!\n\n", false, Gtk::MESSAGE_INFO);
+        Gtk::MessageDialog dialog(*this, _("\n\nPermissions required. Please try again!\n\n"), false, Gtk::MESSAGE_INFO);
         dialog.run();
         return;
     }
  
 
-    Gtk::MessageDialog dialog(*this, "\n\nLauncher created successfully!\n\n", false, Gtk::MESSAGE_INFO);
+    Gtk::MessageDialog dialog(*this, _("\n\nLauncher created successfully!\n\n"), false, Gtk::MESSAGE_INFO);
     dialog.run();
     close();
 }
@@ -347,14 +347,14 @@ void LauncherWindow::on_button_createLauncher_clicked()
 void LauncherWindow::on_button_file_clicked()
 {
 
-    Gtk::FileChooserDialog dialog("Please choose a file",
+    Gtk::FileChooserDialog dialog(_("Please choose a file"),
             Gtk::FILE_CHOOSER_ACTION_OPEN);
     dialog.set_transient_for(*this);
 
 
     //Add response buttons the the dialog:
-    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-    dialog.add_button("_Open", Gtk::RESPONSE_OK);
+    dialog.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
+    dialog.add_button(_("_Open"), Gtk::RESPONSE_OK);
 
     //Show the dialog and wait for a user response:
     int result = dialog.run();
@@ -373,20 +373,21 @@ void LauncherWindow::on_button_file_clicked()
 void LauncherWindow::on_button_icon_clicked()
 {
 
-    Gtk::FileChooserDialog dialog("Please choose a file",
+    Gtk::FileChooserDialog dialog(_("Please choose a file"),
             Gtk::FILE_CHOOSER_ACTION_OPEN);
     dialog.set_transient_for(*this);
 
 
     //Add response buttons the the dialog:
-    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-    dialog.add_button("_Open", Gtk::RESPONSE_OK);
+    dialog.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
+    dialog.add_button(_("_Open"), Gtk::RESPONSE_OK);
 
     auto filter_text = Gtk::FileFilter::create();
-    filter_text->set_name("Image files");
+    filter_text->set_name(_("Image files"));
     filter_text->add_mime_type("image/png");
     filter_text->add_mime_type("image/ico");
     filter_text->add_mime_type("image/svg");
+    filter_text->add_mime_type("image/jpg");
     dialog.add_filter(filter_text);
 
     //Show the dialog and wait for a user response:
@@ -405,7 +406,9 @@ void LauncherWindow::on_button_icon_clicked()
 
 void LauncherWindow::on_button_CategoriesLink_clicked()
 {
-    Utilities::exec("sensible-browser https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
+    //system("sensible-browser https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
+    system("xdg-open https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
+     
 }
 
 bool LauncherWindow::isFormFieldsValid()
@@ -422,8 +425,7 @@ bool LauncherWindow::isFormFieldsValid()
 
 void LauncherWindow::InvalidFormFieldsMessage()
 {
-    //MessageDialog (const Glib::ustring& message, bool use_markup=false, MessageType type=MESSAGE_INFO, ButtonsType buttons=BUTTONS_OK, bool modal=false)
-    Gtk::MessageDialog dialog(*this, "Fields Name and Command can't be empty!\n", false,
+    Gtk::MessageDialog dialog(*this, _("Fields Name and Command can't be empty!\n"), false,
             Gtk::MESSAGE_INFO,
             Gtk::BUTTONS_OK,
             true

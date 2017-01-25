@@ -58,6 +58,7 @@ dnl ======================================================
 AC_CONFIG_FILES([
  Makefile
  data/Makefile
+ data/icons/Makefile
  po/Makefile.in	
  src/Makefile
 ])

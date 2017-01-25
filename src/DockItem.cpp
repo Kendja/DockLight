@@ -1,7 +1,7 @@
 //*****************************************************************
 //
 //  Copyright (C) 2015 Juan R. Gonzalez
-//  Created on November 20, 2015, 7:15 PM
+//  Created on November 20, 2015, 
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,13 +25,14 @@
 /**
  * ctor
  */
-DockItem::DockItem() :
-m_pixbufPreviousPass(false),
+DockItem::DockItem()
+: m_pixbufPreviousPass(false),
 m_image(NULLPB),
 m_scaledPixbuf(nullptr),
 m_imageLoadedRequired(true),
 m_timerStartSet(false),
-m_isDynamic(false)
+m_isDynamic(false),
+m_titlename("")
 {
 
 }
@@ -106,6 +107,7 @@ std::string DockItem::getDesktopFileName()
 
     return desktopfile + ".desktop";
 }
+
 /**
  * This function will not work for pixbufs with images that are other than 8 bits 
  * per sample or channel, but it will work for most of the pixbufs that GTK+ uses.
@@ -151,3 +153,4 @@ gboolean DockItem::isMovementDetected(GdkPixbuf* pixbuf)
     m_pixbufPreviousPass = FALSE;
     return FALSE;
 }
+

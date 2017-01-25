@@ -11,13 +11,13 @@ Homepage: https://github.com/yoosamui/DockLight
 Package: docklight
 Architecture: any
 Depends:  libwnck-3-common, libwnck-3-dev, libc6-dev, libgtkmm-3.0-dev (>=3.0), debconf
-Description: This program shows a Dock Panel with window preview.
- Docklight” is a simple but effective dock for opening
+Description:This program is a lightweight Dock launcher for common Applications.
+ Docklight is a simple but effective dock for opening
  common applications for GNOME 3 desktops e.g (cinnamon).
  It supports a Preview from all open Applications.
- The “DockLight” preview allows more control over the opened
- windows you can navigate to a specific window much easier.
- Select the window or close the desired application. The real
+ The “Docklight” preview allows more control over the opened
+ windows, you can navigate to a specific window much easier.
+ Select a window or close the desired application. The real
  time preview make that very easy.
  “Docklight” is written in C++ with “GTK 3” and “libwnck”.
  “Docklight” is open source width a GNU General Public License.

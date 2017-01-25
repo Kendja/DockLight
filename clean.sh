@@ -5,6 +5,8 @@ rm -rf debian/.debhelper
 rm -f src/docklight
 rm -f src/*.o
 rm -f src/Makefile src/Makefile.in 
+rm -f src/docklight.data/attachments/*
+
 
 ls -1 | egrep -v "^(debian|package|m4|bin|po|src|data|man|clean.sh|configure.ac|autogen.sh|autogen2.sh|Makefile.am|nbproject|README.md|LICENSE)$"  | xargs rm -r
 

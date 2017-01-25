@@ -26,6 +26,7 @@
 #include "DockPosition.h"
 #include "WindowControl.h"
 
+#include  <glibmm/i18n.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
 
@@ -51,8 +52,8 @@ m_cellheight(DEF_CELLHIGHT),
 m_popupMenuOn(false),
 m_launcherWindow(nullptr),
 m_applicationpath(Utilities::getExecPath()),
-m_applicationDatapath(m_applicationpath + "/"+DEF_DATADIRNAME),
-m_applicationAttachmentsPath(m_applicationpath + "/"+DEF_ATTACHMENTDIR)
+m_applicationDatapath(m_applicationpath + "/" + DEF_DATADIRNAME),
+m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR)
 {
     m_currentMoveIndex = -1;
 
@@ -81,6 +82,7 @@ m_applicationAttachmentsPath(m_applicationpath + "/"+DEF_ATTACHMENTDIR)
  */
 int DockPanel::preInit(Gtk::Window* window, bool autohide)
 {
+   
     m_AppWindow = window;
 
     // assumes that the docklight.ico exists.
@@ -95,42 +97,44 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONNAME).c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
 
-    dockItem->m_appname = "Home";
-    dockItem->m_realgroupname = "Home";
+    dockItem->m_appname = _("Home");
+    dockItem->m_realgroupname = _("Home");
     m_dockitems.push_back(dockItem);
 
     m_previewWindowActive = false;
     m_preview.setOwner(*this);
 
-    loadAttachedItems();
 
+    if( loadAttachments() != 0 ) 
+        return -1;
 
+   
     // Menus
     // Home Menu items
-    m_AutohideMenuItem.set_label("Autohide");
+    m_AutohideMenuItem.set_label(_("Autohide"));
     m_AutohideMenuItem.set_active(autohide);
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
 
-    m_HomeUnMinimizeAllWindowsMenuItem.set_label("Show all");
+    m_HomeUnMinimizeAllWindowsMenuItem.set_label(_("Show all"));
     m_HomeUnMinimizeAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeUnMinimizeAllWindows_event));
 
-    m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_label("Minimize all except active");
+    m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_label(_("Minimize all except active"));
     m_HomeMinimizeAllWindowsExceptActiveMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeMinimizeAllWindowsExceptActive_event));
 
 
-    m_HomeMinimizeAllWindowsMenuItem.set_label("Minimize all");
+    m_HomeMinimizeAllWindowsMenuItem.set_label(_("Minimize all"));
     m_HomeMinimizeAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeMinimizeAllWindows_event));
 
-    m_HomeCloseAllWindowsExceptActiveMenuItem.set_label("Close all except active");
+    m_HomeCloseAllWindowsExceptActiveMenuItem.set_label(_("Close all except active"));
     m_HomeCloseAllWindowsExceptActiveMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeCloseAllWindowsExceptActive_event));
 
 
-    m_HomeCloseAllWindowsMenuItem.set_label("Close all");
+    m_HomeCloseAllWindowsMenuItem.set_label(_("Close all"));
     m_HomeCloseAllWindowsMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeCloseAllWindows_event));
 
@@ -152,16 +156,16 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     // m_HomeMenu_Popup.signal_enter_notify_event().
     //        connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
 
-    m_HelpMenuItem.set_label("Help");
+    m_HelpMenuItem.set_label(_("Help"));
     m_HelpMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HelpMenu_event));
 
 
-    m_AboutMenuItem.set_label("About");
+    m_AboutMenuItem.set_label(_("About"));
     m_AboutMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_AboutMenu_event));
 
-    m_QuitMenuItem.set_label("Quit");
+    m_QuitMenuItem.set_label(_("Quit"));
     m_QuitMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
 
@@ -175,34 +179,34 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
 
 
     // Item Menu
-    m_MenuItemNewApp.set_label("Open new");
+    m_MenuItemNewApp.set_label(_("Open new"));
     m_MenuItemNewApp.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_menuNew_event));
     m_Menu_Popup.append(m_MenuItemNewApp);
 
     m_Menu_Popup.append(m_separatorMenuItem2);
 
-    m_MenuItemAttach.set_label("Attach to Dock");
+    m_MenuItemAttach.set_label(_("Attach to Dock"));
     m_MenuItemAttach.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_AttachToDock_event));
     m_Menu_Popup.append(m_MenuItemAttach);
 
-    m_MenuItemDetach.set_label("Detach from Dock");
+    m_MenuItemDetach.set_label(_("Detach from Dock"));
     m_MenuItemDetach.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_DetachFromDock_event));
     m_Menu_Popup.append(m_MenuItemDetach);
 
     m_Menu_Popup.append(m_separatorMenuItem3);
 
-    m_MenuItemUnMinimizedAll.set_label("Show all");
+    m_MenuItemUnMinimizedAll.set_label(_("Show all"));
     m_MenuItemUnMinimizedAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_UnMinimieAll_event));
 
-    m_MenuItemMinimizedAllExceptActive.set_label("Minimize all except active");
+    m_MenuItemMinimizedAllExceptActive.set_label(_("Minimize all except active"));
     m_MenuItemMinimizedAllExceptActive.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_MinimieAllExceptActive_event));
 
-    m_MenuItemMinimizedAll.set_label("Minimize all");
+    m_MenuItemMinimizedAll.set_label(_("Minimize all"));
     m_MenuItemMinimizedAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_MinimieAll_event));
 
@@ -212,11 +216,11 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     m_Menu_Popup.append(m_MenuItemMinimizedAllExceptActive);
     m_Menu_Popup.append(m_MenuItemMinimizedAll);
 
-    m_MenuItemCloseAllExceptActive.set_label("Close all except active");
+    m_MenuItemCloseAllExceptActive.set_label(_("Close all except active"));
     m_MenuItemCloseAllExceptActive.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAllExceptActive_event));
 
-    m_MenuItemCloseAll.set_label("Close all");
+    m_MenuItemCloseAll.set_label(_("Close all"));
     m_MenuItemCloseAll.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_CloseAll_event));
 
@@ -230,6 +234,7 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
 
     m_Menu_Popup.show_all();
     m_Menu_Popup.accelerate(*this);
+
 
     return 0;
 }
@@ -493,7 +498,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             m_MenuItemUnMinimizedAll.set_sensitive(isExitstWindows);
 
 
-            m_MenuItemCloseAllExceptActive.set_sensitive(isExitstActiveWindow);
+            m_MenuItemCloseAllExceptActive.set_sensitive(isExitstWindows && isExitstActiveWindow);
             m_MenuItemCloseAll.set_sensitive(isExitstWindows);
 
             m_MenuItemAttach.set_sensitive(dockitem->m_isAttached == false);
@@ -1287,7 +1292,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
         // TODO: add text to a string resource
         char message[PATH_MAX];
-        sprintf(message, "(%s) %d windows.\nthere are to many windows open for a Preview.\nClose some widows and try again.",
+        sprintf(message, _("(%s) %d windows.\nthere are to many windows open for a Preview.\nClose some windows and try again."),
                 dockitem->getTitle().c_str(), itemscount);
 
         m_infowindow.setText(message);
@@ -1307,10 +1312,17 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
 }
 
-void DockPanel::loadAttachedItems()
+int DockPanel::loadAttachments()
 {
 
     DIR* dirFile = opendir(m_applicationAttachmentsPath.c_str());
+    if (dirFile == 0) {
+        if (ENOENT == errno)
+            g_critical("Error loading attachments: Directory does not exist.\n");
+        
+        return -1;
+    }
+
     struct dirent* hFile;
     errno = 0;
     while ((hFile = readdir(dirFile)) != NULL) {
@@ -1368,6 +1380,7 @@ void DockPanel::loadAttachedItems()
         }
     }
     closedir(dirFile);
+    return 0;
 }
 
 void DockPanel::createLauncher(DockItem* item)
