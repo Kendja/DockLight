@@ -10,13 +10,13 @@ data/docklight.home.ico /usr/share/pixmaps
 po/*.po /usr/lib/docklight/docklight.data/tmp
 
 
-#data/icons/16x16/docklight.home.svg /usr/share/icons/hicolor/16x16/apps
-#data/icons/22x22/docklight.home.svg /usr/share/icons/hicolor/22x22/apps
-#data/icons/24x24/docklight.home.svg /usr/share/icons/hicolor/24x24/apps
-#data/icons/32x32/docklight.home.svg /usr/share/icons/hicolor/32x32/apps
-#data/icons/48x48/docklight.home.svg /usr/share/icons/hicolor/48x48/apps
-#data/icons/64x64/docklight.home.svg /usr/share/icons/hicolor/64x64/apps
-#data/icons/128x128/docklight.home.svg /usr/share/icons/hicolor/128x128/apps
+data/icons/16x16/docklight.home.svg /usr/share/icons/hicolor/16x16/apps
+data/icons/22x22/docklight.home.svg /usr/share/icons/hicolor/22x22/apps
+data/icons/24x24/docklight.home.svg /usr/share/icons/hicolor/24x24/apps
+data/icons/32x32/docklight.home.svg /usr/share/icons/hicolor/32x32/apps
+data/icons/48x48/docklight.home.svg /usr/share/icons/hicolor/48x48/apps
+data/icons/64x64/docklight.home.svg /usr/share/icons/hicolor/64x64/apps
+data/icons/128x128/docklight.home.svg /usr/share/icons/hicolor/128x128/apps
 
 
 #data/icons/16x16/docklight.home.svg /usr/local/share/icons/hicolor/16x16/apps

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-26 01:21+0700\n"
+"POT-Creation-Date: 2017-01-26 18:53+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,6 +49,10 @@ msgstr ""
 
 #: ../src/LauncherWindow.cpp:54
 msgid "Available"
+msgstr ""
+
+#: ../src/LauncherWindow.cpp:56
+msgid "Name: "
 msgstr ""
 
 #: ../src/LauncherWindow.cpp:57
@@ -157,7 +161,7 @@ msgid "Fields Name and Command can't be empty!\n"
 msgstr ""
 
 #: ../src/DockPanel.cpp:100 ../src/DockPanel.cpp:101
-msgid "Home"
+msgid "Desktop"
 msgstr ""
 
 #. Menus

@@ -18,7 +18,7 @@
 #
 #****************************************************************
 #
-#, fuzzy
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.12\n"
@@ -203,8 +203,8 @@ msgid "Fields Name and Command can't be empty!\n"
 msgstr "Felder Name und Befehl dürfen nicht leer sein!\n"
 
 #: ../src/DockPanel.cpp:100 ../src/DockPanel.cpp:101
-msgid "Home"
-msgstr "Heim"
+msgid "Desktop"
+msgstr "Schreibtisch"
 
 #. Menus
 #. Home Menu items

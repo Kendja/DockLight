@@ -97,8 +97,8 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONNAME).c_str(),
             DEF_ICONSIZE, DEF_ICONSIZE, true);
 
-    dockItem->m_appname = _("Home");
-    dockItem->m_realgroupname = _("Home");
+    dockItem->m_appname = _("Desktop");
+    dockItem->m_realgroupname = _("Desktop");
     m_dockitems.push_back(dockItem);
 
     m_previewWindowActive = false;
