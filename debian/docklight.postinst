@@ -39,6 +39,7 @@ chmod 0666 "/usr/lib/docklight/docklight.data/docklight.ini"
 
 # compile the po files and distribute the mo translation files
 # to e.g /usr/local/share/locale/es/LC_MESSAGES/
+
 podir="/usr/lib/docklight/docklight.data/po"
 if [ -d ${podir} ]; then 
 	cd ${podir}
@@ -55,7 +56,9 @@ if [ -d ${podir} ]; then
 			mkdir $localedir  
 		fi
 
-		msgfmt -c ${p} -o ${mofile}
+		echo "Installing $localedir"
+		#msgfmt -c ${p} -o ${mofile}
+		msgfmt ${p} -o ${mofile}
 		
 	done
 fi
