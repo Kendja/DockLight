@@ -1,0 +1,284 @@
+#*****************************************************************
+#
+#  Copyright (C) 2015 Juan R. Gonzalez
+#  Created on Januar, 2017
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#****************************************************************
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.1.12\n"
+"Report-Msgid-Bugs-To:j-gonzalez@email.de \n"
+"POT-Creation-Date: 2017-01-25 21:12+0700\n"
+"PO-Revision-Date: 2017-01-25\n"
+"Last-Translator: FULL NAME <j-gonzalez@email.de>\n"
+"Language-Team: SPAIN\n"
+"Language: ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/About.cpp:86
+msgid ""
+"docklight is a lightweight Dock Panel for opening common applications for "
+"the GNOME Desktop"
+msgstr ""
+"Docklight es un Programa para abrir aplicaciones comunes para el escritorio de GNOME."
+
+#: ../src/LauncherWindow.cpp:15 ../src/LauncherWindow.cpp:52
+msgid "Create Launcher"
+msgstr "Crear Lanzador"
+
+#: ../src/LauncherWindow.cpp:16
+msgid "Test Launcher"
+msgstr "Probar el Lanzador"
+
+#: ../src/LauncherWindow.cpp:17
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: ../src/LauncherWindow.cpp:49
+msgid "Command: "
+msgstr "Comando: "
+
+#: ../src/LauncherWindow.cpp:50
+msgid "Choose command"
+msgstr "Elegir comando"
+
+#: ../src/LauncherWindow.cpp:51
+msgid "Choose Icon"
+msgstr "Elegir Icono"
+
+#: ../src/LauncherWindow.cpp:56
+msgid "Name: "
+msgstr "Nombre: "
+
+
+#: ../src/LauncherWindow.cpp:54
+msgid "Available"
+msgstr "Disponible"
+
+#: ../src/LauncherWindow.cpp:57
+msgid "Comment: "
+msgstr "Comentario"
+
+#: ../src/LauncherWindow.cpp:58
+msgid "Icon: "
+msgstr "Icono"
+
+#: ../src/LauncherWindow.cpp:59
+msgid "Categories: "
+msgstr "Categorias"
+
+#: ../src/LauncherWindow.cpp:60
+msgid "Close"
+msgstr "Cerrar"
+
+#: ../src/LauncherWindow.cpp:63
+msgid "DockLight Launcher"
+msgstr "Docklight Lanzador"
+
+#: ../src/LauncherWindow.cpp:186
+#, c-format
+msgid ""
+"Launcher for %s could not be found.\n"
+"You need to create a Launcher for this Application."
+msgstr ""
+"No se pudo encontrar el lanzador de %s.\n"
+"Debe crear un Lanzador para esta aplicación."
+
+#: ../src/LauncherWindow.cpp:191
+msgid " Application"
+msgstr "Aplicación"
+
+#: ../src/LauncherWindow.cpp:211
+msgid "Launcher test Failed!"
+msgstr "La prueba del lanzador falló!"
+
+#. dialog.set_icon_name()
+#: ../src/LauncherWindow.cpp:213
+msgid ""
+"The command you enter is invalid.\n"
+"\n"
+"Some Applications are scripts files and others requires Administrator "
+"privileges:\n"
+"for scrips files you need to add the bash on the beginning:\n"
+"\n"
+"/bin/sh \"/usr/local/scriptfile.sh\"\n"
+"/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
+"\n"
+"for Applications that requires Administrator privileges:\n"
+"gksu gparted-pkexec\n"
+"\n"
+"Please make sure that the Application starts from the command line.\n"
+"Open a terminal and navigate to the directory where the application is "
+"locate\n"
+"and trying the command from there..."
+msgstr ""
+"El comando no es válido.\n"
+"\n"
+"Algunas aplicaciones son archivos de scripts y otras requieren privilegios de administrador:\n"
+"Para los archivos scrips se necesita agregar bash al principio:\n"
+"\n"
+"/bin/sh \"/usr/local/scriptfile.sh\"\n"
+"/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
+"\n"
+"Para aplicaciones que requieren privilegios de administrador agregar gksu:\n"
+"gksu gparted-pkexec\n"
+"\n"
+"Asegúrese de que la aplicación se inicia desde la terminal de comandos.\n"
+"Abrir un terminal y navegar hasta el directorio donde está la aplicación\n"
+"ejecutar el comando desde allí ..."
+
+
+#: ../src/LauncherWindow.cpp:250
+msgid ""
+"\n"
+"\n"
+"Copy template Error!\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
+"Error de plantilla de copia!\n"
+"\n"
+
+#: ../src/LauncherWindow.cpp:336
+msgid ""
+"\n"
+"\n"
+"Permissions required. Please try again!\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
+"Permisos requeridos. Por favor, inténtelo de nuevo!\n"
+"\n"
+
+
+#: ../src/LauncherWindow.cpp:342
+msgid ""
+"\n"
+"\n"
+"Launcher created successfully!\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
+"Lanzador creado con éxito!\n"
+"\n"
+
+
+#: ../src/LauncherWindow.cpp:350 ../src/LauncherWindow.cpp:376
+msgid "Please choose a file"
+msgstr "Elija un archivo"
+
+
+
+#. Add response buttons the the dialog:
+#: ../src/LauncherWindow.cpp:356 ../src/LauncherWindow.cpp:382
+msgid "_Cancel"
+msgstr "Cancelar"
+
+#: ../src/LauncherWindow.cpp:357 ../src/LauncherWindow.cpp:383
+msgid "_Open"
+msgstr "Abri_r"
+
+#: ../src/LauncherWindow.cpp:386
+msgid "Image files"
+msgstr "Archivos de imagen"
+
+#: ../src/LauncherWindow.cpp:412
+msgid "Browser could not be found!\n"
+msgstr "No se ha podido encontrar el navegador.\n"
+
+#: ../src/LauncherWindow.cpp:436
+msgid "Fields Name and Command can't be empty!\n"
+msgstr "Los campos Nombre y Comando no pueden estar vacíos!\n"
+
+#: ../src/DockPanel.cpp:100 ../src/DockPanel.cpp:101
+msgid "Desktop"
+msgstr "Escritorio"
+
+#. Menus
+#. Home Menu items
+#: ../src/DockPanel.cpp:114
+msgid "Autohide"
+msgstr "Esconder automaticamente"
+
+#: ../src/DockPanel.cpp:119 ../src/DockPanel.cpp:201
+msgid "Show all"
+msgstr "Mostrar todo"
+
+#: ../src/DockPanel.cpp:123 ../src/DockPanel.cpp:205
+msgid "Minimize all except active"
+msgstr "Minimizar todo menos lo activo"
+
+#: ../src/DockPanel.cpp:128 ../src/DockPanel.cpp:209
+msgid "Minimize all"
+msgstr "Minimizar todo"
+
+#: ../src/DockPanel.cpp:132 ../src/DockPanel.cpp:219
+msgid "Close all except active"
+msgstr "Cierra todo menos lo activo"
+
+#: ../src/DockPanel.cpp:137 ../src/DockPanel.cpp:223
+msgid "Close all"
+msgstr "Cierra todo"
+
+#. m_HomeMenu_Popup.signal_enter_notify_event().
+#. connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
+#: ../src/DockPanel.cpp:159
+msgid "Help"
+msgstr "Ayuda"
+
+#: ../src/DockPanel.cpp:164
+msgid "About"
+msgstr "Acerca de"
+
+#: ../src/DockPanel.cpp:168
+msgid "Quit"
+msgstr "Salir"
+
+#. Item Menu
+#: ../src/DockPanel.cpp:182
+msgid "Open new"
+msgstr "Abrir nuevo"
+
+#: ../src/DockPanel.cpp:189
+msgid "Attach to Dock"
+msgstr "Adjuntar al Dock"
+
+#: ../src/DockPanel.cpp:194
+msgid "Detach from Dock"
+msgstr "Desconectarse de el Dock"
+
+#: ../src/DockPanel.cpp:1295
+#, c-format
+msgid ""
+"(%s) %d windows.\n"
+"there are to many windows open for a Preview.\n"
+"Close some windows and try again."
+msgstr ""
+"(%s) %d Ventanas.\n"
+"Hay muchas ventanas abiertas para una vista previa.\n"
+"Cierre algunas ventanas e inténtelo de nuevo."
+
+
+
+
+
