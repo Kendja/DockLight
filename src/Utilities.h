@@ -34,7 +34,7 @@ namespace Utilities
 {
 
     std::string getExecPath();
-    std::string getExecPath(const std::string str);
+    std::string getExecPath(const std::string& str);
         
     std::vector<std::string> split(const std::string &text, char sep);
     void RoundedRectangle(const Cairo::RefPtr<Cairo::Context>& cr,

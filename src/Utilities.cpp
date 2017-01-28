@@ -77,14 +77,15 @@ namespace Utilities
      * output:
      * /sample/path/test.txt
      */
-    std::string getExecPath(const std::string str)
+    std::string getExecPath(const std::string& str)
     {
         std::string path = Utilities::getExecPath() ;
         std::string result = path +"/"+str ;
         return result;
     }
     
-   
+      
+    
     /*
      * std::vector<std::string> 
      * split(const std::string &text, char sep)

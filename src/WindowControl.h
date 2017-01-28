@@ -26,7 +26,7 @@ namespace WindowControl
     void closeAllExceptActiveByDockItem(DockItem* dockitem);
     void closeAllByDockItem(DockItem* dockitem);
     
-    bool isExitstWindowsByDockItem(DockItem* dockitem);
+    int isExitstWindowsByDockItem(DockItem* dockitem);
     bool isExitsActivetWindowByDockItem(DockItem* dockitem);
 
     

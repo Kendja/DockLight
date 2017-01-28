@@ -481,7 +481,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         // Items 
         if (m_currentMoveIndex > 0) {
             DockItem *dockitem = m_dockitems.at(m_currentMoveIndex);
-            bool isExitstWindows =
+            int isExitstWindows =
                     WindowControl::isExitstWindowsByDockItem(dockitem);
             bool isExitstActiveWindow =
                     WindowControl::isExitsActivetWindowByDockItem(dockitem);
@@ -491,14 +491,14 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             //        WindowControl::isExistsMinimizedWindowsByDockItem(dockitem);
 
 
-            m_MenuItemMinimizedAll.set_sensitive(isExitstWindows && maximizedexistst);
+            m_MenuItemMinimizedAll.set_sensitive(isExitstWindows > 0 && maximizedexistst);
 
-            m_MenuItemMinimizedAllExceptActive.set_sensitive(isExitstWindows
+            m_MenuItemMinimizedAllExceptActive.set_sensitive(isExitstWindows > 1
                     && maximizedexistst && isExitstActiveWindow);
             m_MenuItemUnMinimizedAll.set_sensitive(isExitstWindows);
 
 
-            m_MenuItemCloseAllExceptActive.set_sensitive(isExitstWindows && isExitstActiveWindow);
+            m_MenuItemCloseAllExceptActive.set_sensitive(isExitstWindows > 1 && isExitstActiveWindow);
             m_MenuItemCloseAll.set_sensitive(isExitstWindows);
 
             m_MenuItemAttach.set_sensitive(dockitem->m_isAttached == false);
@@ -526,10 +526,11 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             int unminimized = WindowControl::unMinimizedWindowsCount();
 
             m_HomeCloseAllWindowsMenuItem.set_sensitive(wincount > 0);
-            m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 0);
+            m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 1);
             m_HomeMinimizeAllWindowsMenuItem.set_sensitive(unminimized > 0);
             m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(wincount > 0);
-            m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 0);
+            
+            m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 1);
 
             if (!m_HomeMenu_Popup.get_attach_widget())
                 m_HomeMenu_Popup.attach_to_widget(*this);

@@ -181,7 +181,7 @@ namespace WindowControl
             wnck_window_minimize(window);
             return;
         }
-        
+
         int ct = gtk_get_current_event_time();
         wnck_window_activate(window, ct);
 
@@ -323,9 +323,28 @@ namespace WindowControl
         return false;
     }
 
-    bool isExitstWindowsByDockItem(DockItem* dockitem)
+    int isExitstWindowsByDockItem(DockItem* dockitem)
     {
-        return dockitem->m_items.size() > 0;
+        int count = 0;
+        for (auto item : dockitem->m_items) {
+            WnckWindow *window = item->m_window;
+            if (window == NULL)
+                continue;
+
+            WnckWindowType wt = wnck_window_get_window_type(window);
+
+            if (wt == WNCK_WINDOW_DESKTOP ||
+                    wt == WNCK_WINDOW_DOCK ||
+                    wt == WNCK_WINDOW_TOOLBAR ||
+                    wt == WNCK_WINDOW_MENU) {
+
+                continue;
+            }
+            
+             count++;
+        }
+        
+        return count;
     }
 
     int windowscount()
