@@ -41,16 +41,16 @@ docklightdata_DATA = \
 @INTLTOOL_DESKTOP_RULE@
 
 install-exec-hook:
-	if test ! -d $(bindir)/docklight.data; then mkdir $(bindir)/docklight.data; fi
-	if test ! -d $(bindir)/docklight.data/attachments; then mkdir $(bindir)/docklight.data/attachments; fi
-	chmod -R 0777 $(bindir)/docklight.data		
+	if test ! -d $(bindir)/data; then mkdir $(bindir)/data; fi
+	if test ! -d $(bindir)/data/attachments; then mkdir $(bindir)/data/attachments; fi
+	chmod -R 0777 $(bindir)/data		
 	
 	
 	
 	
 uninstall-hook:
 	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
-	if test -d $(bindir)/docklight.data; then rm -fr $(bindir)/docklight.data; fi
+	if test -d $(bindir)/data; then rm -fr $(bindir)/data; fi
 	if test -d $(prefix); then rm -fr $(prefix); fi
 
 

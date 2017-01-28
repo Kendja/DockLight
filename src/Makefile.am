@@ -1,12 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4 --install
 bin_PROGRAMS = docklight
 
-
-# what flags you want to pass to the C compiler & linker
-#AM_CPPFLAGS = -g -Wall -Wno-reorder -std=c++11 -DPROGRAMNAME_LOCALEDIR=\""$(datadir)/locale"\"  `pkg-#config  --cflags gtkmm-3.0 libwnck-3.0` 
-#AM_LDFLAGS = -static-libstdc++ -lX11  -lxcb  `pkg-config  --cflags --libs gtkmm-3.0 libwnck-3.0 ` 
-
-
 ALLCPPFLAGS = $(GTKMM_CFLAGS)
 ALLCPPFLAGS += $(WNCK_CFLAGS)
 
@@ -73,7 +67,7 @@ docklight_SOURCES =  \
 
 install-exec-hook:
 	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
-	ln -s  $(bindir)/docklight "/usr/local/bin/docklight"
+	ln -s  $(bindir)/bin/docklight "/usr/local/bin/docklight"
 
 #uninstall-hook:
 #	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
