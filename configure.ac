@@ -1,5 +1,7 @@
 PACKAGE=docklight
 VERSION=1.0-12
+INSTALLDIR=/usr/local/docklight
+LOCALEDIR=/usr/lib/docklight/share/locale
 
 dnl ======================================================
 AC_INIT([docklight], [1.0.12], [bug-automake@gnu.org])
@@ -12,6 +14,11 @@ AC_PROG_CXX
 # make config headers
 AC_CONFIG_HEADERS([config.h])
 
+
+dnl ======================================================
+#AC_PREFIX_DEFAULT($INSTALLDIR)
+#AC_PREFIX_PROGRAM ($INSTALLDIR)
+#AC_SUBST(INSTALLDIR)
 dnl ======================================================
 IT_PROG_INTLTOOL([0.35.0])  
 
@@ -23,7 +30,12 @@ AM_GNU_GETTEXT_VERSION([0.19])
 
 # This PROGRAMNAME_LOCALEDIR variable will be used later in the Makefile.am file,
 # to define a macro that will be used when you initialize gettext in your source code.
-PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
+#PROGRAMNAME_LOCALEDIR=[${datadir}/locale]
+#PROGRAMNAME_LOCALEDIR=[${prefix}/locale]
+
+PROGRAMNAME_LOCALEDIR=$LOCALEDIR
+
+#@AC_SUBST(LOCALEDIR)
 AC_SUBST(PROGRAMNAME_LOCALEDIR)
 
 dnl ======================================================
@@ -49,8 +61,8 @@ AC_CHECK_LIB([wnck-3],[wnck_screen_get_default])
 
 dnl ======================================================
 #AC_SUBST_FILE([ouptput_bin])
-  ouptput_bin=$srcdir/bin/docklight
-#AC_DEFINE_UNQUOTED([DATADIR], ["$datadir"], [/usr/lib/DockLight])
+#  ouptput_bin=$srcdir/bin/docklight
+#AC_DEFINE_UNQUOTED([DATADIR], ["$datadir"], [/usr/local/DockLight])
 
 dnl ======================================================
 
@@ -66,9 +78,7 @@ AC_CONFIG_FILES([
 
 #AC_SUBST_FILE([ouptput_bin])
 #ouptput_bin=$srcdir/bin/docklight
-#AC_DEFINE_UNQUOTED([DATADIR], ["$datadir"], [/usr/lib/DockLight])
-
-
+#AC_DEFINE_UNQUOTED([DATADIR], ["$datadir"], [/usr/local/DockLight])
 dnl ==========================================================================
 echo "
 	docklight Version       $VERSION
@@ -77,7 +87,7 @@ echo "
 	compiler:		${CC}
 	top_srcdir  		${top_srcdir}
 	bin dir			$(bindir)
-        locale   		${datadir}/locale
+        locale   		${PROGRAMNAME_LOCALEDIR}
 "
 
 AC_OUTPUT

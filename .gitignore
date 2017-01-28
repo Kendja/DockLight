@@ -8,6 +8,8 @@ src/.deps/
 
 *.dh-orig
 *.gmo
+*.ex
+*.EX
 
 /ABOUT-NLS
 /Makefile

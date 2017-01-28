@@ -21,16 +21,16 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define DEF_DATADIRNAME         "docklight.data/" 
-#define DEF_ATTACHMENTDIR       "docklight.data/attachments" 
+#define DEF_DATADIRNAME         "data/" 
+#define DEF_ATTACHMENTDIR       "data/attachments" 
 
-#define DEF_ICONNAME            "docklight.data/docklight.home.ico"
-#define DEF_LOGONAME            "docklight.data//docklight.logo.png"
-#define DEF_INITNAME            "docklight.data/docklight.ini"
+#define DEF_ICONNAME            "data/docklight.home.ico"
+#define DEF_LOGONAME            "data/docklight.logo.png"
+#define DEF_INITNAME            "data/docklight.ini"
 #define DEF_LAUCHERTEMPLATE     "docklight.template.desktop"
-#define DEF_LAUCHERTEMPLATEPATH "docklight.data/docklight.template.desktop"
+#define DEF_LAUCHERTEMPLATEPATH "data/docklight.template.desktop"
 #define DEF_LAUCHERSCRIPT       "docklight.launcher.sh"
-#define DEF_LAUCHERSCRIPTPATH   "docklight.data/docklight.launcher.sh"
+#define DEF_LAUCHERSCRIPTPATH   "data/docklight.launcher.sh"
 
 
 #define DOCKLIGHT_INSTANCENAME "docklight"

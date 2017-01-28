@@ -37,11 +37,34 @@
 int main(int argc, char *argv[])
 {
 
-    bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
-    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-    textdomain(GETTEXT_PACKAGE);
-
-
+   // const char* localedir = "/usr/lib/docklight/docklight.data/locale";
+    const char* localedir = "/usr/lib/docklight/share/locale";
+    
+    
+    
+   
+    char* domain = bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
+    g_print("bindtextdomain: %s %s %s\n",domain,GETTEXT_PACKAGE,PROGRAMNAME_LOCALEDIR);
+   
+    // bind_textdomain_codeset - set encoding of message trans‐lations
+    char* btdcodeset = bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    g_print("bind_textdomain_codeset: %s\n",btdcodeset);
+    // The  textdomain  function  sets or retrieves the current  message domain.
+    char* txtdomain = textdomain(GETTEXT_PACKAGE);
+    g_print("textdomain: %s\n\n",txtdomain);
+      
+    /*
+    char* domain = bindtextdomain(GETTEXT_PACKAGE, localedir);
+    g_print("bindtextdomain: %s %s %s\n",domain,GETTEXT_PACKAGE,localedir);
+   
+    // bind_textdomain_codeset - set encoding of message trans‐lations
+    char* btdcodeset = bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    g_print("bind_textdomain_codeset: %s\n",btdcodeset);
+    // The  textdomain  function  sets or retrieves the current  message domain.
+    char* txtdomain = textdomain(GETTEXT_PACKAGE);
+    g_print("textdomain: %s\n\n",txtdomain);
+    */
+    
     Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
 

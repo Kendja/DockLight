@@ -11,12 +11,15 @@ ALLCPPFLAGS = $(GTKMM_CFLAGS)
 ALLCPPFLAGS += $(WNCK_CFLAGS)
 
 #This macro will be used when you initialize gettext in your source code.
-ALLCPPFLAGS += -DPROGRAMNAME_LOCALEDIR=\""$(datadir)/locale"\" 
+#ALLCPPFLAGS += -DPROGRAMNAME_LOCALEDIR=\""$(datadir)/locale"\" 
+#ALLCPPFLAGS += -DPROGRAMNAME_LOCALEDIR=\""$(prefix)/share/locale"\"
+ALLCPPFLAGS += -DPROGRAMNAME_LOCALEDIR=\""/usr/lib/docklight/share/locale"\"
+
 
 docklight_CPPFLAGS = $(ALLCPPFLAGS)
 
 ALLDADDLIBS = $(GTKMM_LIBS)
-ALLDADDLIBS +=$(WNCK_LIBS)
+#ALLDADDLIBS +=$(WNCK_LIBS)
 docklight_LDADD = $(ALLDADDLIBS)
 
 
@@ -66,6 +69,15 @@ docklight_SOURCES =  \
 #dist_sysconf_DATA = $(top_srcdir)/docklight.ini
 
 
+
+
+install-exec-hook:
+	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
+	ln -s  $(bindir)/docklight "/usr/local/bin/docklight"
+
+#uninstall-hook:
+#	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
+
 # this works 
 #install-exec-hook:
 #	cp docklight.ini $(DESTDIR)$(bindir)
@@ -78,7 +90,9 @@ docklight_SOURCES =  \
 #if test -d ${pkgdatadir}/applications; then rmdir ${pkgdatadir}/applications; fi
 #if test -d ${pkgdatadir}; then rmdir ${pkgdatadir}; fi
 #uninstall-hook:
-#	rm -f $(DESTDIR)$(bindir)/docklight.ini
+#	rm -rf $(bindir)
+##	rm -rf $(prefix)
+
 #	rm -f $(DESTDIR)$(bindir)/docklight.ico 
 #	rm -f $(DESTDIR)$(bindir)/logo.png 
 #	rm -f $(DESTDIR)$(bindir)/createlauncher.sh 
