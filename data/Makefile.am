@@ -29,7 +29,7 @@ applications_DATA = docklight.menu.desktop
 
 
 #/docklight.data
-docklightdatadir = $(bindir)/docklight.data
+docklightdatadir = $(bindir)/data
 docklightdata_DATA = \
 		docklight.home.ico \
 		docklight.ini \

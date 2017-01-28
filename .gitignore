@@ -10,7 +10,8 @@ src/.deps/
 *.gmo
 *.ex
 *.EX
-
+*.in~
+*.pot
 /ABOUT-NLS
 /Makefile
 /Makefile.in

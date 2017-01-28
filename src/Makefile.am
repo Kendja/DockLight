@@ -67,7 +67,7 @@ docklight_SOURCES =  \
 
 install-exec-hook:
 	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
-	ln -s  $(bindir)/bin/docklight "/usr/local/bin/docklight"
+	ln -s  $(bindir)/docklight "/usr/local/bin/docklight"
 
 #uninstall-hook:
 #	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
