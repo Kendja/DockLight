@@ -78,18 +78,18 @@ chmod 0644 "${datadir}/docklight.ini"
 
             file=`echo $lang | sed 's,.*/,,'`.gmo \
             && rm -f $file && msgfmt -o $file "$lang.po"
-                     
-	    mkdir -p $dir
-	    echo "..................create LANG $dir" 			
-     	    
-            if test -r $lang.gmo; then 
-                /usr/bin/install -c -m 644 $lang.gmo $dir/docklight.mo; \
-                echo "installing $lang.gmo as $dir/docklight.mo"; \
-                else \
-                /usr/bin/install -c -m 644 ./$lang.gmo $dir/docklight.mo; \
-                echo "installing ./$lang.gmo as" \
-                "$dir/docklight.mo"; \
-            fi
+            mkdir -p $dir
+	    
+	    if [ -f "/usr/bin/install" ];then					
+		    if test -r $lang.gmo; then 
+		        install -c -m 644 $lang.gmo $dir/docklight.mo; \
+		        echo "..installing $lang.gmo as $dir/docklight.mo"; \
+		        else \
+		        /usr/bin/install -c -m 644 ./$lang.gmo $dir/docklight.mo; \
+		        echo "installing ./$lang.gmo as" \
+		        "$dir/docklight.mo"; \
+		    fi
+	    fi	
 
         done    
     fi

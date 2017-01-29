@@ -83,7 +83,7 @@ void About::init(Window* window)
     this->set_icon_from_file(docklightIcon.c_str());
 
 
-    this->set_comments(_("docklight is a lightweight Dock Panel for opening common applications for the GNOME Desktop"));
+    this->set_comments(_("This program is a lightweight Dock Launcher for opening common applications for the GNOME Desktop"));
     this->set_copyright("Copyright © 2016-2017 Juan González");
     this->set_wrap_license(true);
 

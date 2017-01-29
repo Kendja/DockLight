@@ -29,6 +29,7 @@
 #include  <glibmm/i18n.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
+#include <gdkmm/cursor.h>
 
 #include <limits.h>
 
@@ -70,7 +71,7 @@ m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR)
             Gdk::POINTER_MOTION_MASK);
 
 
-
+   
 
 }
 
@@ -82,9 +83,6 @@ m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR)
  */
 int DockPanel::preInit(Gtk::Window* window, bool autohide)
 {
-   
-    m_AppWindow = window;
-
     // assumes that the docklight.ico exists.
     std::string filename = Utilities::getExecPath(DEF_ICONNAME);
     gboolean isexists = g_file_test(filename.c_str(), G_FILE_TEST_EXISTS);
@@ -392,7 +390,7 @@ void DockPanel::previewWindowClosed()
 bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
-
+    
     return false;
 }
 
@@ -1155,7 +1153,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
 
         if (m_titleItemOldindex == m_currentMoveIndex) {
-            if (m_titleElapsedSeconds > 0.5 && m_titleShow == false && !m_previewWindowActive) {
+            if (m_titleElapsedSeconds > 0.3 && m_titleShow == false && !m_previewWindowActive) {
 
                 DockItem* item = m_dockitems.at(m_currentMoveIndex);
                 std::string title = item->getTitle();

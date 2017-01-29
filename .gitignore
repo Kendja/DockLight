@@ -5,7 +5,7 @@ debian/docklight
 src/.deps/
 
 !package/*
-
+/src/data/attachments/*
 *.dh-orig
 *.gmo
 *.ex

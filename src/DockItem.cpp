@@ -30,8 +30,8 @@ DockItem::DockItem()
 m_image(NULLPB),
 m_scaledPixbuf(nullptr),
 m_imageLoadedRequired(true),
-m_timerStartSet(false),
 m_isDynamic(false),
+m_frames(0),
 m_titlename("")
 {
 

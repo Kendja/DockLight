@@ -38,8 +38,6 @@ public:
     GdkPixbuf *m_scaledPixbuf;
     bool m_imageLoadedRequired;
     bool m_isDynamic;
-    Glib::Timer m_timer;
-    bool m_timerStartSet;
     DockItem* GetCurrent();
     DockItem* GetNext();
     WnckWindow *m_window;
@@ -53,7 +51,7 @@ public:
     bool m_isAttached = false;
     bool m_isDirty = false;
     bool visible = true;
-
+    int m_frames;
     std::string getTitle();
     std::string getDesktopFileName();
     gboolean isMovementDetected(GdkPixbuf *pixbuf);

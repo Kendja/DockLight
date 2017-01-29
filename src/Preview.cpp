@@ -138,11 +138,11 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
 
     // Sort by title name
     int size = (int) m_previewtems.size();
-    int i, m, j ;
+    int i, m, j;
 
     for (i = 0; i < size - 1; i = i + 1) {
         m = i;
-        for ( j = i + 1; j < size; j = j + 1) {
+        for (j = i + 1; j < size; j = j + 1) {
 
             std::string s1 = m_previewtems.at(j)->m_titlename.c_str();
             std::string s2 = m_previewtems.at(m)->m_titlename.c_str();
@@ -442,7 +442,6 @@ void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer 
                 continue;
 
             item->m_imageLoadedRequired = true;
-            item->m_timerStartSet = false;
             item->m_isDynamic = false;
         }
     }
@@ -490,7 +489,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
             // This can happen when a browser play a video and gets minimized and 
             // stops playing. When it gets unminimized should play again in the preview.
             if (!item->m_isDynamic) {
-                item->m_timerStartSet = false;
+               
                 item->m_imageLoadedRequired = true;
             }
 
@@ -625,11 +624,6 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             // show the loaded image. 
             showPreview(cr, scaledpb, idx);
 
-            if (!item->m_timerStartSet) {
-                item->m_timerStartSet = true;
-                item->m_timer.start();
-            }
-
             // Checks if the image have movement.
             if (item->isMovementDetected(scaledpb) && !item->m_isDynamic) {
                 item->m_isDynamic = true;
@@ -637,13 +631,12 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             // if no movement has been detected, means that the image 
             // is static and we don't need to reload it again 
-            if (item->m_timer.elapsed() > 0.2 && !item->m_isDynamic) {
+            if (++item->m_frames > 3 && !item->m_isDynamic) {
                 item->m_scaledPixbuf = scaledpb;
-                // item->m_timerStartSet = false;
-                item->m_timer.stop();
+                item->m_frames = 0;
                 item->m_imageLoadedRequired = false;
             }
-
+            
             // if the image is static do not unreference the scaledpb.
             if (item->m_imageLoadedRequired)
                 g_object_unref(scaledpb);
