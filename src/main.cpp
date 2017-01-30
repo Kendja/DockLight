@@ -100,6 +100,8 @@ int main(int argc, char *argv[])
     if (r != 0) {
         exit(r);
     }
-
-    return app->run(win);
+    
+    int result =  app->run(win);
+    g_print("Terminate with code %d \n",result);
+    return result;
 }
