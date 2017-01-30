@@ -182,6 +182,17 @@ namespace DockPosition
 
     }
 
+    int getDockItemRelativeMouseXPos(int dockitemscount, int currentindex, int targetwidth, int mouseX)
+    {
+        int monitorWidth = MonitorGeometry::getGeometry().width;
+        int monitorX = MonitorGeometry::getGeometry().x;
+        int intemcenter = (dockitemscount * m_cellwidth) / 2;
+        int monitorcenter = monitorWidth / 2;
+        int firstItempos = monitorX + (monitorcenter - intemcenter);
+
+        return abs((mouseX + monitorX) -(firstItempos + (m_cellwidth * currentindex)));
+    }
+
     int getHomeMenuTopPosition()
     {
         int position = MonitorGeometry::getScreenHeight() -
@@ -229,7 +240,7 @@ namespace DockPosition
     {
         // calculate the preview position. 
         int centerpos = getDockItemCenterPos(dockItemsCount, dockItemIndex, windowWidth);
-        
+
         instance->hide();
         instance->resize(windowWidth, previewHeight);
         instance->move(centerpos, MonitorGeometry::getAppWindowTopPosition() - previewHeight);

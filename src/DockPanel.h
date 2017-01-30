@@ -38,7 +38,7 @@
 #include "DockPosition.h"
 #include "LauncherWindow.h"
 #include "About.h"
-
+#include "DragDropWindow.h"
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -67,6 +67,7 @@ private:
     Gtk::Window* m_AppWindow;
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;
+    DragDropWindow m_dragDropWindow;
 
     About m_about;
     Preview m_preview;
@@ -75,19 +76,12 @@ private:
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
 
-    // Gtk::MessageDialog m_messageDialog;
-
     std::string m_applicationpath;
     std::string m_applicationDatapath;
     std::string m_applicationAttachmentsPath;
+    std::string m_homeiconFilePath;
 
     sigc::connection m_TimeoutConnection;
-
-    double m_last_time;
-    gint m_frames;
-    float m_curFPS;
-    gint m_fps;
-    Glib::Timer m_fpstimer;
 
     // Timer for showing the title window
     Glib::Timer m_titleTimer;
@@ -95,20 +89,26 @@ private:
     int m_titleItemOldindex = 0;
     bool m_titleShow = false;
 
+    guint32 m_mouseclickEventTime;
 
+    // Drag and Drop 
+    static bool m_dragdropsStarts;
+    Glib::Timer m_dragdropTimer;
+    bool m_dragdropTimerSet;
+    bool m_dragdropMouseDown;
+    int m_dragdropItemIndex;
+    Gdk::Point m_dragdropMousePoint;
+
+    void dropDockItem(GdkEventButton *event);
+    int getAttachedOrderIndex();
     int loadAttachments();
     void SelectWindow(int index, GdkEventButton * event);
-
-
     void createLauncher(DockItem* item);
-
-
-
 
     void on_QuitMenu_event();
     void on_AboutMenu_event();
     void on_HelpMenu_event();
-    
+
     void on_menuNew_event();
     void on_DetachFromDock_event();
     void on_AttachToDock_event();
@@ -131,7 +131,6 @@ private:
     //bool on_MenuEnterNotify_event (GdkEventCrossing* crossing_event);
 
 
-
     // Mome menu 
     Gtk::Menu m_HomeMenu_Popup;
     Gtk::MenuItem m_HelpMenuItem;
@@ -147,7 +146,7 @@ private:
     Gtk::MenuItem m_MenuItemCloseAll;
     Gtk::MenuItem m_MenuItemCloseAllExceptActive;
 
-    
+
     Gtk::MenuItem m_MenuItemUnMinimizedAll;
     Gtk::MenuItem m_MenuItemMinimizedAllExceptActive;
     Gtk::MenuItem m_MenuItemMinimizedAll;
@@ -188,8 +187,6 @@ private:
 
     int getIndex(int x, int y);
 
-
-
     int m_cellheight;
     int m_cellwidth;
     int m_previousCellwidth;
@@ -208,10 +205,6 @@ protected:
     virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_scroll_event(GdkEventScroll* e);
-
-
-
-
 
 };
 

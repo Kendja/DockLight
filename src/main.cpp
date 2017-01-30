@@ -36,41 +36,26 @@
  */
 int main(int argc, char *argv[])
 {
-
-   // const char* localedir = "/usr/lib/docklight/docklight.data/locale";
-    const char* localedir = "/usr/lib/docklight/share/locale";
-    
-    
-    
    
+    g_print("INIT GETTEXT\n"); 
     char* domain = bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
     g_print("bindtextdomain: %s %s %s\n",domain,GETTEXT_PACKAGE,PROGRAMNAME_LOCALEDIR);
    
-    // bind_textdomain_codeset - set encoding of message trans‐lations
+    // bind_text domain_codeset - set encoding of message trans‐lations
     char* btdcodeset = bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     g_print("bind_textdomain_codeset: %s\n",btdcodeset);
-    // The  textdomain  function  sets or retrieves the current  message domain.
+    
+    // The  text domain  function  sets or retrieves the current  message domain.
     char* txtdomain = textdomain(GETTEXT_PACKAGE);
     g_print("textdomain: %s\n\n",txtdomain);
       
-    /*
-    char* domain = bindtextdomain(GETTEXT_PACKAGE, localedir);
-    g_print("bindtextdomain: %s %s %s\n",domain,GETTEXT_PACKAGE,localedir);
-   
-    // bind_textdomain_codeset - set encoding of message trans‐lations
-    char* btdcodeset = bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-    g_print("bind_textdomain_codeset: %s\n",btdcodeset);
-    // The  textdomain  function  sets or retrieves the current  message domain.
-    char* txtdomain = textdomain(GETTEXT_PACKAGE);
-    g_print("textdomain: %s\n\n",txtdomain);
-    */
-    
+       
     Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
 
     AppWindow win;
     int autohide = 0;
-
+    
     std::string filepath = Utilities::getExecPath(DEF_INITNAME);
     GError *error = NULL;
     GKeyFile *key_file = g_key_file_new();
@@ -94,7 +79,8 @@ int main(int argc, char *argv[])
             error = NULL;
         }
     }
-
+    
+     g_key_file_free (key_file);
 
     int r = win.Init(panel_locationType::BOTTOM, autohide);
     if (r != 0) {

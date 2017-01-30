@@ -48,6 +48,7 @@ public:
     std::vector<DockItem*> m_items;
     int m_xid;
     int m_index = 0;
+    int m_attachedIndex=0;
     bool m_isAttached = false;
     bool m_isDirty = false;
     bool visible = true;

@@ -30,6 +30,8 @@ docklight_SOURCES =  \
  AppWindow.h \
  MonitorGeometry.cpp \
  MonitorGeometry.h \
+ DragDropWindow.cpp \
+ DragDropWindow.h \
  DockPanel.cpp \
  DockPanel.h \
  DockItem.cpp \

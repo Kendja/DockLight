@@ -26,6 +26,7 @@
 #include "DockPosition.h"
 #include "WindowControl.h"
 
+
 #include  <glibmm/i18n.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
@@ -33,14 +34,15 @@
 
 #include <limits.h>
 
+
+
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
 int DockPanel::m_currentMoveIndex;
 bool DockPanel::m_previewWindowActive;
+bool DockPanel::m_dragdropsStarts;
 
 DockPanel::DockPanel() :
-m_frames(0),
-m_last_time(0),
 m_titleElapsedSeconds(0),
 m_mouseIn(FALSE),
 m_mouseRightClick(FALSE),
@@ -52,11 +54,18 @@ m_previousCellwidth(DEF_CELLWIDTH),
 m_cellheight(DEF_CELLHIGHT),
 m_popupMenuOn(false),
 m_launcherWindow(nullptr),
+m_mouseclickEventTime(0),
+m_dragdropTimerSet(false),
+m_dragdropMouseDown(false),
+m_dragdropItemIndex(-1),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/" + DEF_DATADIRNAME),
-m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR)
+m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR),
+m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
 {
-    m_currentMoveIndex = -1;
+
+    DockPanel::m_dragdropsStarts = false;
+    DockPanel::m_currentMoveIndex = -1;
 
     // Set masks for mouse events
     add_events(Gdk::BUTTON_PRESS_MASK |
@@ -71,8 +80,6 @@ m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR)
             Gdk::POINTER_MOTION_MASK);
 
 
-   
-
 }
 
 /**
@@ -83,17 +90,21 @@ m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR)
  */
 int DockPanel::preInit(Gtk::Window* window, bool autohide)
 {
-    // assumes that the docklight.ico exists.
-    std::string filename = Utilities::getExecPath(DEF_ICONNAME);
-    gboolean isexists = g_file_test(filename.c_str(), G_FILE_TEST_EXISTS);
-    if (!isexists) {
-        g_critical("init: docklight.ico could not be found!\n");
+    // assumes that the "docklight.home.ico" exists.
+    const char* filename = m_homeiconFilePath.c_str();
+    DockItem* dockItem = new DockItem();
+    try {
+        dockItem->m_image = Gdk::Pixbuf::create_from_file(filename,
+                DEF_ICONSIZE, DEF_ICONSIZE, true);
+    } catch (Glib::FileError fex) {
+        g_critical("preInit: file %s could not be found!\n", filename);
+        return -1;
+
+    } catch (Gdk::PixbufError bex) {
+        g_critical("preInit: file %s PixbufError!\n", filename);
         return -1;
     }
 
-    DockItem* dockItem = new DockItem();
-    dockItem->m_image = Gdk::Pixbuf::create_from_file(Utilities::getExecPath(DEF_ICONNAME).c_str(),
-            DEF_ICONSIZE, DEF_ICONSIZE, true);
 
     dockItem->m_appname = _("Desktop");
     dockItem->m_realgroupname = _("Desktop");
@@ -103,10 +114,10 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     m_preview.setOwner(*this);
 
 
-    if( loadAttachments() != 0 ) 
+    if (loadAttachments() != 0)
         return -1;
 
-   
+
     // Menus
     // Home Menu items
     m_AutohideMenuItem.set_label(_("Autohide"));
@@ -243,9 +254,6 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
  */
 void DockPanel::postInit()
 {
-
-    m_fpstimer.start();
-    // m_titleTimer.start();
 
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
             &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
@@ -390,7 +398,7 @@ void DockPanel::previewWindowClosed()
 bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 {
     m_currentMoveIndex = getIndex(event->x, event->y);
-    
+
     return false;
 }
 
@@ -411,6 +419,39 @@ bool DockPanel::ispopupMenuActive()
 
 }
 
+void DockPanel::dropDockItem(GdkEventButton *event)
+{
+    int relativeMouseX = DockPosition::getDockItemRelativeMouseXPos(
+            (int) m_dockitems.size(), m_currentMoveIndex,
+            m_cellwidth, (int) event->x);
+
+    int dropIndex = m_currentMoveIndex;
+    if (relativeMouseX < (DEF_CELLWIDTH / 2)) {
+
+        dropIndex = m_currentMoveIndex > m_dragdropItemIndex ?
+                m_currentMoveIndex - 1 : m_currentMoveIndex;
+
+    }
+    if (relativeMouseX > (DEF_CELLWIDTH / 2)) {
+
+
+        dropIndex = m_currentMoveIndex > m_dragdropItemIndex ?
+                m_currentMoveIndex : m_currentMoveIndex + 1;
+
+
+    }
+
+    std::vector<DockItem*> tmp(m_dockitems.begin() +
+            m_dragdropItemIndex, m_dockitems.begin() + m_dragdropItemIndex + 1);
+
+    m_dockitems.erase(m_dockitems.begin() +
+            m_dragdropItemIndex, m_dockitems.begin() + m_dragdropItemIndex + 1);
+
+    m_dockitems.insert(m_dockitems.begin() + dropIndex, tmp.begin(), tmp.end());
+
+    g_print("Drop from %d to %d \n", m_dragdropItemIndex, dropIndex);
+}
+
 /** 
  * bool DockPanel::on_button_press_event(GdkEventButton *event)
  * 
@@ -420,11 +461,36 @@ bool DockPanel::ispopupMenuActive()
  */
 bool DockPanel::on_button_press_event(GdkEventButton *event)
 {
-
     if ((event->type == GDK_BUTTON_PRESS)) {
 
         m_currentMoveIndex = getIndex(event->x, event->y);
         m_mouseRightClick = false;
+
+
+        // Set Drag and drop variables and Starts the timer
+        if (event->button == 1 && !m_dragdropTimerSet && m_currentMoveIndex > 0) {
+
+            // remember the item we want to drag
+            m_dragdropItemIndex = m_currentMoveIndex;
+            int relativex = DockPosition::getDockItemRelativeMouseXPos(
+                    (int) m_dockitems.size(), m_dragdropItemIndex,
+                    m_cellwidth, (int) event->x);
+
+            // sets the relative item mouse coordinates         
+            m_dragdropMousePoint.set_x(relativex);
+            m_dragdropMousePoint.set_y((int) event->y);
+
+            // Variables are set 
+            m_dragdropTimerSet = true;
+            // Start the timer
+            m_dragdropMouseDown = true;
+            m_dragdropTimer.start();
+            g_print("Drag timer starts\n");
+        }
+
+
+        // remember the time to check it later 
+        m_mouseclickEventTime = gtk_get_current_event_time();
 
         // Check if the event is a left button click.
         if (event->button == 1 && !m_mouseLeftButtonDown) {
@@ -452,9 +518,47 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
  */
 bool DockPanel::on_button_release_event(GdkEventButton *event)
 {
+    // Check if a item was drop
+
+    if (m_dragdropMouseDown) {
+        m_dragdropsStarts = false;
+        m_dragdropTimerSet = false;
+        m_dragdropMouseDown = false;
+
+        m_dragDropWindow.Hide();
+        m_dragdropTimer.stop();
+        g_print("Reset Darg And Drop \n");
+        if (m_dragdropItemIndex != m_currentMoveIndex && m_currentMoveIndex > 0) {
+
+            g_print("Drag %d Drop %d\n", m_dragdropItemIndex, m_currentMoveIndex);
+            dropDockItem(event);
+
+            //            int idx = 0;
+            //            for(DockItem* item: m_dockitems){
+            //                
+            //                if( item->m_isAttached) {
+            //                  g_print("%d %s \n",idx++,item->m_instancename.c_str());
+            //                }
+            //                
+            //            }
+        }
+
+    }
+
+
+    // Taking Too Long To Release the mouse.
+    // That is not a valid Click.
+    if ((gtk_get_current_event_time() - m_mouseclickEventTime) > 200) {
+        m_mouseLeftButtonDown = false;
+        m_mouseRightButtonDown = false;
+        return true;
+    }
 
     if (!m_mouseIn)
         return true;
+
+
+
 
     if (m_mouseLeftButtonDown) {
 
@@ -527,7 +631,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             m_HomeCloseAllWindowsExceptActiveMenuItem.set_sensitive(wincount > 1);
             m_HomeMinimizeAllWindowsMenuItem.set_sensitive(unminimized > 0);
             m_HomeUnMinimizeAllWindowsMenuItem.set_sensitive(wincount > 0);
-            
+
             m_HomeMinimizeAllWindowsExceptActiveMenuItem.set_sensitive(unminimized > 1);
 
             if (!m_HomeMenu_Popup.get_attach_widget())
@@ -616,29 +720,59 @@ void DockPanel::on_menuNew_event()
 
 }
 
-void DockPanel::on_AttachToDock_event()
+int DockPanel::getAttachedOrderIndex()
 {
 
+    int idx = 0;
+    int count = 0;
 
+    for (DockItem* item : m_dockitems) {
+        if (!item->m_isAttached)
+            continue;
+        
+        idx = item->m_attachedIndex;
+        
+        if( count >= m_currentMoveIndex){
+            g_print("HERE SWAP\n");
+            break;
+        }
+        
+        count++;
+    }
+    
+    return idx + 1;
+ 
+}
+
+void DockPanel::on_AttachToDock_event()
+{
     if (m_currentMoveIndex < 1)
         return;
 
+    
+    int a = getAttachedOrderIndex();
+            
+    return;
+    
+    
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (dockitem->m_isAttached)
-
         return; // already attached
+    
+
+    char filename[NAME_MAX];
+    std::string s = dockitem->m_realgroupname;
+    std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
+    sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
+            getAttachedOrderIndex(),
+            s.c_str());
 
     dockitem->m_isAttached = true;
     dockitem->m_isDirty = true;
-
-    char filename[PATH_MAX];
-    std::string s = dockitem->m_realgroupname;
-    std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
-    sprintf(filename, "%s/%s.png", m_applicationAttachmentsPath.c_str(), s.c_str());
-
     dockitem->m_image->save(filename, "png");
-
+    
+    
     g_print("DockItem is now Attached for index : %d\n", m_currentMoveIndex);
 
 }
@@ -807,39 +941,19 @@ int m_oldcellsize = DEF_CELLWIDTH;
 bool DockPanel::on_timeoutDraw()
 {
 
-    //    DockPosition::setItemsCount(m_dockitems.size());
-    //    m_cellwidth = DockPosition::getCellSize();
-    //    m_iconsize = DockPosition::getIconSize();
-    //
-    //   // g_print("Recal %d %d\n",m_cellwidth,(int)m_titleTimer.elapsed());
-    //    
-    //    if (m_cellwidth != m_oldcellsize) {
-    //        //g_print("Recal %d \n",(int)m_titleTimer.elapsed());
-    //        m_oldcellsize = m_cellwidth;
-    //        for (DockItem* item : m_dockitems) {
-    //
-    //            Glib::RefPtr<Gdk::Pixbuf> appIcon = item->m_image;
-    //            item->m_image = appIcon->scale_simple(m_iconsize,
-    //                    m_iconsize, Gdk::INTERP_BILINEAR);
-    //
-    //        }
-    //
-    //    }
+    if (!m_previewWindowActive && !m_dragdropsStarts && m_dragdropItemIndex > 0 &&
+            m_dragdropTimerSet && m_dragdropTimer.elapsed() > 0.5) {
+        m_dragdropsStarts = true;
+        m_dragdropTimer.stop();
+        DockItem* item = m_dockitems.at(m_dragdropItemIndex);
+
+        m_dragDropWindow.Show(item->m_image, m_cellwidth, m_dragdropMousePoint);
+
+    }
+
 
     Gtk::Widget::queue_draw();
 
-    ++m_frames;
-    m_last_time += m_fpstimer.elapsed();
-
-    if (m_last_time >= 0) {
-
-        m_curFPS = (float) (m_frames / m_last_time);
-        m_frames = 0;
-        m_last_time = 0;
-        m_fpstimer.reset();
-    }
-
-    //g_print("FPS: %d\n", (int) m_curFPS);
 
     return true;
 }
@@ -877,7 +991,7 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
 
-    if (m_previewWindowActive)
+    if (m_previewWindowActive || DockPanel::m_dragdropsStarts)
         return;
 
     WnckWindow * window = wnck_screen_get_active_window(screen);
@@ -892,6 +1006,9 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
 
 void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
 {
+    if (DockPanel::m_dragdropsStarts)
+        return;
+
     int xid = wnck_window_get_xid(window);
 
     int idx = 0;
@@ -1318,7 +1435,7 @@ int DockPanel::loadAttachments()
     if (dirFile == 0) {
         if (ENOENT == errno)
             g_critical("Error loading attachments: Directory does not exist.\n");
-        
+
         return -1;
     }
 
@@ -1335,8 +1452,6 @@ int DockPanel::loadAttachments()
             std::string imageFilePath = std::string(m_applicationAttachmentsPath) +
                     std::string("/") + filename;
 
-            //g_print("found an .png file: %s\n", imageFilePath.c_str());
-
             std::vector<std::string> tokens = Utilities::split(filename, '_');
             std::size_t found = filename.find_last_of(".");
             if (found < 1)
@@ -1345,13 +1460,28 @@ int DockPanel::loadAttachments()
             std::string appname = filename.substr(0, found);
             std::replace(appname.begin(), appname.end(), '_', ' ');
 
+            std::string index = appname.substr(0, 2);
+            appname = appname.substr(3, appname.length() - 3);
+
+            int idx;
+            try {
+                idx = std::stoi(index.c_str());
+
+            } catch (std::invalid_argument fex) {
+                g_critical("loadAttachments: std::invalid_argument\n");
+                return -1;
+
+            } catch (std::out_of_range) {
+                g_critical("loadAttachments: std::out_of_range\n");
+                return -1;
+            }
 
             std::string titlename =
                     Launcher::getTitleNameFromDesktopFile(appname);
 
-
             DockItem * item = new DockItem();
             item->m_appname = appname;
+            item->m_attachedIndex = idx;
             item->m_instancename = Utilities::stringToLower(appname.c_str());
             item->m_realgroupname = appname;
             item->m_titlename = titlename;
@@ -1361,13 +1491,17 @@ int DockPanel::loadAttachments()
 
 
             try {
-                item->m_image = item->m_image->create_from_file(imageFilePath);
+
+                item->m_image = Gdk::Pixbuf::create_from_file(imageFilePath,
+                        DEF_ICONSIZE, DEF_ICONSIZE, true);
 
             } catch (Glib::FileError fex) {
                 g_critical("Attachment file not found %s\n", appname.c_str());
+                return -1;
 
             } catch (Gdk::PixbufError bex) {
                 g_critical("Attachment file PixbufError %s\n", appname.c_str());
+                return -1;
             }
 
 
@@ -1376,6 +1510,24 @@ int DockPanel::loadAttachments()
 
 
             m_dockitems.push_back(item);
+        }
+        //sort
+        // Sort by index
+        int size = (int) m_dockitems.size();
+        int i, m, j;
+
+        for (i = 0; i < size - 1; i = i + 1) {
+            m = i;
+            for (j = i + 1; j < size; j = j + 1) {
+
+                int a = m_dockitems.at(j)->m_attachedIndex;
+                int b = m_dockitems.at(m)->m_attachedIndex;
+
+                if (a < b) {
+                    m = j;
+                }
+            }
+            std::swap(m_dockitems.at(i), m_dockitems.at(m));
         }
     }
     closedir(dirFile);

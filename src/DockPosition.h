@@ -28,7 +28,10 @@ namespace DockPosition
 {
 
     void getCenterScreenPos(int targetwidth,int targetheight, int &posx, int &posy);
+    
     int getDockItemCenterPos(int dockitemscount, int currentindex, int targetwidth);
+    int getDockItemRelativeMouseXPos(int dockitemscount, int currentindex, int targetwidth, int mouseX);
+    
     bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize);
     bool getPreviewItemGeometry(int dockitemscount, int &width, int &height);
     int getHomeMenuTopPosition();

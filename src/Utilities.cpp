@@ -57,8 +57,8 @@ namespace Utilities
      */
     std::string getExecPath()
     {
-        char result[ PATH_MAX ];
-        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+        char result[ NAME_MAX ];
+        ssize_t count = readlink("/proc/self/exe", result, NAME_MAX);
         if (count == -1)
             return "";
 
@@ -168,7 +168,7 @@ namespace Utilities
 
     std::string exec(const char* cmd)
     {
-        char buffer[128];
+        char buffer[NAME_MAX];
         std::string result = "";
         FILE* pipe = popen(cmd, "r");
         if (!pipe) throw std::runtime_error("popen() failed!");
@@ -187,7 +187,7 @@ namespace Utilities
 
     int system(const char* cmd)
     {
-        char command[128];
+        char command[NAME_MAX];
         sprintf(command, "%s &", cmd);
         return  std::system(command);
     }
