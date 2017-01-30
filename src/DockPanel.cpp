@@ -419,6 +419,46 @@ bool DockPanel::ispopupMenuActive()
 
 }
 
+void DockPanel::saveAttachments(int aIdx, int bIdx)
+{
+    DockItem* a = m_dockitems[aIdx];
+    DockItem* b = m_dockitems[bIdx];
+
+    if (!a->m_isAttached && !b->m_isAttached)
+        return;
+
+    char command[100];
+    char filename[100];
+
+    sprintf(command, "exec rm -r /%s/*", m_applicationAttachmentsPath.c_str());
+    if (system(command) != 0) {
+        g_critical("can't delete attachments! ");
+        return;
+    }
+
+    int idx = 0;
+    for (DockItem* item : m_dockitems) {
+        if (!item->m_isAttached)
+            continue;
+
+
+        char filename[NAME_MAX];
+        std::string s = item->m_realgroupname;
+        std::replace(s.begin(), s.end(), ' ', '_');
+
+        sprintf(filename, "%s/%2d_%s.png",
+                m_applicationAttachmentsPath.c_str(),
+                idx, item->m_realgroupname.c_str());
+
+        item->m_attachedIndex = idx;
+        item->m_image->save(filename, "png");
+
+        idx++;
+    }
+
+
+}
+
 void DockPanel::dropDockItem(GdkEventButton *event)
 {
     int relativeMouseX = DockPosition::getDockItemRelativeMouseXPos(
@@ -450,6 +490,7 @@ void DockPanel::dropDockItem(GdkEventButton *event)
     m_dockitems.insert(m_dockitems.begin() + dropIndex, tmp.begin(), tmp.end());
 
     g_print("Drop from %d to %d \n", m_dragdropItemIndex, dropIndex);
+    saveAttachments(m_dragdropItemIndex, dropIndex );
 }
 
 /** 
@@ -720,59 +761,31 @@ void DockPanel::on_menuNew_event()
 
 }
 
-int DockPanel::getAttachedOrderIndex()
-{
-
-    int idx = 0;
-    int count = 0;
-
-    for (DockItem* item : m_dockitems) {
-        if (!item->m_isAttached)
-            continue;
-        
-        idx = item->m_attachedIndex;
-        
-        if( count >= m_currentMoveIndex){
-            g_print("HERE SWAP\n");
-            break;
-        }
-        
-        count++;
-    }
-    
-    return idx + 1;
- 
-}
 
 void DockPanel::on_AttachToDock_event()
 {
     if (m_currentMoveIndex < 1)
         return;
 
-    
-    int a = getAttachedOrderIndex();
-            
-    return;
-    
-    
+
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (dockitem->m_isAttached)
         return; // already attached
-    
+
 
     char filename[NAME_MAX];
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
     sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
-            getAttachedOrderIndex(),
+            /*getAttachedOrderIndex()*/m_currentMoveIndex,
             s.c_str());
 
     dockitem->m_isAttached = true;
     dockitem->m_isDirty = true;
     dockitem->m_image->save(filename, "png");
-    
-    
+
+
     g_print("DockItem is now Attached for index : %d\n", m_currentMoveIndex);
 
 }
@@ -780,11 +793,10 @@ void DockPanel::on_AttachToDock_event()
 void DockPanel::on_DetachFromDock_event()
 {
 
-
     if (m_currentMoveIndex < 0)
         return;
 
-    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem* dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (!dockitem->m_isAttached)
         return;
@@ -797,12 +809,15 @@ void DockPanel::on_DetachFromDock_event()
 
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
-    sprintf(filename, "%s//%s.png", m_applicationAttachmentsPath.c_str(), s.c_str());
+    sprintf(filename, "%s/%2d_%s.png",
+            m_applicationAttachmentsPath.c_str(), 
+            dockitem->m_attachedIndex,
+            s.c_str());
 
     //g_print(" Remove path %s n", m_applicationAttachmentsPath.c_str());
 
     if (remove(filename) != 0) {
-        g_print("\non_UnPin_event. ERROR remove file. ");
+        g_print("DetachFromDock_event. ERROR remove file. \n");
 
         return;
     }
@@ -1469,15 +1484,17 @@ int DockPanel::loadAttachments()
 
             } catch (std::invalid_argument fex) {
                 g_critical("loadAttachments: std::invalid_argument\n");
+                closedir(dirFile);
                 return -1;
 
             } catch (std::out_of_range) {
                 g_critical("loadAttachments: std::out_of_range\n");
+                closedir(dirFile);
                 return -1;
             }
 
             std::string titlename =
-                    Launcher::getTitleNameFromDesktopFile(appname);
+             Launcher::getTitleNameFromDesktopFile(appname);
 
             DockItem * item = new DockItem();
             item->m_appname = appname;
@@ -1497,40 +1514,76 @@ int DockPanel::loadAttachments()
 
             } catch (Glib::FileError fex) {
                 g_critical("Attachment file not found %s\n", appname.c_str());
+                closedir(dirFile);
                 return -1;
 
             } catch (Gdk::PixbufError bex) {
                 g_critical("Attachment file PixbufError %s\n", appname.c_str());
+                closedir(dirFile);
                 return -1;
             }
-
 
             item->m_isAttached = true;
             item->m_isDirty = true;
 
-
             m_dockitems.push_back(item);
         }
-        //sort
-        // Sort by index
-        int size = (int) m_dockitems.size();
-        int i, m, j;
-
-        for (i = 0; i < size - 1; i = i + 1) {
-            m = i;
-            for (j = i + 1; j < size; j = j + 1) {
-
-                int a = m_dockitems.at(j)->m_attachedIndex;
-                int b = m_dockitems.at(m)->m_attachedIndex;
-
-                if (a < b) {
-                    m = j;
-                }
-            }
-            std::swap(m_dockitems.at(i), m_dockitems.at(m));
-        }
     }
+
     closedir(dirFile);
+    
+    
+    // Sort by index
+    int size = (int) m_dockitems.size();
+    int i, m, j;
+
+    for (i = 0; i < size - 1; i = i + 1) {
+        m = i;
+        for (j = i + 1; j < size; j = j + 1) {
+
+            int a = m_dockitems.at(j)->m_attachedIndex;
+            int b = m_dockitems.at(m)->m_attachedIndex;
+
+            if (a < b) {
+                m = j;
+            }
+        }
+        std::swap(m_dockitems.at(i), m_dockitems.at(m));
+    }
+
+  
+
+    for (int idx = 1; idx <= (int) m_dockitems.size() - 1; idx++) {
+
+        DockItem* item = m_dockitems[idx];
+       
+        if (idx == item->m_attachedIndex)
+            continue;
+
+        char filename[NAME_MAX];
+        char newmame[NAME_MAX];
+        sprintf(filename, "%s/%2d_%s.png",
+                m_applicationAttachmentsPath.c_str(),
+                item->m_attachedIndex, item->m_appname.c_str());
+
+        sprintf(newmame, "%s/%2d_%s.png",
+                m_applicationAttachmentsPath.c_str(),
+                idx, item->m_appname.c_str());
+
+
+        //g_print("%d %s\n", idx, item->m_appname.c_str());
+
+        int rc = std::rename(filename, newmame);
+        if (rc) {
+            g_critical("Attachment file could not be renamed: %s\n", newmame);
+            return 1;
+        }
+
+        item->m_attachedIndex = idx;
+    }
+
+    
+  
     return 0;
 }
 

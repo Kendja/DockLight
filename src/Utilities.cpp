@@ -57,16 +57,22 @@ namespace Utilities
      */
     std::string getExecPath()
     {
-        char result[ NAME_MAX ];
-        ssize_t count = readlink("/proc/self/exe", result, NAME_MAX);
-        if (count == -1)
+        char result[ PATH_MAX ];
+        *result = 0;
+        
+        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+        if (count == -1) {
+            g_critical("getExecPath Fail!\n"); 
             return "";
-
+        }      
+        
         std::string path = result;
         std::size_t found = path.find_last_of("/\\");
-        path = path.substr(0, found);
-
-        return path;
+        
+        if(  found )
+            path = path.substr(0, found);
+       
+        return std::string(path);
     }
 
     /*
@@ -79,13 +85,11 @@ namespace Utilities
      */
     std::string getExecPath(const std::string& str)
     {
-        std::string path = Utilities::getExecPath() ;
-        std::string result = path +"/"+str ;
+        std::string path = Utilities::getExecPath();
+        std::string result = path + "/" + str;
         return result;
     }
-    
-      
-    
+
     /*
      * std::vector<std::string> 
      * split(const std::string &text, char sep)
@@ -189,7 +193,7 @@ namespace Utilities
     {
         char command[NAME_MAX];
         sprintf(command, "%s &", cmd);
-        return  std::system(command);
+        return std::system(command);
     }
 
     bool getMousePosition(int&x, int &y)

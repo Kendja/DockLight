@@ -100,7 +100,8 @@ private:
     Gdk::Point m_dragdropMousePoint;
 
     void dropDockItem(GdkEventButton *event);
-    int getAttachedOrderIndex();
+    
+    void saveAttachments(int aIdx, int bIdx);
     int loadAttachments();
     void SelectWindow(int index, GdkEventButton * event);
     void createLauncher(DockItem* item);
