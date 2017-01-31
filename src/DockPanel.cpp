@@ -424,13 +424,6 @@ bool DockPanel::ispopupMenuActive()
 
 void DockPanel::saveAttachments(int aIdx, int bIdx)
 {
-    DockItem* a = m_dockitems[aIdx];
-    DockItem* b = m_dockitems[bIdx];
-
-    if (!a->m_isAttached && !b->m_isAttached)
-        return;
-
-
     char filename[100];
 
     std::ostringstream command;
@@ -465,15 +458,15 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
 
 void DockPanel::dropDockItem(GdkEventButton *event)
 {
-    
-    if( m_dragdropItemIndex < 1 ) 
+
+    if (m_dragdropItemIndex < 1)
         return;
-    
+
+    // we check if the drop item is Attachhed.
+    // if not the we let in drop but we don't save anything.
     DockItem* a = m_dockitems[m_dragdropItemIndex];
-    if( !a->m_isAttached)
-        return;
-    
-    
+    bool isAttached = a->m_isAttached;
+
     int relativeMouseX = DockPosition::getDockItemRelativeMouseXPos(
             (int) m_dockitems.size(), m_currentMoveIndex,
             m_cellwidth, (int) event->x);
@@ -500,8 +493,9 @@ void DockPanel::dropDockItem(GdkEventButton *event)
 
     m_dockitems.insert(m_dockitems.begin() + dropIndex, tmp.begin(), tmp.end());
 
-    //g_print("Drop from %d to %d \n", m_dragdropItemIndex, dropIndex);
-    saveAttachments(m_dragdropItemIndex, dropIndex);
+    // if is not attached the we don't need to save.
+    if (isAttached)
+        saveAttachments(m_dragdropItemIndex, dropIndex);
 }
 
 /** 
@@ -579,9 +573,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 
         if (m_dragdropItemIndex != m_currentMoveIndex
                 && m_currentMoveIndex > 0) {
-           
+
             dropDockItem(event);
-            
+
             m_dragdropItemIndex = -1;
         }
     }

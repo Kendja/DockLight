@@ -47,7 +47,7 @@ void About::init(Window* window)
         this->m_isInitSet = true;
     }
 
-    this->set_transient_for(*window);
+    // this->set_transient_for(*window);
 
     this->set_name(m_appName);
     this->set_version(m_appVersion);
