@@ -23,7 +23,7 @@ cd m4
 rm -rf !(NOTES)
 
 cd ../po
-rm -rf !(*.po|LINGUAS|POTFILES.in|compile_all.sh|deploymo.sh)
+rm -rf !(*.po|LINGUAS|POTFILES.in|compile_all.sh|deploymo.sh|merge.sh)
 
 cd ..
 
