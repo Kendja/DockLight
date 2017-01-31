@@ -47,6 +47,7 @@ void About::init(Window* window)
         this->m_isInitSet = true;
     }
 
+    // FIX THIS! cause a crash...
     // this->set_transient_for(*window);
 
     this->set_name(m_appName);

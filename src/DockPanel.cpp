@@ -455,10 +455,12 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
 
 
 }
-
+/**
+ * Drop a DockItem
+ * @param GdkEventButton event
+ */
 void DockPanel::dropDockItem(GdkEventButton *event)
 {
-
     if (m_dragdropItemIndex < 1)
         return;
 
