@@ -4,10 +4,11 @@
 #include "gio/gdesktopappinfo.h"
 #include <map>
 
+
+
 namespace Launcher
 {
     std::map<std::string, std::string> dictionary;
-
     /**
      * Launch an application from a desktop file or from bash.
      * @param DockItem* item
