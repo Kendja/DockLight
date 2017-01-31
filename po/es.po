@@ -1,4 +1,4 @@
-#*****************************************************************
+# *****************************************************************
 #
 #  Copyright (C) 2015 Juan R. Gonzalez
 #  Created on Januar, 2017
@@ -7,37 +7,39 @@
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-# 
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#****************************************************************
+# ****************************************************************
 #
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.12\n"
-"Report-Msgid-Bugs-To:j-gonzalez@email.de \n"
-"POT-Creation-Date: 2017-01-25 21:12+0700\n"
-"PO-Revision-Date: 2017-01-25\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-01 00:21+0700\n"
+"PO-Revision-Date: 2017-02-01 00:23+0700\n"
 "Last-Translator: FULL NAME <j-gonzalez@email.de>\n"
 "Language-Team: SPAIN\n"
-"Language: ES\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.11\n"
 
 #: ../src/About.cpp:86
 msgid ""
-"docklight is a lightweight Dock Panel for opening common applications for "
-"the GNOME Desktop"
+"This program is a lightweight Dock Launcher for opening common applications "
+"for the GNOME Desktop"
 msgstr ""
-"Docklight es un Programa para abrir aplicaciones comunes para el escritorio de GNOME."
+"Docklight es un Programa para abrir aplicaciones  para el escritorio de "
+"GNOME."
 
 #: ../src/LauncherWindow.cpp:15 ../src/LauncherWindow.cpp:52
 msgid "Create Launcher"
@@ -63,14 +65,13 @@ msgstr "Elegir comando"
 msgid "Choose Icon"
 msgstr "Elegir Icono"
 
-#: ../src/LauncherWindow.cpp:56
-msgid "Name: "
-msgstr "Nombre: "
-
-
 #: ../src/LauncherWindow.cpp:54
 msgid "Available"
 msgstr "Disponible"
+
+#: ../src/LauncherWindow.cpp:56
+msgid "Name: "
+msgstr "Nombre: "
 
 #: ../src/LauncherWindow.cpp:57
 msgid "Comment: "
@@ -131,7 +132,8 @@ msgid ""
 msgstr ""
 "El comando no es válido.\n"
 "\n"
-"Algunas aplicaciones son archivos de scripts y otras requieren privilegios de administrador:\n"
+"Algunas aplicaciones son archivos de scripts y otras requieren privilegios "
+"de administrador:\n"
 "Para los archivos scrips se necesita agregar bash al principio:\n"
 "\n"
 "/bin/sh \"/usr/local/scriptfile.sh\"\n"
@@ -143,7 +145,6 @@ msgstr ""
 "Asegúrese de que la aplicación se inicia desde la terminal de comandos.\n"
 "Abrir un terminal y navegar hasta el directorio donde está la aplicación\n"
 "ejecutar el comando desde allí ..."
-
 
 #: ../src/LauncherWindow.cpp:250
 msgid ""
@@ -169,7 +170,6 @@ msgstr ""
 "Permisos requeridos. Por favor, inténtelo de nuevo!\n"
 "\n"
 
-
 #: ../src/LauncherWindow.cpp:342
 msgid ""
 "\n"
@@ -182,12 +182,9 @@ msgstr ""
 "Lanzador creado con éxito!\n"
 "\n"
 
-
 #: ../src/LauncherWindow.cpp:350 ../src/LauncherWindow.cpp:376
 msgid "Please choose a file"
 msgstr "Elija un archivo"
-
-
 
 #. Add response buttons the the dialog:
 #: ../src/LauncherWindow.cpp:356 ../src/LauncherWindow.cpp:382
@@ -210,64 +207,64 @@ msgstr "No se ha podido encontrar el navegador.\n"
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "Los campos Nombre y Comando no pueden estar vacíos!\n"
 
-#: ../src/DockPanel.cpp:100 ../src/DockPanel.cpp:101
+#: ../src/DockPanel.cpp:109 ../src/DockPanel.cpp:110
 msgid "Desktop"
 msgstr "Escritorio"
 
 #. Menus
 #. Home Menu items
-#: ../src/DockPanel.cpp:114
+#: ../src/DockPanel.cpp:123
 msgid "Autohide"
 msgstr "Esconder automaticamente"
 
-#: ../src/DockPanel.cpp:119 ../src/DockPanel.cpp:201
+#: ../src/DockPanel.cpp:128 ../src/DockPanel.cpp:210
 msgid "Show all"
 msgstr "Mostrar todo"
 
-#: ../src/DockPanel.cpp:123 ../src/DockPanel.cpp:205
+#: ../src/DockPanel.cpp:132 ../src/DockPanel.cpp:214
 msgid "Minimize all except active"
 msgstr "Minimizar todo menos lo activo"
 
-#: ../src/DockPanel.cpp:128 ../src/DockPanel.cpp:209
+#: ../src/DockPanel.cpp:137 ../src/DockPanel.cpp:218
 msgid "Minimize all"
 msgstr "Minimizar todo"
 
-#: ../src/DockPanel.cpp:132 ../src/DockPanel.cpp:219
+#: ../src/DockPanel.cpp:141 ../src/DockPanel.cpp:228
 msgid "Close all except active"
 msgstr "Cierra todo menos lo activo"
 
-#: ../src/DockPanel.cpp:137 ../src/DockPanel.cpp:223
+#: ../src/DockPanel.cpp:146 ../src/DockPanel.cpp:232
 msgid "Close all"
 msgstr "Cierra todo"
 
 #. m_HomeMenu_Popup.signal_enter_notify_event().
 #. connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
-#: ../src/DockPanel.cpp:159
+#: ../src/DockPanel.cpp:168
 msgid "Help"
 msgstr "Ayuda"
 
-#: ../src/DockPanel.cpp:164
+#: ../src/DockPanel.cpp:173
 msgid "About"
 msgstr "Acerca de"
 
-#: ../src/DockPanel.cpp:168
+#: ../src/DockPanel.cpp:177
 msgid "Quit"
 msgstr "Salir"
 
 #. Item Menu
-#: ../src/DockPanel.cpp:182
+#: ../src/DockPanel.cpp:191
 msgid "Open new"
 msgstr "Abrir nuevo"
 
-#: ../src/DockPanel.cpp:189
+#: ../src/DockPanel.cpp:198
 msgid "Attach to Dock"
 msgstr "Adjuntar al Dock"
 
-#: ../src/DockPanel.cpp:194
+#: ../src/DockPanel.cpp:203
 msgid "Detach from Dock"
 msgstr "Desconectarse de el Dock"
 
-#: ../src/DockPanel.cpp:1295
+#: ../src/DockPanel.cpp:1427
 #, c-format
 msgid ""
 "(%s) %d windows.\n"
@@ -277,8 +274,3 @@ msgstr ""
 "(%s) %d Ventanas.\n"
 "Hay muchas ventanas abiertas para una vista previa.\n"
 "Cierre algunas ventanas e inténtelo de nuevo."
-
-
-
-
-

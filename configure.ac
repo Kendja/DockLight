@@ -4,12 +4,12 @@
 PACKAGE=docklight
 #
 #---------------------------------------------------------
-VERSION=1.0-12
+VERSION=1.0.13
 INSTALLDIR=/usr/local/docklight
 LOCALEDIR=/usr/lib/docklight/share/locale
 
 dnl ======================================================
-AC_INIT([docklight], [1.0.12], [bug-automake@gnu.org])
+AC_INIT([docklight], [1.0.13], [bug-automake@gnu.org])
 # this flags are for automake
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 # find & probe c compiler
