@@ -76,6 +76,19 @@ m_initialItemMax(0)
             Gdk::LEAVE_NOTIFY_MASK |
             Gdk::POINTER_MOTION_MASK);
 
+
+    GdkScreen *screen;
+    GdkVisual *visual;
+
+    gtk_widget_set_app_paintable(GTK_WIDGET(gobj()), TRUE);
+    screen = gdk_screen_get_default();
+    visual = gdk_screen_get_rgba_visual(screen);
+
+    if (visual != NULL && gdk_screen_is_composited(screen)) {
+        gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
+    }
+
+
     font.set_family("System");
     font.set_weight(Pango::WEIGHT_NORMAL);
 
@@ -489,7 +502,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
             // This can happen when a browser play a video and gets minimized and 
             // stops playing. When it gets unminimized should play again in the preview.
             if (!item->m_isDynamic) {
-               
+
                 item->m_imageLoadedRequired = true;
             }
 
@@ -520,15 +533,35 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
-    cr->paint();
+   cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
+    Utilities::RoundedRectangle(cr,
+          0, 0, this->get_width(), this->get_height(),6.0);
+     cr->fill();
 
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-    cr->rectangle(0, 0, this->get_width(), this->get_height());
-    cr->fill();
-    cr->set_line_width(1.0);
+       Utilities::RoundedRectangle(cr,
+          0, 0, this->get_width(), this->get_height(),6.0);
+   cr->fill();
+    
+    
+//    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
+//    cr->rectangle(0, 0, this->get_width(), this->get_height());
+//    cr->fill();
+//    cr->set_line_width(1.0);
 
 
+   
+//   cr->set_source_rgba(0.0, 0.0, 1.8, 0.8);
+//   
+//   Utilities::RoundedRectangle(cr,
+//           0, 0, this->get_width(), this->get_height(),6.0);
+//   cr->fill();
+
+//   cr->set_source_rgba(1.0, 1.0, 1.8, 1.0); 
+//   Utilities::RoundedRectangle(cr,
+//           0, 0, this->get_width(), this->get_height(),6.0);
+//   cr->stroke(); 
+//   
     if (!m_isActive) {
         return Gtk::Window::on_draw(cr);
     }
@@ -636,7 +669,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 item->m_frames = 0;
                 item->m_imageLoadedRequired = false;
             }
-            
+
             // if the image is static do not unreference the scaledpb.
             if (item->m_imageLoadedRequired)
                 g_object_unref(scaledpb);

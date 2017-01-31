@@ -85,7 +85,7 @@ namespace Utilities
      */
     std::string getExecPath(const std::string& str)
     {
-        std::string path = Utilities::getExecPath();
+        std::string path = getExecPath();
         std::string result = path + "/" + str;
         return result;
     }

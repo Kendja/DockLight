@@ -47,8 +47,6 @@ void About::init(Window* window)
         this->m_isInitSet = true;
     }
 
-
-
     this->set_transient_for(*window);
 
     this->set_name(m_appName);
@@ -60,6 +58,7 @@ void About::init(Window* window)
     this->set_translator_credits("Juan Álvarez\nSuppaluk Srisaeng");
     this->set_website_label("docklight on github");
     this->set_website("https://github.com/yoosamui/docklight");
+    
     this->set_license_type(Gtk::License::LICENSE_GPL_3_0);
     //this->set_license("nullptr");
 

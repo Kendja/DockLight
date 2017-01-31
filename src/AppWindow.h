@@ -45,7 +45,7 @@ public:
 private:
     DockPanel m_dockpanel;
     Glib::Timer m_Timer;
-    gdouble m_timerElapsedSeconds;
+    gdouble m_timerElapsedSeconds=0;
     
     bool on_timeout();
 

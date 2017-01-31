@@ -275,6 +275,9 @@ void DockPanel::postInit()
 DockPanel::~DockPanel()
 {
 
+    if( m_launcherWindow != nullptr)
+        delete(m_launcherWindow);
+            
     m_titlewindow.close();
 
     for (auto item : m_dockitems)
@@ -427,11 +430,12 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
     if (!a->m_isAttached && !b->m_isAttached)
         return;
 
-    char command[100];
+
     char filename[100];
 
-    sprintf(command, "exec rm -r /%s/*", m_applicationAttachmentsPath.c_str());
-    if (system(command) != 0) {
+    std::ostringstream command;
+    command << "exec rm -r /" << m_applicationAttachmentsPath << "/*";
+    if (system(command.str().c_str()) != 0) {
         g_critical("can't delete attachments! ");
         return;
     }
@@ -441,14 +445,14 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
         if (!item->m_isAttached)
             continue;
 
-
         char filename[NAME_MAX];
         std::string s = item->m_realgroupname;
         std::replace(s.begin(), s.end(), ' ', '_');
 
         sprintf(filename, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
-                idx, item->m_realgroupname.c_str());
+                idx, s.c_str());
+
 
         item->m_attachedIndex = idx;
         item->m_image->save(filename, "png");
@@ -466,18 +470,16 @@ void DockPanel::dropDockItem(GdkEventButton *event)
             m_cellwidth, (int) event->x);
 
     int dropIndex = m_currentMoveIndex;
-    if (relativeMouseX < (DEF_CELLWIDTH / 2)) {
+    if (relativeMouseX < (m_cellwidth / 2)) {
 
         dropIndex = m_currentMoveIndex > m_dragdropItemIndex ?
                 m_currentMoveIndex - 1 : m_currentMoveIndex;
 
     }
-    if (relativeMouseX > (DEF_CELLWIDTH / 2)) {
-
+    if (relativeMouseX > (m_cellwidth / 2)) {
 
         dropIndex = m_currentMoveIndex > m_dragdropItemIndex ?
                 m_currentMoveIndex : m_currentMoveIndex + 1;
-
 
     }
 
@@ -489,8 +491,8 @@ void DockPanel::dropDockItem(GdkEventButton *event)
 
     m_dockitems.insert(m_dockitems.begin() + dropIndex, tmp.begin(), tmp.end());
 
-    g_print("Drop from %d to %d \n", m_dragdropItemIndex, dropIndex);
-    saveAttachments(m_dragdropItemIndex, dropIndex );
+    //g_print("Drop from %d to %d \n", m_dragdropItemIndex, dropIndex);
+    saveAttachments(m_dragdropItemIndex, dropIndex);
 }
 
 /** 
@@ -506,7 +508,6 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 
         m_currentMoveIndex = getIndex(event->x, event->y);
         m_mouseRightClick = false;
-
 
         // Set Drag and drop variables and Starts the timer
         if (event->button == 1 && !m_dragdropTimerSet && m_currentMoveIndex > 0) {
@@ -526,7 +527,7 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
             // Start the timer
             m_dragdropMouseDown = true;
             m_dragdropTimer.start();
-            g_print("Drag timer starts\n");
+            // g_print("Drag timer starts\n");
         }
 
 
@@ -560,30 +561,17 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 bool DockPanel::on_button_release_event(GdkEventButton *event)
 {
     // Check if a item was drop
-
     if (m_dragdropMouseDown) {
         m_dragdropsStarts = false;
         m_dragdropTimerSet = false;
         m_dragdropMouseDown = false;
-
         m_dragDropWindow.Hide();
         m_dragdropTimer.stop();
-        g_print("Reset Darg And Drop \n");
-        if (m_dragdropItemIndex != m_currentMoveIndex && m_currentMoveIndex > 0) {
 
-            g_print("Drag %d Drop %d\n", m_dragdropItemIndex, m_currentMoveIndex);
+        if (m_dragdropItemIndex != m_currentMoveIndex
+                && m_currentMoveIndex > 0) {
             dropDockItem(event);
-
-            //            int idx = 0;
-            //            for(DockItem* item: m_dockitems){
-            //                
-            //                if( item->m_isAttached) {
-            //                  g_print("%d %s \n",idx++,item->m_instancename.c_str());
-            //                }
-            //                
-            //            }
         }
-
     }
 
 
@@ -630,9 +618,6 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
                     WindowControl::isExitsActivetWindowByDockItem(dockitem);
             bool maximizedexistst =
                     WindowControl::isExistsUnMaximizedWindowsByDockItem(dockitem);
-            //bool minizedexitst =
-            //        WindowControl::isExistsMinimizedWindowsByDockItem(dockitem);
-
 
             m_MenuItemMinimizedAll.set_sensitive(isExitstWindows > 0 && maximizedexistst);
 
@@ -761,7 +746,6 @@ void DockPanel::on_menuNew_event()
 
 }
 
-
 void DockPanel::on_AttachToDock_event()
 {
     if (m_currentMoveIndex < 1)
@@ -778,7 +762,7 @@ void DockPanel::on_AttachToDock_event()
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
     sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
-            /*getAttachedOrderIndex()*/m_currentMoveIndex,
+            m_currentMoveIndex,
             s.c_str());
 
     dockitem->m_isAttached = true;
@@ -801,7 +785,7 @@ void DockPanel::on_DetachFromDock_event()
     if (!dockitem->m_isAttached)
         return;
 
-    // can't detach if still open
+    // can't detach if still have windows open
     if (dockitem->m_items.size() > 0)
         return;
 
@@ -809,17 +793,23 @@ void DockPanel::on_DetachFromDock_event()
 
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
+
     sprintf(filename, "%s/%2d_%s.png",
-            m_applicationAttachmentsPath.c_str(), 
+            m_applicationAttachmentsPath.c_str(),
             dockitem->m_attachedIndex,
             s.c_str());
 
-    //g_print(" Remove path %s n", m_applicationAttachmentsPath.c_str());
-
     if (remove(filename) != 0) {
-        g_print("DetachFromDock_event. ERROR remove file. \n");
 
-        return;
+        sprintf(filename, "%s/%2d_%s.png",
+                m_applicationAttachmentsPath.c_str(),
+                m_currentMoveIndex,
+                s.c_str());
+        if (remove(filename) != 0) {
+
+            g_print("DetachFromDock_event. ERROR remove file. \n");
+            return;
+        }
     }
 
     int idx = m_currentMoveIndex;
@@ -1060,7 +1050,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
 
     if (iw < DEF_MINCONSIZE) {
         g_warning("there are to many dock Items. Please close some windows and try again.");
-        //return;
+        return;
     }
 
 
@@ -1494,7 +1484,7 @@ int DockPanel::loadAttachments()
             }
 
             std::string titlename =
-             Launcher::getTitleNameFromDesktopFile(appname);
+                    Launcher::getTitleNameFromDesktopFile(appname);
 
             DockItem * item = new DockItem();
             item->m_appname = appname;
@@ -1531,8 +1521,8 @@ int DockPanel::loadAttachments()
     }
 
     closedir(dirFile);
-    
-    
+
+
     // Sort by index
     int size = (int) m_dockitems.size();
     int i, m, j;
@@ -1551,24 +1541,28 @@ int DockPanel::loadAttachments()
         std::swap(m_dockitems.at(i), m_dockitems.at(m));
     }
 
-  
+
 
     for (int idx = 1; idx <= (int) m_dockitems.size() - 1; idx++) {
 
         DockItem* item = m_dockitems[idx];
-       
+
         if (idx == item->m_attachedIndex)
             continue;
+
+        std::string appname = item->m_appname;
+        std::replace(appname.begin(), appname.end(), ' ', '_');
+
 
         char filename[NAME_MAX];
         char newmame[NAME_MAX];
         sprintf(filename, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
-                item->m_attachedIndex, item->m_appname.c_str());
+                item->m_attachedIndex, appname.c_str());
 
         sprintf(newmame, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
-                idx, item->m_appname.c_str());
+                idx, appname.c_str());
 
 
         //g_print("%d %s\n", idx, item->m_appname.c_str());
@@ -1582,8 +1576,8 @@ int DockPanel::loadAttachments()
         item->m_attachedIndex = idx;
     }
 
-    
-  
+
+
     return 0;
 }
 

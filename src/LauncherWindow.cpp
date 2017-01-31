@@ -175,7 +175,7 @@ bool LauncherWindow::on_delete_event(GdkEventAny* event)
 
 LauncherWindow::~LauncherWindow()
 {
-    g_print("LauncherWindow deleted!\n");
+    g_print("LauncherWindow destroy!\n");
 }
 void LauncherWindow::init(DockPanel& dockpanel, DockItem* dockitem)
 {
