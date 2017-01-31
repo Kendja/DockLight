@@ -957,13 +957,13 @@ bool DockPanel::on_timeoutDraw()
     if (!m_previewWindowActive && !m_dragdropsStarts && m_dragdropItemIndex > 0 &&
             m_dragdropTimerSet && m_dragdropTimer.elapsed() > 0.5) {
         DockItem* item = m_dockitems.at(m_dragdropItemIndex);
-        if (item->m_isAttached) {
+       
             m_dragdropsStarts = true;
             m_dragdropTimer.stop();
             m_dragDropWindow.Show(item->m_image,
                     m_iconsize, m_cellwidth,
                     m_dragdropMousePoint);
-        }
+        
 
     }
 
