@@ -32,7 +32,7 @@ class DragDropWindow : public Gtk::Window
 public:
     DragDropWindow();
     ~DragDropWindow();
-    void Show(Glib::RefPtr<Gdk::Pixbuf> icon, int size, Gdk::Point mousePoint);
+    void Show(Glib::RefPtr<Gdk::Pixbuf> icon, int iconSize, int cellWidth, Gdk::Point mousePoint);
     void Hide();
 protected:
     bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);

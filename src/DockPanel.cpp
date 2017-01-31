@@ -275,9 +275,9 @@ void DockPanel::postInit()
 DockPanel::~DockPanel()
 {
 
-    if( m_launcherWindow != nullptr)
+    if (m_launcherWindow != nullptr)
         delete(m_launcherWindow);
-            
+
     m_titlewindow.close();
 
     for (auto item : m_dockitems)
@@ -465,6 +465,15 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
 
 void DockPanel::dropDockItem(GdkEventButton *event)
 {
+    
+    if( m_dragdropItemIndex < 1 ) 
+        return;
+    
+    DockItem* a = m_dockitems[m_dragdropItemIndex];
+    if( !a->m_isAttached)
+        return;
+    
+    
     int relativeMouseX = DockPosition::getDockItemRelativeMouseXPos(
             (int) m_dockitems.size(), m_currentMoveIndex,
             m_cellwidth, (int) event->x);
@@ -570,7 +579,10 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 
         if (m_dragdropItemIndex != m_currentMoveIndex
                 && m_currentMoveIndex > 0) {
+           
             dropDockItem(event);
+            
+            m_dragdropItemIndex = -1;
         }
     }
 
@@ -948,11 +960,14 @@ bool DockPanel::on_timeoutDraw()
 
     if (!m_previewWindowActive && !m_dragdropsStarts && m_dragdropItemIndex > 0 &&
             m_dragdropTimerSet && m_dragdropTimer.elapsed() > 0.5) {
-        m_dragdropsStarts = true;
-        m_dragdropTimer.stop();
         DockItem* item = m_dockitems.at(m_dragdropItemIndex);
-
-        m_dragDropWindow.Show(item->m_image, m_cellwidth, m_dragdropMousePoint);
+        if (item->m_isAttached) {
+            m_dragdropsStarts = true;
+            m_dragdropTimer.stop();
+            m_dragDropWindow.Show(item->m_image,
+                    m_iconsize, m_cellwidth,
+                    m_dragdropMousePoint);
+        }
 
     }
 

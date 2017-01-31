@@ -54,13 +54,13 @@ void DragDropWindow::Hide()
     this->hide();
 }
 
-void DragDropWindow::Show(Glib::RefPtr<Gdk::Pixbuf> icon, int size, Gdk::Point mousePoint)
+void DragDropWindow::Show(Glib::RefPtr<Gdk::Pixbuf> icon, int iconSize, int cellWidth, Gdk::Point mousePoint)
 {
-    this->m_icon = icon;
+    this->m_icon = icon->scale_simple(iconSize, iconSize, Gdk::INTERP_BILINEAR);
     this->m_mousePoint.set_x(mousePoint.get_x());
     this->m_mousePoint.set_y(mousePoint.get_y());
 
-    resize(size, size);
+    resize(cellWidth, cellWidth);
     if (mouseMove(m_mousePoint.get_x(), m_mousePoint.get_y())) {
         m_active = true;
         this->show_now();

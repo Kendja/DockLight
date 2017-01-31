@@ -1,3 +1,10 @@
+docklight (1.0-13) UNRELEASED; urgency=medium
+
+  * create drag & drop functionality
+  * fix minor bug fixes	
+
+ -- Juan González <j-gonzalez@email.de>  Tue, 31 Jan 2017 17:24:50 +0700
+
 docklight (1.0-12) UNRELEASED; urgency=medium
 
   * create autotools build system
