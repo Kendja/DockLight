@@ -1,4 +1,7 @@
+
+#---------------------------------------------------------
 PACKAGE=docklight
+#---------------------------------------------------------
 VERSION=1.0-12
 INSTALLDIR=/usr/local/docklight
 LOCALEDIR=/usr/lib/docklight/share/locale
