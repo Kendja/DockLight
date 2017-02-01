@@ -90,6 +90,9 @@ m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
  */
 int DockPanel::preInit(Gtk::Window* window, bool autohide)
 {
+
+    this->m_AppWindow = window;
+
     // assumes that the "docklight.home.ico" exists.
     const char* filename = m_homeiconFilePath.c_str();
     DockItem* dockItem = new DockItem();
@@ -455,6 +458,7 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
 
 
 }
+
 /**
  * Drop a DockItem
  * @param GdkEventButton event
@@ -957,13 +961,13 @@ bool DockPanel::on_timeoutDraw()
     if (!m_previewWindowActive && !m_dragdropsStarts && m_dragdropItemIndex > 0 &&
             m_dragdropTimerSet && m_dragdropTimer.elapsed() > 0.5) {
         DockItem* item = m_dockitems.at(m_dragdropItemIndex);
-       
-            m_dragdropsStarts = true;
-            m_dragdropTimer.stop();
-            m_dragDropWindow.Show(item->m_image,
-                    m_iconsize, m_cellwidth,
-                    m_dragdropMousePoint);
-        
+
+        m_dragdropsStarts = true;
+        m_dragdropTimer.stop();
+        m_dragDropWindow.Show(item->m_image,
+                m_iconsize, m_cellwidth,
+                m_dragdropMousePoint);
+
 
     }
 
@@ -1075,6 +1079,15 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     }
 
     const std::string extensions[] = {".py", ".exe", ".sh"};
+
+    //    WnckApplication* app = wnck_application_get (wnck_window_get_xid(window));
+    //    
+    //    
+    //      g_print (_("Name: %s\n"), wnck_application_get_name (app));
+    //      g_print (_("Icon Name: %s\n"), wnck_application_get_icon_name (app));
+
+
+
     const char* _appname = wnck_window_get_name(window);
     if (_appname == NULL) {
         g_print("Update: No Application name....\n");

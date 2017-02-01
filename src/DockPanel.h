@@ -64,7 +64,7 @@ public:
 
     bool ispopupMenuActive();
 private:
-    Gtk::Window* m_AppWindow;
+    Gtk::Window* m_AppWindow = nullptr;
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;
     DragDropWindow m_dragDropWindow;

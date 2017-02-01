@@ -533,35 +533,35 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-   cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
+    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
     Utilities::RoundedRectangle(cr,
-          0, 0, this->get_width(), this->get_height(),6.0);
-     cr->fill();
+            0, 0, this->get_width(), this->get_height(), 6.0);
+    cr->fill();
 
     cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-       Utilities::RoundedRectangle(cr,
-          0, 0, this->get_width(), this->get_height(),6.0);
-   cr->fill();
-    
-    
-//    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-//    cr->rectangle(0, 0, this->get_width(), this->get_height());
-//    cr->fill();
-//    cr->set_line_width(1.0);
+    Utilities::RoundedRectangle(cr,
+            0, 0, this->get_width(), this->get_height(), 6.0);
+    cr->fill();
 
 
-   
-//   cr->set_source_rgba(0.0, 0.0, 1.8, 0.8);
-//   
-//   Utilities::RoundedRectangle(cr,
-//           0, 0, this->get_width(), this->get_height(),6.0);
-//   cr->fill();
+    //    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
+    //    cr->rectangle(0, 0, this->get_width(), this->get_height());
+    //    cr->fill();
+    //    cr->set_line_width(1.0);
 
-//   cr->set_source_rgba(1.0, 1.0, 1.8, 1.0); 
-//   Utilities::RoundedRectangle(cr,
-//           0, 0, this->get_width(), this->get_height(),6.0);
-//   cr->stroke(); 
-//   
+
+
+    //   cr->set_source_rgba(0.0, 0.0, 1.8, 0.8);
+    //   
+    //   Utilities::RoundedRectangle(cr,
+    //           0, 0, this->get_width(), this->get_height(),6.0);
+    //   cr->fill();
+
+    //   cr->set_source_rgba(1.0, 1.0, 1.8, 1.0); 
+    //   Utilities::RoundedRectangle(cr,
+    //           0, 0, this->get_width(), this->get_height(),6.0);
+    //   cr->stroke(); 
+    //   
     if (!m_isActive) {
         return Gtk::Window::on_draw(cr);
     }

@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.12\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-31 23:22+0700\n"
-"PO-Revision-Date: 2017-01-31 23:27+0700\n"
+"POT-Creation-Date: 2017-02-01 23:06+0700\n"
+"PO-Revision-Date: 2017-02-01 23:08+0700\n"
 "Last-Translator: Juan Gonzalez <j-gonzalez@email.de>\n"
 "Language-Team: https://github.com/yoosamui/docklight\n"
 "Language: de\n"
@@ -33,8 +33,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.11\n"
 
-#: ../src/About.cpp:86
 #
+#: ../src/About.cpp:86
 msgid ""
 "This program is a lightweight Dock Launcher for opening common applications "
 "for the GNOME Desktop"
@@ -210,64 +210,64 @@ msgstr "Browser konnte nicht gefunden werden!\n"
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "Felder Name und Befehl dürfen nicht leer sein!\n"
 
-#: ../src/DockPanel.cpp:109 ../src/DockPanel.cpp:110
+#: ../src/DockPanel.cpp:112 ../src/DockPanel.cpp:113
 msgid "Desktop"
 msgstr "Schreibtisch"
 
 #. Menus
 #. Home Menu items
-#: ../src/DockPanel.cpp:123
+#: ../src/DockPanel.cpp:126
 msgid "Autohide"
 msgstr "Automatisch ausblenden"
 
-#: ../src/DockPanel.cpp:128 ../src/DockPanel.cpp:210
+#: ../src/DockPanel.cpp:131 ../src/DockPanel.cpp:213
 msgid "Show all"
 msgstr "Zeige alle"
 
-#: ../src/DockPanel.cpp:132 ../src/DockPanel.cpp:214
+#: ../src/DockPanel.cpp:135 ../src/DockPanel.cpp:217
 msgid "Minimize all except active"
 msgstr "Alle minimieren, außer die aktive"
 
-#: ../src/DockPanel.cpp:137 ../src/DockPanel.cpp:218
+#: ../src/DockPanel.cpp:140 ../src/DockPanel.cpp:221
 msgid "Minimize all"
 msgstr "Alle minimieren"
 
-#: ../src/DockPanel.cpp:141 ../src/DockPanel.cpp:228
+#: ../src/DockPanel.cpp:144 ../src/DockPanel.cpp:231
 msgid "Close all except active"
 msgstr "Alles schließen, außer die aktive"
 
-#: ../src/DockPanel.cpp:146 ../src/DockPanel.cpp:232
+#: ../src/DockPanel.cpp:149 ../src/DockPanel.cpp:235
 msgid "Close all"
 msgstr "Alle schließen"
 
 #. m_HomeMenu_Popup.signal_enter_notify_event().
 #. connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
-#: ../src/DockPanel.cpp:168
+#: ../src/DockPanel.cpp:171
 msgid "Help"
 msgstr "Hilfe"
 
-#: ../src/DockPanel.cpp:173
+#: ../src/DockPanel.cpp:176
 msgid "About"
 msgstr "Über"
 
-#: ../src/DockPanel.cpp:177
+#: ../src/DockPanel.cpp:180
 msgid "Quit"
 msgstr "Beenden"
 
 #. Item Menu
-#: ../src/DockPanel.cpp:191
+#: ../src/DockPanel.cpp:194
 msgid "Open new"
 msgstr "Öffne neu"
 
-#: ../src/DockPanel.cpp:198
+#: ../src/DockPanel.cpp:201
 msgid "Attach to Dock"
 msgstr "An Dock befestigen"
 
-#: ../src/DockPanel.cpp:203
+#: ../src/DockPanel.cpp:206
 msgid "Detach from Dock"
 msgstr "Vom Dock entfernen"
 
-#: ../src/DockPanel.cpp:1427
+#: ../src/DockPanel.cpp:1440
 #, c-format
 msgid ""
 "(%s) %d windows.\n"
@@ -277,3 +277,11 @@ msgstr ""
 "(%s) %d Fenster.\n"
 "Es gibt zu viele Fenster offen für eine Vorschau.\n"
 "Schließen Sie einige Fenster und versuchen Sie es erneut."
+
+#: ../src/Launcher.cpp:12
+msgid "gpk-update-viewer"
+msgstr "Paketeaktualisierung"
+
+#: ../src/Launcher.cpp:13
+msgid "gpk-application"
+msgstr "Pakete"
