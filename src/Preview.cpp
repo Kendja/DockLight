@@ -24,7 +24,7 @@
 #include "IconLoader.h"
 #include "MonitorGeometry.h"
 #include "WindowControl.h"
-
+#include "Configuration.h"
 #include <gdk/gdkx.h>
 
 // Static members
@@ -533,35 +533,37 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  */
 bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
-    Utilities::RoundedRectangle(cr,
-            0, 0, this->get_width(), this->get_height(), 6.0);
-    cr->fill();
-
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-    Utilities::RoundedRectangle(cr,
-            0, 0, this->get_width(), this->get_height(), 6.0);
-    cr->fill();
+    Configuration::Theme theme = Configuration::getTheme();
+    if (theme.forPreview().enabled()) {
 
 
-    //    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-    //    cr->rectangle(0, 0, this->get_width(), this->get_height());
+        cr->set_source_rgba(
+                theme.forPreview().background().red,
+                theme.forPreview().background().green,
+                theme.forPreview().background().blue,
+                theme.forPreview().background().alpha);
+
+        Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
+                theme.forPanel().roundedRatious());
+
+        cr->fill();
+
+    }
+
+    //    
+    //    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
+    //    Utilities::RoundedRectangle(cr,
+    //            0, 0, this->get_width(), this->get_height(), 6.0);
     //    cr->fill();
-    //    cr->set_line_width(1.0);
+    //    
+
+    //
+    //    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
+    //    Utilities::RoundedRectangle(cr,
+    //            0, 0, this->get_width(), this->get_height(), 6.0);
+    //    cr->fill();
 
 
-
-    //   cr->set_source_rgba(0.0, 0.0, 1.8, 0.8);
-    //   
-    //   Utilities::RoundedRectangle(cr,
-    //           0, 0, this->get_width(), this->get_height(),6.0);
-    //   cr->fill();
-
-    //   cr->set_source_rgba(1.0, 1.0, 1.8, 1.0); 
-    //   Utilities::RoundedRectangle(cr,
-    //           0, 0, this->get_width(), this->get_height(),6.0);
-    //   cr->stroke(); 
-    //   
     if (!m_isActive) {
         return Gtk::Window::on_draw(cr);
     }
@@ -584,32 +586,62 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         int pos_width = m_previewWidth - DEF_PREVIEW_LEFT_MARGING;
         int pos_height = 20;
 
+        cr->set_source_rgba(
+                theme.forPreview().foreground().red,
+                theme.forPreview().foreground().green,
+                theme.forPreview().foreground().blue,
+                theme.forPreview().foreground().alpha);
 
-        cr->set_line_width(1);
-        cr->set_source_rgba(1.0, 1.0, 1.8, 0.2);
+        cr->set_line_width(theme.forPreview().lineWith());
+
         if (item->m_imageLoadedRequired)
-            cr->set_source_rgba(1.0, 1.0, 1.0, 1.2);
+            cr->set_line_width(theme.forPreview().lineWith() + 0.5);
 
         Utilities::RoundedRectangle(cr,
                 DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx),
                 16, m_previewWidth,
-                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING, 2.0);
+                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING,
+                theme.forPanel().roundedRatious());
 
         cr->stroke();
 
 
-        // draw title the clipping rectangle
-        cr->set_source_rgba(1.0, 1.0, 1.0, 0.0);
-        cr->rectangle(pos_x, pos_y + 2, pos_width, pos_height);
+
+        // draw title and create clipping rectangle
+        cr->set_source_rgba(
+                theme.forPreviewTitle().background().red,
+                theme.forPreviewTitle().background().green,
+                theme.forPreviewTitle().background().blue,
+                theme.forPreviewTitle().foreground().alpha);
+        cr->rectangle(pos_x, pos_y + 2, pos_width + 2, pos_height);
         cr->clip_preserve();
+        cr->fill();
+
+        cr->set_source_rgba(
+                theme.forPreviewTitle().foreground().red,
+                theme.forPreviewTitle().foreground().green,
+                theme.forPreviewTitle().foreground().blue,
+                theme.forPreviewTitle().foreground().alpha);
+        cr->set_line_width(theme.forPreviewTitle().lineWith());
+        cr->rectangle(pos_x, pos_y + 2, pos_width + 2, pos_height);
         cr->stroke();
+
 
         auto layout = create_pango_layout(item->m_titlename);
         layout->set_font_description(font);
-        cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
-        cr->move_to(pos_x, pos_y);
+
+
+
+        cr->set_source_rgba(
+                theme.forPreviewTitleText().foreground().red,
+                theme.forPreviewTitleText().foreground().green,
+                theme.forPreviewTitleText().foreground().blue,
+                theme.forPreviewTitleText().foreground().alpha);
+
+        cr->move_to(pos_x, pos_y + 4);
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
+
 
         // selector
         if (m_currentIndex >= 0) {
@@ -620,28 +652,51 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             pos_width = m_previewWidth + 1;
             pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
+            cr->set_source_rgba(
+                    theme.forPreviewSelector().background().red,
+                    theme.forPreviewSelector().background().green,
+                    theme.forPreviewSelector().background().blue,
+                    theme.forPreviewSelector().background().alpha);
 
             cr->set_source_rgba(1.0, 1.0, 1.8, 0.08);
-            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
+            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
+                    theme.forPreviewSelector().roundedRatious());
             cr->fill();
 
-            // rectangle frame selector
-            cr->set_line_width(2);
-            cr->set_source_rgba(1.0, 1.0, 1.0, 0.9);
-            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height, 2.0);
+
+            cr->set_source_rgba(
+                    theme.forPreviewSelector().foreground().red,
+                    theme.forPreviewSelector().foreground().green,
+                    theme.forPreviewSelector().foreground().blue,
+                    theme.forPreviewSelector().foreground().alpha);
+            cr->set_line_width(theme.forPreviewSelector().lineWith());
+
+
+            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
+                    theme.forPreviewSelector().roundedRatious());
             cr->stroke();
 
+            cr->set_source_rgba(
+                    theme.forPreviewSelectorClose().background().red,
+                    theme.forPreviewSelectorClose().background().green,
+                    theme.forPreviewSelectorClose().background().blue,
+                    theme.forPreviewSelectorClose().background().alpha);
 
-            // Close rectangle
-            cr->set_source_rgba(1.0, 1.0, 1.0, 1);
-            cr->set_source_rgba(0.337, 0.612, 0.117, 1.0); // green
+
             pos_x = (m_previewWidth - 5) + (m_previewWidth * m_currentIndex);
-            cr->rectangle(pos_x, 18, DEF_PREVIEW_LEFT_MARGING, DEF_PREVIEW_LEFT_MARGING);
+            cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING);
+
+            cr->rectangle(pos_x, 18, DEF_PREVIEW_LEFT_MARGING, DEF_PREVIEW_LEFT_MARGING + 2);
             cr->fill();
-            cr->stroke();
+
+            cr->set_source_rgba(
+                    theme.forPreviewSelectorClose().foreground().red,
+                    theme.forPreviewSelectorClose().foreground().green,
+                    theme.forPreviewSelectorClose().foreground().blue,
+                    theme.forPreviewSelectorClose().foreground().alpha);
+            cr->set_line_width(theme.forPreviewSelectorClose().lineWith());
 
             // Close X text
-            cr->set_source_rgba(1.0, 1.0, 1.0, 1); //white
             cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING - 1);
             cr->show_text("X");
 

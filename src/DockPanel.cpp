@@ -25,6 +25,7 @@
 #include "IconLoader.h"
 #include "DockPosition.h"
 #include "WindowControl.h"
+#include "Configuration.h"
 
 
 #include  <glibmm/i18n.h>
@@ -1271,9 +1272,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     }
 
 
-    int center = MonitorGeometry::getGeometry().width / 2;
-    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
-    int pos_x = col = center - ((m_dockitems.size() * m_cellwidth) / 2);
+
 
     // Timer control for the title Window
     if (m_mouseIn && m_currentMoveIndex == -1) {
@@ -1326,35 +1325,66 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         }
     }
 
-    // uncomment for a Panel Background color;
-    //     cr->set_source_rgba(0.0, 0.0, 0.0, 1.0);
-    //     cr->paint();
+    int center = MonitorGeometry::getGeometry().width / 2;
+    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
+    int pos_x = col = center - ((m_dockitems.size() * m_cellwidth) / 2);
+    Configuration::Theme theme = Configuration::getTheme();
 
-    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
-    Utilities::RoundedRectangle(cr, pos_x,
-            DEF_CELLTOPMARGIN, (m_dockitems.size() * m_cellwidth),
-            m_cellheight, 2.0);
-    cr->fill();
+    if (theme.forWindow().enabled()) {
 
-    // Selector
-    if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
+        cr->set_source_rgba(
+                theme.forWindow().background().red,
+                theme.forWindow().background().green,
+                theme.forWindow().background().blue,
+                theme.forWindow().background().alpha);
 
-        pos_x = col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex) - m_cellwidth / 2;
-        cr->set_line_width(2);
-        cr->set_source_rgba(1.0, 1.0, 1.0, 0.4); // partially translucent
-        Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN, m_cellwidth - 1, m_cellheight, 2.0);
-        cr->fill();
-
-        // rectangle border
-        cr->set_source_rgba(1.0, 1.0, 1.0, 0.8); // partially translucent     
-        Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
-                m_cellwidth - 1, m_cellheight, 2.0);
-        cr->stroke();
+        cr->paint();
     }
 
+
+
+    //    if (theme.forWindow().enabled()) {
+    //        cr->set_source_rgba(0.0, 0.0, 0.8, 0.4); // partially translucent
+    //        Utilities::RoundedRectangle(cr, pos_x,
+    //                DEF_CELLTOPMARGIN, (m_dockitems.size() * m_cellwidth),
+    //                m_cellheight, 2.0);
+    //        cr->fill();
+    //    }
+
+
+    int idx = 0;
     for (auto item : m_dockitems) {
         if (item->m_image == NULLPB)
             continue;
+
+        if (theme.forPanel().enabled()) {
+
+            // draw cells
+            cr->set_source_rgba(
+                    theme.forPanel().background().red,
+                    theme.forPanel().background().green,
+                    theme.forPanel().background().blue,
+                    theme.forPanel().background().alpha);
+
+            Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
+                    m_cellheight, theme.forPanel().roundedRatious());
+            cr->fill();
+
+
+            // Draw Rectangles
+            cr->set_source_rgba(
+                    theme.forPanel().foreground().red,
+                    theme.forPanel().foreground().green,
+                    theme.forPanel().foreground().blue,
+                    theme.forPanel().foreground().alpha);
+
+            cr->set_line_width(theme.forPanel().lineWith());
+            Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
+                    m_cellheight, theme.forPanel().roundedRatious());
+            cr->stroke();
+
+        }
+
 
         // Draw circles
         double radius = 2.0;
@@ -1385,19 +1415,60 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             icon = item->m_image;
         }
+
+        if (m_currentMoveIndex == idx && theme.panelScaleOnhover()) {
+
+            icon = item->m_image->scale_simple(
+                    m_iconsize + 4, m_iconsize + 4, Gdk::INTERP_BILINEAR);
+
+        }
+
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_ICONTOPMARGIN);
         cr->paint();
         cr->restore();
 
 
-        // Draw Rectangles
-        cr->set_source_rgba(1.0, 1.0, 1.0, 0.8); // partially translucent
-        cr->set_line_width(0.7);
-        Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1, m_cellheight, 2.0);
-        cr->stroke();
-
+        idx++;
         col += m_cellwidth;
     }
+
+
+    // Selector
+    if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
+
+        int col = center - (m_dockitems.size() * m_cellwidth) / 2;
+        int pos_x = col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex) - m_cellwidth / 2;
+
+        if (theme.forPanelSelector().enabled()) {
+
+            cr->set_source_rgba(
+                    theme.forPanelSelector().background().red,
+                    theme.forPanelSelector().background().green,
+                    theme.forPanelSelector().background().blue,
+                    theme.forPanelSelector().background().alpha);
+
+            Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
+                    m_cellwidth - 1, m_cellheight,
+                    theme.forPanelSelector().roundedRatious());
+
+            cr->fill();
+
+            cr->set_source_rgba(
+                    theme.forPanelSelector().foreground().red,
+                    theme.forPanelSelector().foreground().green,
+                    theme.forPanelSelector().foreground().blue,
+                    theme.forPanelSelector().foreground().alpha);
+
+            cr->set_line_width(theme.forPanelSelector().lineWith());
+            Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
+                    m_cellwidth - 1, m_cellheight,
+                    theme.forPanelSelector().roundedRatious());
+            cr->stroke();
+        }
+
+    }
+
+
 
     return true;
 }

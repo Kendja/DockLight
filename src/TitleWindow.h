@@ -34,6 +34,10 @@ public:
         
 private:
     
+    bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr);
+    
+    Pango::FontDescription font;
+    
     //Child widgets:
     Gtk::Box m_HBox;
     Gtk::Label m_Label;

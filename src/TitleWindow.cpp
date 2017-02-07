@@ -19,6 +19,9 @@
 //****************************************************************
 
 #include "TitleWindow.h"
+#include "Configuration.h"
+#include "Utilities.h"
+
 /**
  * constructs a window POPUP contained a Label.
  */
@@ -27,20 +30,38 @@ Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 m_HBox(Gtk::ORIENTATION_HORIZONTAL, 5),
 m_Label("", false)
 {
+
+
+    GdkScreen *screen;
+    GdkVisual *visual;
+
+    gtk_widget_set_app_paintable(GTK_WIDGET(gobj()), TRUE);
+    screen = gdk_screen_get_default();
+    visual = gdk_screen_get_rgba_visual(screen);
+
+    if (visual != NULL && gdk_screen_is_composited(screen)) {
+        gtk_widget_set_visual(GTK_WIDGET(gobj()), visual);
+    }
+
+
+    font.set_family("System");
+    font.set_weight(Pango::WEIGHT_NORMAL);
+
     Gtk::Window::set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_TOOLTIP);
     m_HBox.set_margin_left(6);
     m_HBox.set_margin_right(6);
     m_HBox.set_margin_top(6);
     m_HBox.set_margin_bottom(6);
 
-    override_background_color(Gdk::RGBA("black"));
-    m_Label.override_color(Gdk::RGBA("white"), Gtk::STATE_FLAG_NORMAL);
+    //override_background_color(Gdk::RGBA("black"));
+    //m_Label.override_color(Gdk::RGBA("white"), Gtk::STATE_FLAG_NORMAL);
 
     add(m_HBox);
     m_HBox.add(m_Label);
-    
-  
+
+
 }
+
 /**
  * Hide the window on destroy
  */
@@ -56,6 +77,59 @@ TitleWindow::~TitleWindow()
 void TitleWindow::setText(const Glib::ustring text)
 {
     m_Label.set_text(text);
-    resize(2,get_height()); // Trick to auto resize the window
+    resize(2, get_height()); // Trick to auto resize the window
     show_all();
+}
+
+bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
+{
+    
+    Configuration::Theme theme = Configuration::getTheme();
+
+    if (theme.forPanelTitle().enabled()) {
+
+        cr->set_source_rgba(
+                theme.forPanelTitle().background().red,
+                theme.forPanelTitle().background().green,
+                theme.forPanelTitle().background().blue,
+                theme.forPanelTitle().background().alpha);
+
+        Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
+                theme.forPanelTitle().roundedRatious());
+
+        cr->fill();
+
+
+
+
+        // draw title the clipping rectangle
+       // cr->set_source_rgba(1.0, 1.0, 1.0, 0.0);
+
+        cr->set_source_rgba(
+                theme.forPanelTitle().foreground().red,
+                theme.forPanelTitle().foreground().green,
+                theme.forPanelTitle().foreground().blue,
+                theme.forPanelTitle().foreground().alpha);
+        
+         cr->set_line_width(theme.forPanelTitle().lineWith());   
+         
+        Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
+                theme.forPanelTitle().roundedRatious());
+        cr->clip_preserve();
+        cr->stroke();
+
+        auto layout = create_pango_layout(m_Label.get_text());
+        layout->set_font_description(font);
+        
+        cr->set_source_rgba(
+                theme.forPanelTitleText().foreground().red,
+                theme.forPanelTitleText().foreground().green,
+                theme.forPanelTitleText().foreground().blue,
+                theme.forPanelTitleText().foreground().alpha);
+        
+        cr->move_to(6, 6);
+        layout->show_in_cairo_context(cr);
+        cr->reset_clip(); // Reset the clipping 
+
+    }
 }

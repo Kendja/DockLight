@@ -50,6 +50,8 @@ docklight_SOURCES =  \
  LauncherWindow.h \
  WindowControl.cpp \
  WindowControl.h \
+ Configuration.h \
+ Configuration.cpp \
  About.cpp \
  About.h \
  main.cpp \
