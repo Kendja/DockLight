@@ -47,6 +47,13 @@ namespace Utilities
         return result;
     }
 
+    
+    
+    inline bool isNumeric(const std::string& s)
+    {
+        return( strspn( s.c_str(), "-.0123456789" ) == s.size() );
+    }
+    
     /*
      * getExecPath()
      *
@@ -55,24 +62,37 @@ namespace Utilities
      * output:
      * /sample/path
      */
-    std::string getExecPath()
+    inline std::string getExecPath()
     {
-        char result[ PATH_MAX ];
-        *result = 0;
+        char szTmp[32];
+        sprintf(szTmp, "/proc/%d/exe", getpid());
         
-        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-        if (count == -1) {
-            g_critical("getExecPath Fail!\n"); 
-            return "";
-        }      
+        char buffer[ PATH_MAX ];
+        ssize_t count = readlink( szTmp, buffer, PATH_MAX );
+        std::string result = std::string( buffer, (count > 0) ? count : 0 );
+        std::size_t found = result.find_last_of("/");
+        if (found != std::string::npos)
+             result = result.substr(0, found);
         
-        std::string path = result;
-        std::size_t found = path.find_last_of("/\\");
+        return result;
         
-        if(  found )
-            path = path.substr(0, found);
-       
-        return std::string(path);
+        
+        
+        
+        
+//        ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+//        if (count == -1) {
+//            g_critical("getExecPath Fail!\n"); 
+//            return "";
+//        }      
+//        
+//        std::string path = result;
+//        std::size_t found = path.find_last_of("/\\");
+//        
+//        if(  found )
+//            path = path.substr(0, found);
+//       
+//        return std::string(path);
     }
 
     /*
