@@ -35,7 +35,7 @@ class AppWindow : public Gtk::Window
 {
 public:
     AppWindow();
-    int Init(panel_locationType location, int autohide);
+    int Init(panel_locationType location);
     virtual ~AppWindow();
 
     DockPanel* getDockPanelReference()

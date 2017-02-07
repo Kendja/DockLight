@@ -49,7 +49,7 @@ namespace Utilities
 
     
     
-    inline bool isNumeric(const std::string& s)
+    bool isNumeric(const std::string& s)
     {
         return( strspn( s.c_str(), "-.0123456789" ) == s.size() );
     }

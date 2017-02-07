@@ -21,6 +21,7 @@
 #include "AppWindow.h"
 #include "MonitorGeometry.h"
 #include "../config.h"
+#include "Configuration.h"
 //#include  <glibmm/i18n.h>
 /*
  * http://web.mit.edu/ghudson/dev/nokrb/third/libwnck/libwnck/test-wnck.c
@@ -50,7 +51,7 @@ AppWindow::AppWindow()
  * @param location
  * @return 0 or -1 is an error
  */
-int AppWindow::Init(panel_locationType location, int autohide)
+int AppWindow::Init(panel_locationType location)
 {
     this->set_title(PACKAGE_NAME);
     
@@ -90,13 +91,8 @@ int AppWindow::Init(panel_locationType location, int autohide)
             G_CALLBACK(monitor_size_changed_callback), (gpointer) this);
 
 
-
-    bool isautohide = autohide == 1;
-    DockPosition::setAutoHide(isautohide);
-
-
     // Initialize the dock Panel
-    if (m_dockpanel.preInit(this, isautohide) != 0)
+    if (m_dockpanel.preInit(this) != 0)
         return -1;
 
     // read the monitor geometry and repositioning the window

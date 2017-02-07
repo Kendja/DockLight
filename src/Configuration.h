@@ -135,6 +135,12 @@ namespace Configuration
         {
             return m_panelScaleOnhover;
         }
+        
+        void setPanelScaleOnhover(bool value)
+        {
+            m_panelScaleOnhover=value;
+        }
+        
 
     private:
         ColorWindow* m_window;
@@ -158,7 +164,10 @@ namespace Configuration
 
 
     Theme getTheme();
-
+    void Load();
+    void setAutohide(bool value);
+    bool getAutohide();
+    
 }
 
 

@@ -47,7 +47,7 @@ namespace Utilities
     int system(const char* cmd);
     bool getMousePosition(int&x,int &y);
     bool isNumeric(const std::string& s);
-
+    
 
 }
 

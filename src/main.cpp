@@ -22,6 +22,7 @@
 #include "AppWindow.h"
 #include <sstream>
 #include "Utilities.h"
+#include "Configuration.h"
 
 #include <glibmm/i18n.h>
 #include <gtkmm/main.h>
@@ -53,36 +54,11 @@ int main(int argc, char *argv[])
     Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv, "org.gtkmm.docklight");
 
+    
+    Configuration::Load();
+    
     AppWindow win;
-    int autohide = 0;
-    
-    std::string filepath = Utilities::getExecPath(DEF_INITNAME);
-    GError *error = NULL;
-    GKeyFile *key_file = g_key_file_new();
-
-    gboolean found = g_key_file_load_from_file(key_file,
-            filepath.c_str(), GKeyFileFlags::G_KEY_FILE_NONE, &error);
-
-    if (found) {
-        // read the Autohide Entry 
-        found = g_key_file_get_boolean(key_file, "DockLight", "Autohide", &error);
-        autohide = (int) found;
-        if (error) {
-            g_warning("Autohide Entry not found. %s\n", error->message);
-            g_error_free(error);
-            error = NULL;
-        }
-    } else {
-        g_warning("docklight config  file not found.\n");
-        if (error) {
-            g_error_free(error);
-            error = NULL;
-        }
-    }
-    
-     g_key_file_free (key_file);
-
-    int r = win.Init(panel_locationType::BOTTOM, autohide);
+    int r = win.Init(panel_locationType::BOTTOM);
     if (r != 0) {
         exit(r);
     }

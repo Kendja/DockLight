@@ -94,6 +94,7 @@ bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 theme.forPanelTitle().background().blue,
                 theme.forPanelTitle().background().alpha);
 
+       
         Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
                 theme.forPanelTitle().roundedRatious());
 

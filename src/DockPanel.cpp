@@ -89,7 +89,7 @@ m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
  * @param Gtk::Window*  window
  * @return return 0 is success or -1 is an error found
  */
-int DockPanel::preInit(Gtk::Window* window, bool autohide)
+int DockPanel::preInit(Gtk::Window* window)
 {
 
     this->m_AppWindow = window;
@@ -125,7 +125,7 @@ int DockPanel::preInit(Gtk::Window* window, bool autohide)
     // Menus
     // Home Menu items
     m_AutohideMenuItem.set_label(_("Autohide"));
-    m_AutohideMenuItem.set_active(autohide);
+    m_AutohideMenuItem.set_active( Configuration::getAutohide() );
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
 
