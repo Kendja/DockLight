@@ -115,7 +115,7 @@ bool mouseIn = false;
 bool AppWindow::on_timeout()
 {
 
-    if (!DockPosition::isAutoHide())
+    if (!Configuration::getAutohide())
         return true;
 
     bool popupMenuActive = m_dockpanel.ispopupMenuActive();

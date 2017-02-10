@@ -114,7 +114,7 @@ namespace Configuration
                     }
 
                     values[ index ] = value;
-                    g_print(" %d........:%f\n", index, value);
+                    //g_print(" %d........:%f\n", index, value);
                     token = "";
                     index++;
                 }

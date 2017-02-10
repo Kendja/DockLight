@@ -62,8 +62,7 @@ m_dragdropItemIndex(-1),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/" + DEF_DATADIRNAME),
 m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR),
-m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
-{
+m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME)) {
 
     DockPanel::m_dragdropsStarts = false;
     DockPanel::m_currentMoveIndex = -1;
@@ -89,8 +88,7 @@ m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
  * @param Gtk::Window*  window
  * @return return 0 is success or -1 is an error found
  */
-int DockPanel::preInit(Gtk::Window* window)
-{
+int DockPanel::preInit(Gtk::Window* window) {
 
     this->m_AppWindow = window;
 
@@ -125,7 +123,7 @@ int DockPanel::preInit(Gtk::Window* window)
     // Menus
     // Home Menu items
     m_AutohideMenuItem.set_label(_("Autohide"));
-    m_AutohideMenuItem.set_active( Configuration::getAutohide() );
+    m_AutohideMenuItem.set_active(Configuration::getAutohide());
     m_AutohideMenuItem.signal_toggled().
             connect(sigc::mem_fun(*this, &DockPanel::on_AutohideToggled_event));
 
@@ -256,8 +254,7 @@ int DockPanel::preInit(Gtk::Window* window)
  * PostInit sets the signals handlers
  * @return 
  */
-void DockPanel::postInit()
-{
+void DockPanel::postInit() {
 
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
             &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
@@ -276,8 +273,7 @@ void DockPanel::postInit()
 
 }
 
-DockPanel::~DockPanel()
-{
+DockPanel::~DockPanel() {
 
     if (m_launcherWindow != nullptr)
         delete(m_launcherWindow);
@@ -299,8 +295,7 @@ DockPanel::~DockPanel()
  * @param y
  * @return 
  */
-int DockPanel::getIndex(int x, int y)
-{
+int DockPanel::getIndex(int x, int y) {
     //    if (!m_mouseIn)
     //        return -1;
 
@@ -336,8 +331,7 @@ int DockPanel::getIndex(int x, int y)
  * @param crossing_event
  * @return 
  */
-bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
-{
+bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event) {
     m_popupMenuOn = false;
     m_mouseIn = true;
 
@@ -351,8 +345,7 @@ bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  * @param crossing_event
  * @return 
  */
-bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
-{
+bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event) {
 
     m_mouseIn = false;
     m_titlewindow.hide();
@@ -381,8 +374,7 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
     return true;
 }
 
-void DockPanel::previewWindowClosed()
-{
+void DockPanel::previewWindowClosed() {
     WnckScreen *wnckscreen = wnck_screen_get(0);
     WnckWindow *window = wnck_screen_get_active_window(wnckscreen);
     if (window == NULL) {
@@ -402,8 +394,7 @@ void DockPanel::previewWindowClosed()
  * @param event
  * @return 
  */
-bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
-{
+bool DockPanel::on_motion_notify_event(GdkEventMotion*event) {
     m_currentMoveIndex = getIndex(event->x, event->y);
 
     return false;
@@ -414,20 +405,17 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 //
 //}
 
-void DockPanel::on_MenuDeactivated_event()
-{
+void DockPanel::on_MenuDeactivated_event() {
     m_popupMenuOn = false;
 }
 
-bool DockPanel::ispopupMenuActive()
-{
+bool DockPanel::ispopupMenuActive() {
 
     return m_popupMenuOn || m_previewWindowActive;
 
 }
 
-void DockPanel::saveAttachments(int aIdx, int bIdx)
-{
+void DockPanel::saveAttachments(int aIdx, int bIdx) {
     char filename[100];
 
     std::ostringstream command;
@@ -464,8 +452,7 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
  * Drop a DockItem
  * @param GdkEventButton event
  */
-void DockPanel::dropDockItem(GdkEventButton *event)
-{
+void DockPanel::dropDockItem(GdkEventButton *event) {
     if (m_dragdropItemIndex < 1)
         return;
 
@@ -512,8 +499,7 @@ void DockPanel::dropDockItem(GdkEventButton *event)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_button_press_event(GdkEventButton *event)
-{
+bool DockPanel::on_button_press_event(GdkEventButton *event) {
     if ((event->type == GDK_BUTTON_PRESS)) {
 
         m_currentMoveIndex = getIndex(event->x, event->y);
@@ -568,8 +554,7 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
  */
-bool DockPanel::on_button_release_event(GdkEventButton *event)
-{
+bool DockPanel::on_button_release_event(GdkEventButton *event) {
     // Check if a item was drop
     if (m_dragdropMouseDown) {
         m_dragdropsStarts = false;
@@ -704,8 +689,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
  * @param y
  * @param push_in
  */
-void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
-{
+void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in) {
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
 
@@ -713,11 +697,13 @@ void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 
     x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) +
             (m_cellwidth * m_currentMoveIndex);
-    y = DockPosition::getHomeMenuTopPosition();
+
+    y = MonitorGeometry::getScreenHeight() -
+            m_HomeMenu_Popup.get_height() -
+            MonitorGeometry::getStrutHeight();
 }
 
-void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
-{
+void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in) {
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_Menu_Popup.get_allocated_width() / 2);
 
@@ -725,28 +711,27 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 
     x = MonitorGeometry::getGeometry().x + col + (m_cellwidth / 2) +
             (m_cellwidth * m_currentMoveIndex);
-    y = DockPosition::getItemMenuTopPosition();
+
+    y = MonitorGeometry::getScreenHeight() -
+            m_Menu_Popup.get_height() -
+            MonitorGeometry::getStrutHeight();
 }
 
-void DockPanel::on_HelpMenu_event()
-{
+void DockPanel::on_HelpMenu_event() {
 
 }
 
-void DockPanel::on_AboutMenu_event()
-{
+void DockPanel::on_AboutMenu_event() {
     m_about.show(m_AppWindow);
 }
 
-void DockPanel::on_QuitMenu_event()
-{
+void DockPanel::on_QuitMenu_event() {
 
 
     m_AppWindow->close();
 }
 
-void DockPanel::on_menuNew_event()
-{
+void DockPanel::on_menuNew_event() {
     int index = m_currentMoveIndex;
     if (index < 1)
         return;
@@ -759,8 +744,7 @@ void DockPanel::on_menuNew_event()
 
 }
 
-void DockPanel::on_AttachToDock_event()
-{
+void DockPanel::on_AttachToDock_event() {
     if (m_currentMoveIndex < 1)
         return;
 
@@ -787,8 +771,7 @@ void DockPanel::on_AttachToDock_event()
 
 }
 
-void DockPanel::on_DetachFromDock_event()
-{
+void DockPanel::on_DetachFromDock_event() {
 
     if (m_currentMoveIndex < 0)
         return;
@@ -836,8 +819,7 @@ void DockPanel::on_DetachFromDock_event()
 
 }
 
-void DockPanel::on_CloseAllExceptActive_event()
-{
+void DockPanel::on_CloseAllExceptActive_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -845,8 +827,7 @@ void DockPanel::on_CloseAllExceptActive_event()
     WindowControl::closeAllExceptActiveByDockItem(dockitem);
 }
 
-void DockPanel::on_CloseAll_event()
-{
+void DockPanel::on_CloseAll_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -854,8 +835,7 @@ void DockPanel::on_CloseAll_event()
     WindowControl::closeAllByDockItem(dockitem);
 }
 
-void DockPanel::on_UnMinimieAll_event()
-{
+void DockPanel::on_UnMinimieAll_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -863,8 +843,7 @@ void DockPanel::on_UnMinimieAll_event()
     WindowControl::unMinimizeAllByDockItem(dockitem);
 }
 
-void DockPanel::on_MinimieAllExceptActive_event()
-{
+void DockPanel::on_MinimieAllExceptActive_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -872,8 +851,7 @@ void DockPanel::on_MinimieAllExceptActive_event()
     WindowControl::minimizeAllExceptActiveByDockItem(dockitem);
 }
 
-void DockPanel::on_MinimieAll_event()
-{
+void DockPanel::on_MinimieAll_event() {
     if (m_currentMoveIndex < 0)
         return;
 
@@ -882,11 +860,10 @@ void DockPanel::on_MinimieAll_event()
 
 }
 
-void DockPanel::on_AutohideToggled_event()
-{
+void DockPanel::on_AutohideToggled_event() {
     //discover the new state.
     bool autohide = m_AutohideMenuItem.get_active();
-    DockPosition::setAutoHide(autohide);
+    Configuration::setAutohide(autohide);
     if (autohide)
         MonitorGeometry::RemoveStrut();
 
@@ -894,28 +871,23 @@ void DockPanel::on_AutohideToggled_event()
 
 }
 
-void DockPanel::on_HomeMinimizeAllWindows_event()
-{
+void DockPanel::on_HomeMinimizeAllWindows_event() {
     WindowControl::HomeMinimizeAll();
 }
 
-void DockPanel::on_HomeUnMinimizeAllWindows_event()
-{
+void DockPanel::on_HomeUnMinimizeAllWindows_event() {
     WindowControl::HomeUnMinimizeAll();
 }
 
-void DockPanel::on_HomeMinimizeAllWindowsExceptActive_event()
-{
+void DockPanel::on_HomeMinimizeAllWindowsExceptActive_event() {
     WindowControl::HomeMinimizeAllExceptActive();
 }
 
-void DockPanel::on_HomeCloseAllWindowsExceptActive_event()
-{
+void DockPanel::on_HomeCloseAllWindowsExceptActive_event() {
     WindowControl::HomeCloseAllExceptActive();
 }
 
-void DockPanel::on_HomeCloseAllWindows_event()
-{
+void DockPanel::on_HomeCloseAllWindows_event() {
     WindowControl::HomeCloseAllWindows();
 
 }
@@ -925,8 +897,7 @@ void DockPanel::on_HomeCloseAllWindows_event()
  * handles the mouse scroll . 
  * 
  */
-bool DockPanel::on_scroll_event(GdkEventScroll * e)
-{
+bool DockPanel::on_scroll_event(GdkEventScroll * e) {
     int index = m_currentMoveIndex;
     if (index == -1 || index == 0)
         return true;
@@ -956,8 +927,7 @@ int m_oldcellsize = DEF_CELLWIDTH;
  * Timeout handler to regenerate the frame. 
  * force to redraw the entire content.
  */
-bool DockPanel::on_timeoutDraw()
-{
+bool DockPanel::on_timeoutDraw() {
 
     if (!m_previewWindowActive && !m_dragdropsStarts && m_dragdropItemIndex > 0 &&
             m_dragdropTimerSet && m_dragdropTimer.elapsed() > 0.5) {
@@ -985,8 +955,7 @@ bool DockPanel::on_timeoutDraw()
  * @param window
  * @param data
  */
-void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointer data)
-{
+void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointer data) {
     Update(window, Window_action::OPEN);
 }
 
@@ -996,8 +965,7 @@ void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointe
  * @param window
  * @param data
  */
-void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
-{
+void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data) {
 
     Update(window, Window_action::CLOSE);
 }
@@ -1009,8 +977,7 @@ void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointe
  * @param user_data
  */
 void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
-        WnckWindow *previously_active_window, gpointer user_data)
-{
+        WnckWindow *previously_active_window, gpointer user_data) {
 
     if (m_previewWindowActive || DockPanel::m_dragdropsStarts)
         return;
@@ -1025,8 +992,7 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
     DockPanel::setItemImdexFromActiveWindow(window);
 }
 
-void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
-{
+void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window) {
     if (DockPanel::m_dragdropsStarts)
         return;
 
@@ -1057,8 +1023,7 @@ void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window)
  * @param window
  * @param actiontype
  */
-void DockPanel::Update(WnckWindow* window, Window_action actiontype)
-{
+void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
 
     int cw;
     int iw;
@@ -1245,8 +1210,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
  * @param Cairo::Context
  * @return true/false 
  */
-bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
+bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     Glib::RefPtr<Gdk::Pixbuf> icon = NULLPB;
 
     DockPosition::getDockItemGeometry(m_dockitems.size(), m_cellwidth, m_iconsize);
@@ -1473,14 +1437,12 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     return true;
 }
 
-std::string DockPanel::getApplicationPath()
-{
+std::string DockPanel::getApplicationPath() {
 
     return m_applicationpath;
 }
 
-void DockPanel::SelectWindow(int index, GdkEventButton * event)
-{
+void DockPanel::SelectWindow(int index, GdkEventButton * event) {
 
     if (index < 1)
         return;
@@ -1528,8 +1490,7 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
 }
 
-int DockPanel::loadAttachments()
-{
+int DockPanel::loadAttachments() {
 
     DIR* dirFile = opendir(m_applicationAttachmentsPath.c_str());
     if (dirFile == 0) {
@@ -1676,8 +1637,7 @@ int DockPanel::loadAttachments()
     return 0;
 }
 
-void DockPanel::createLauncher(DockItem* item)
-{
+void DockPanel::createLauncher(DockItem* item) {
     if (m_launcherWindow == nullptr) {
         m_launcherWindow = new LauncherWindow(); // TODO: free space in dtor
         m_launcherWindow->init(*this, item);

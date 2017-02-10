@@ -1,6 +1,7 @@
 #include "MonitorGeometry.h"
 #include "Defines.h"
 #include "AppWindow.h"
+#include "Configuration.h"
 
 // use deprecate methods for compatibility with older gtk-3 versions. 
 #define GTKDEPRECATED 1
@@ -153,7 +154,7 @@ namespace MonitorGeometry
         switch (location) {
             case panel_locationType::BOTTOM:
                 
-                if( DockPosition::isAutoHide() == false)
+                if( Configuration::getAutohide() == false)
                     m_window->move(geometry.x, Gdk::screen_height() - height);
 
                 insets[strutsPosition::BottomStart] = geometry.x;
@@ -203,7 +204,7 @@ namespace MonitorGeometry
 
         StrutHeight = height;
 
-        if (DockPosition::isAutoHide()) {
+        if (Configuration::getAutohide()) {
 
             if (!DockPosition::isVisible()) {
                 window->move(geometry.x, Gdk::screen_height() - height);

@@ -9,8 +9,8 @@
 namespace Launcher
 {
     std::map<std::string, std::string> dictionary = {
-        {"gpk-update-viewer", _("gpk-update-viewer")},
-        {"gpk-application", _("gpk-application")}
+        {"Gpk-update-viewer", _("Gpk-update-viewer")},
+        {"Gpk-application", _("Gpk-application")}
     };
 
     /**
@@ -151,7 +151,7 @@ namespace Launcher
         if (dictionary.count(appname) == 1) {
             std::string value = dictionary[appname];
             if (value.empty())
-                return "";
+                return appname;
 
             return gettext(value.c_str());
         }
@@ -224,8 +224,8 @@ namespace Launcher
         }
 
         if (titlename == NULL) {
-            dictionary[appname] = "";
-            g_print("....Application (%s) without desktop launcher\n", appname.c_str());
+            dictionary[appname] = appname;
+            g_print("Application (%s) without desktop launcher\n", appname.c_str());
         } else {
             dictionary[appname] = titlename;
         }

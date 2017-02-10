@@ -34,10 +34,10 @@ namespace DockPosition
     
     bool getDockItemGeometry(int dockitemscount, int &cellsize, int &iconsize);
     bool getPreviewItemGeometry(int dockitemscount, int &width, int &height);
-    int getHomeMenuTopPosition();
-    int getItemMenuTopPosition();
-    bool isAutoHide();
-    void setAutoHide(bool autohide);
+//    int getHomeMenuTopPosition();
+//    int getItemMenuTopPosition();
+//    bool isAutoHide();
+//    void setAutoHide(bool autohide);
     bool isVisible();
     void setVisibleState(bool visible);
         

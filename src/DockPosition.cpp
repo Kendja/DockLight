@@ -21,6 +21,7 @@
 
 #include "DockPosition.h"
 #include "MonitorGeometry.h"
+#include "Configuration.h"
 
 class DockPanel;
 
@@ -31,18 +32,18 @@ namespace DockPosition
     int m_previewWidth = DEF_PREVIEW_WIDTH;
     int m_previewHeight = DEF_PREVIEW_HEIGHT;
 
-    bool m_autoHide = false;
+    //bool m_autoHide = false;
     bool m_visible = false;
 
-    bool isAutoHide()
-    {
-        return m_autoHide;
-    }
+//    bool isAutoHide()
+//    {
+//        return m_autoHide;
+//    }
 
-    void setAutoHide(bool autohide)
-    {
-        m_autoHide = autohide;
-    }
+//    void setAutoHide(bool autohide)
+//    {
+//        m_autoHide = autohide;
+//    }
 
     bool isVisible()
     {
@@ -51,7 +52,7 @@ namespace DockPosition
 
     void setVisibleState(bool visible)
     {
-        if (!m_autoHide) {
+        if (!Configuration::getAutohide()) {
             m_visible = true;
         }
 
@@ -193,48 +194,7 @@ namespace DockPosition
         return abs((mouseX + monitorX) -(firstItempos + (m_cellwidth * currentindex)));
     }
 
-    int getHomeMenuTopPosition()
-    {
-        int position = MonitorGeometry::getScreenHeight() -
-                MonitorGeometry::getStrutHeight();
-
-        if (m_autoHide) {
-
-            position -= 223;
-
-        } else {
-
-            // This is a fix for a BUG! in  Gtk::Menu.
-            // The position don't work on resolution smaller or equal then 768 height.
-            if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 225; // Modify this value depend of the menu children count
-            }
-        }
-
-        return position;
-    }
-
-    int getItemMenuTopPosition()
-    {
-        int position = MonitorGeometry::getScreenHeight() -
-                MonitorGeometry::getStrutHeight();
-
-        if (m_autoHide) {
-
-            position -= 198;
-
-        } else {
-
-            // This is a fix for a BUG! in  Gtk::Menu.
-            // The position don't work on resolution smaller or equal then 768 height.
-            if (MonitorGeometry::getGeometry().height <= 768) {
-                position -= 200; // Modify this value depend of the menu children count
-            }
-        }
-
-        return position;
-    }
-
+   
     void updatePreviewPosition(Gtk::Window* instance, int dockItemsCount,
             int dockItemIndex, int windowWidth, int previewWidth, int previewHeight)
     {

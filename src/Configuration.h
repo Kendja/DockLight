@@ -167,7 +167,7 @@ namespace Configuration
     void Load();
     void setAutohide(bool value);
     bool getAutohide();
-    
+    void setAutohide(bool value);
 }
 
 
