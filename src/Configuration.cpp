@@ -110,7 +110,7 @@ namespace Configuration
                     try {
                         value = std::stod(token);
                     } catch (std::invalid_argument) {
-                        g_critical("getColorFromString: can't convert the token\n", s.c_str());
+                        g_critical("getColorFromString: can't convert the token: %s\n", s.c_str());
                     }
 
                     values[ index ] = value;

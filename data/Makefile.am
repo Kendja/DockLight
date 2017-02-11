@@ -53,11 +53,11 @@ install-exec-hook:
 	
 
 	
-	
+#if test -d $(prefix); then rm -fr $(prefix); fi	
 uninstall-hook:
 	if test -L "/usr/local/bin/docklight"; then rm "/usr/local/bin/docklight"; fi
 	if test -d $(bindir)/data; then rm -fr $(bindir)/data; fi
-	if test -d $(prefix); then rm -fr $(prefix); fi
+	if test -d "/usr/lib/docklight" ; then rm -fr "/usr/lib/docklight"; fi	
 
 
 #desktopdir = $(datadir)/applications

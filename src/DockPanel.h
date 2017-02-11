@@ -132,6 +132,7 @@ private:
     void on_HomeMinimizeAllWindows_event();
     void on_HomeUnMinimizeAllWindows_event();
     void on_HomeMinimizeAllWindowsExceptActive_event();
+    void on_HomeAddSessionGrp_event();
 
     void on_AutohideToggled_event();
     void on_MenuDeactivated_event();
@@ -140,6 +141,8 @@ private:
 
     // Mome menu 
     Gtk::Menu m_HomeMenu_Popup;
+    
+    Gtk::MenuItem m_homeSessionGrp;
     Gtk::MenuItem m_HelpMenuItem;
     Gtk::MenuItem m_AboutMenuItem;
     Gtk::MenuItem m_QuitMenuItem;

@@ -169,6 +169,12 @@ int DockPanel::preInit(Gtk::Window* window) {
     // m_HomeMenu_Popup.signal_enter_notify_event().
     //        connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
 
+    
+    m_homeSessionGrp.set_label(_("Session group"));
+    m_homeSessionGrp.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomeAddSessionGrp_event));
+
+            
     m_HelpMenuItem.set_label(_("Help"));
     m_HelpMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HelpMenu_event));
@@ -183,7 +189,9 @@ int DockPanel::preInit(Gtk::Window* window) {
             connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
 
 
+    m_HomeMenu_Popup.append(m_homeSessionGrp);
     m_HomeMenu_Popup.append(m_HelpMenuItem);
+    
     m_HomeMenu_Popup.append(m_AboutMenuItem);
     m_HomeMenu_Popup.append(m_separatorMenuItem8);
     m_HomeMenu_Popup.append(m_QuitMenuItem);
@@ -730,9 +738,15 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in) {
             MonitorGeometry::getStrutHeight();
 }
 
+
+void DockPanel::on_HomeAddSessionGrp_event()
+{
+     CreateSessionDockItemGrp();
+}
+
 void DockPanel::on_HelpMenu_event() {
 
-    CreateSessionDockItemGrp();
+   if( system("xdg-open https://github.com/yoosamui/DockLight/wiki") != 0 ){}
 }
 
 void DockPanel::on_AboutMenu_event() {

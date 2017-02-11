@@ -4,6 +4,7 @@ data/docklight.ini 		/usr/lib/docklight/bin/data
 data/docklight.launcher.sh 	/usr/lib/docklight/bin/data
 data/docklight.logo.png 	/usr/lib/docklight/bin/data
 data/docklight.template.desktop /usr/lib/docklight/bin/data
+data/docklight-session.png	/usr/lib/docklight/bin/data
 
 po/*.po 			/usr/lib/docklight/bin/data/tmp
 po/LINGUAS 			/usr/lib/docklight/bin/data/tmp
