@@ -51,7 +51,7 @@ namespace Utilities
     
     bool isNumeric(const std::string& s)
     {
-        return( strspn( s.c_str(), "-.0123456789" ) == s.size() );
+        return( strspn( s.c_str(), " ,.0123456789" ) == s.size() );
     }
     
     /*

@@ -88,7 +88,7 @@ namespace Configuration
     {
 
         if (!Utilities::isNumeric(s)) {
-            g_critical("The color string is not numeric %s\n", s.c_str());
+            g_critical("The color string is not numeric: [%s]\n", s.c_str());
         }
 
         const int MAXBUFF = 50;
@@ -155,7 +155,7 @@ namespace Configuration
                 return;
             }
         }
-
+        
         m_autohide = g_key_file_get_boolean(key_file, "DockLight", "Autohide", &error);
         if (error) {
             g_critical("configuration Key (Autohide) could not be found!! %s\n", error->message);

@@ -161,8 +161,7 @@ bool AppWindow::on_leave_notify_event(GdkEventCrossing* crossing_event)
  */
 void AppWindow::application_opened_callback(WnckScreen *screen, WnckApplication *app)
 {
-//     g_print (_("Name: %s\n"), wnck_application_get_name (app));
-//     g_print (_("Icon Name: %s\n"), wnck_application_get_icon_name (app));
+
 }
 
 /**
