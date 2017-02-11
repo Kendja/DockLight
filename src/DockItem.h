@@ -56,6 +56,7 @@ public:
     std::string getTitle();
     std::string getDesktopFileName();
     gboolean isMovementDetected(GdkPixbuf *pixbuf);
+    int m_dockitemSesssionGrpId = 0;
 private:
     bool m_pixbufPreviousPass;
 

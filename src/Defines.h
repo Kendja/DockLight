@@ -25,6 +25,7 @@
 #define DEF_ATTACHMENTDIR       "data/attachments" 
 
 #define DEF_ICONNAME            "data/docklight.home.ico"
+#define DEF_SEISSIONICONNAME    "data/docklight-session.png"
 #define DEF_LOGONAME            "data/docklight.logo.png"
 #define DEF_INITNAME            "data/docklight.ini"
 #define DEF_LAUCHERTEMPLATE     "docklight.template.desktop"

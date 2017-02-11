@@ -75,11 +75,17 @@ private:
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow(WnckWindow *window);
+    static void updateSessioWindow(WnckWindow *window);
+    void CreateSessionDockItemGrp();
+    void attachToSessiongrp();
+    int getNextSessionGrpNumber(); 
 
     std::string m_applicationpath;
     std::string m_applicationDatapath;
     std::string m_applicationAttachmentsPath;
     std::string m_homeiconFilePath;
+    std::string m_SessionGrpIconFilePath;
+      
 
     sigc::connection m_TimeoutConnection;
 
