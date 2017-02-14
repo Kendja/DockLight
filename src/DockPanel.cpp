@@ -56,6 +56,7 @@ m_previousCellwidth(DEF_CELLWIDTH),
 m_cellheight(DEF_CELLHIGHT),
 m_popupMenuOn(false),
 m_launcherWindow(nullptr),
+m_preferences(nullptr),
 m_mouseclickEventTime(0),
 m_dragdropTimerSet(false),
 m_dragdropMouseDown(false),
@@ -169,12 +170,19 @@ int DockPanel::preInit(Gtk::Window* window) {
     // m_HomeMenu_Popup.signal_enter_notify_event().
     //        connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
 
-    
+
+    //on_HomePreferences_event
+
+    m_preferencesMenuItem.set_label(_("Preferences"));
+    m_preferencesMenuItem.signal_activate().
+            connect(sigc::mem_fun(*this, &DockPanel::on_HomePreferences_event));
+
+
     m_homeSessionGrp.set_label(_("Session group"));
     m_homeSessionGrp.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeAddSessionGrp_event));
 
-            
+
     m_HelpMenuItem.set_label(_("Help"));
     m_HelpMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HelpMenu_event));
@@ -189,9 +197,14 @@ int DockPanel::preInit(Gtk::Window* window) {
             connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
 
 
+
+
+
+    m_HomeMenu_Popup.append(m_preferencesMenuItem);
     m_HomeMenu_Popup.append(m_homeSessionGrp);
+    m_HomeMenu_Popup.append(m_separatorMenuItem9);
     m_HomeMenu_Popup.append(m_HelpMenuItem);
-    
+
     m_HomeMenu_Popup.append(m_AboutMenuItem);
     m_HomeMenu_Popup.append(m_separatorMenuItem8);
     m_HomeMenu_Popup.append(m_QuitMenuItem);
@@ -287,6 +300,13 @@ DockPanel::~DockPanel() {
 
     if (m_launcherWindow != nullptr)
         delete(m_launcherWindow);
+
+
+    if (m_preferences != nullptr)
+        delete(m_preferences);
+
+
+
 
     m_titlewindow.close();
 
@@ -738,15 +758,19 @@ void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in) {
             MonitorGeometry::getStrutHeight();
 }
 
+void DockPanel::on_HomePreferences_event() {
 
-void DockPanel::on_HomeAddSessionGrp_event()
-{
-     CreateSessionDockItemGrp();
+    createPreferences();
+}
+
+void DockPanel::on_HomeAddSessionGrp_event() {
+    CreateSessionDockItemGrp();
 }
 
 void DockPanel::on_HelpMenu_event() {
 
-   if( system("xdg-open https://github.com/yoosamui/DockLight/wiki") != 0 ){}
+    if (system("xdg-open https://github.com/yoosamui/DockLight/wiki") != 0) {
+    }
 }
 
 void DockPanel::on_AboutMenu_event() {
@@ -1143,21 +1167,18 @@ int DockPanel::getNextSessionGrpNumber() {
 
 
     int count = 0;
-    for (DockItem* items : m_dockitems) 
-        if (items->m_dockitemSesssionGrpId == 1 )
-                    count++;
-        
-    
-    return(count>0 ? count + 1: count);
+    for (DockItem* items : m_dockitems)
+        if (items->m_dockitemSesssionGrpId == 1)
+            count++;
+
+
+    return (count > 0 ? count + 1 : count);
 }
-
-
-
 
 void DockPanel::CreateSessionDockItemGrp() {
 
     const char* filename = m_SessionGrpIconFilePath.c_str();
-            DockItem* dockItem = new DockItem();
+    DockItem* dockItem = new DockItem();
 
     try {
         dockItem->m_image = Gdk::Pixbuf::create_from_file(filename,
@@ -1179,20 +1200,20 @@ void DockPanel::CreateSessionDockItemGrp() {
 
     // Create a new Item
 
-            int number = getNextSessionGrpNumber();
-            dockItem->m_dockitemSesssionGrpId = 1;
-            dockItem->m_isAttached = false;
-            dockItem->m_appname = "session-group";
-            
-            char buff[100];
-            sprintf(buff,"Session-group %d", number);
-            dockItem->m_titlename = buff;
-            dockItem->m_realgroupname = "Session-group";
-            dockItem->m_instancename = "session-group";
-            dockItem->m_window = NULL;
-            dockItem->m_xid = 0;
+    int number = getNextSessionGrpNumber();
+    dockItem->m_dockitemSesssionGrpId = 1;
+    dockItem->m_isAttached = false;
+    dockItem->m_appname = "session-group";
 
-            m_dockitems.push_back(std::move(dockItem));
+    char buff[100];
+    sprintf(buff, "Session-group %d", number);
+    dockItem->m_titlename = buff;
+    dockItem->m_realgroupname = "Session-group";
+    dockItem->m_instancename = "session-group";
+    dockItem->m_window = NULL;
+    dockItem->m_xid = 0;
+
+    m_dockitems.push_back(std::move(dockItem));
 
 }
 
@@ -1205,8 +1226,8 @@ void DockPanel::CreateSessionDockItemGrp() {
 void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
 
     int cw;
-            int iw;
-            DockPosition::getDockItemGeometry(m_dockitems.size() + 1, cw, iw);
+    int iw;
+    DockPosition::getDockItemGeometry(m_dockitems.size() + 1, cw, iw);
 
     if (iw < DEF_MINCONSIZE) {
         g_warning("there are to many dock Items. Please close some windows and try again.");
@@ -1240,148 +1261,148 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
     }
     std::string appname(_appname);
 
-            const char* _instancename = wnck_window_get_class_instance_name(window);
+    const char* _instancename = wnck_window_get_class_instance_name(window);
     if (_instancename == NULL) {
         _instancename = _appname;
     }
 
     std::string instancename(_instancename);
-            instancename = Utilities::removeExtension(instancename, extensions);
+    instancename = Utilities::removeExtension(instancename, extensions);
 
-            const char* _realgroupname = wnck_window_get_class_group_name(window);
+    const char* _realgroupname = wnck_window_get_class_group_name(window);
     if (_realgroupname == NULL) {
         _realgroupname = _appname;
     }
 
     std::string realgroupname(_realgroupname);
-            realgroupname = Utilities::removeExtension(realgroupname, extensions);
+    realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
-            std::string titlename =
+    std::string titlename =
             Launcher::getTitleNameFromDesktopFile(instancename, realgroupname);
 
     if (realgroupname == "Wine")
-            realgroupname = instancename;
+        realgroupname = instancename;
 
 
-        if (instancename == DOCKLIGHT_INSTANCENAME)
-            return;
+    if (instancename == DOCKLIGHT_INSTANCENAME)
+        return;
 
-            //DEBUG
-            g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
-                instancename.c_str(),
-                realgroupname.c_str(),
-                titlename.c_str());
+    //DEBUG
+    g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
+            instancename.c_str(),
+            realgroupname.c_str(),
+            titlename.c_str());
 
-            if (actiontype == Window_action::OPEN) {
+    if (actiontype == Window_action::OPEN) {
 
-                Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
+        Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
 
-                        appIcon = IconLoader::GetWindowIcon(window);
-                        appIcon = appIcon->scale_simple(DEF_ICONSIZE,
-                        DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
+        appIcon = IconLoader::GetWindowIcon(window);
+        appIcon = appIcon->scale_simple(DEF_ICONSIZE,
+                DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
 
-                        // handle DockItems groups
-                for (auto item : m_dockitems) {
-                    if (realgroupname == item->m_realgroupname) {
-                        DockItem* childItem = new DockItem();
-                                childItem->m_realgroupname = realgroupname;
-                                childItem->m_appname = appname;
-                                childItem->m_titlename = titlename;
-                                childItem->m_instancename = instancename;
-                                childItem->m_isDirty = false;
-                                childItem->m_window = window;
-                                childItem->m_xid = wnck_window_get_xid(window);
-                                childItem->m_image = NULLPB;
+        // handle DockItems groups
+        for (auto item : m_dockitems) {
+            if (realgroupname == item->m_realgroupname) {
+                DockItem* childItem = new DockItem();
+                childItem->m_realgroupname = realgroupname;
+                childItem->m_appname = appname;
+                childItem->m_titlename = titlename;
+                childItem->m_instancename = instancename;
+                childItem->m_isDirty = false;
+                childItem->m_window = window;
+                childItem->m_xid = wnck_window_get_xid(window);
+                childItem->m_image = NULLPB;
 
-                        if (item->m_isAttached && item->m_isDirty) {
-                            item->m_window = window;
-                                    item->m_xid = childItem->m_xid;
-                                    item->m_isDirty = false;
+                if (item->m_isAttached && item->m_isDirty) {
+                    item->m_window = window;
+                    item->m_xid = childItem->m_xid;
+                    item->m_isDirty = false;
 
-                            for (auto itemtorelease : item->m_items)
-                                    delete(itemtorelease);
+                    for (auto itemtorelease : item->m_items)
+                        delete(itemtorelease);
 
-                                    item->m_items.clear();
-                            }
-
-                        item->m_items.push_back(childItem);
-                        return;
-                    }
+                    item->m_items.clear();
                 }
 
-                // Create a new Item
-                DockItem* dockItem = new DockItem();
-                        dockItem->m_appname = appname;
-                        dockItem->m_titlename = titlename;
-                        dockItem->m_realgroupname = realgroupname;
-                        dockItem->m_instancename = instancename;
-                        dockItem->m_window = window;
-                        dockItem->m_xid = wnck_window_get_xid(window);
-                        dockItem->m_image = appIcon;
+                item->m_items.push_back(childItem);
+                return;
+            }
+        }
 
-                        // Create a child items
-                        DockItem* childItem = new DockItem();
-                        childItem->m_appname = dockItem->m_appname;
-                        childItem->m_titlename = titlename;
-                        childItem->m_realgroupname = dockItem->m_realgroupname;
-                        childItem->m_instancename = dockItem->m_instancename;
-                        childItem->m_window = dockItem->m_window;
-                        childItem->m_xid = dockItem->m_xid;
-                        childItem->m_image = NULLPB;
+        // Create a new Item
+        DockItem* dockItem = new DockItem();
+        dockItem->m_appname = appname;
+        dockItem->m_titlename = titlename;
+        dockItem->m_realgroupname = realgroupname;
+        dockItem->m_instancename = instancename;
+        dockItem->m_window = window;
+        dockItem->m_xid = wnck_window_get_xid(window);
+        dockItem->m_image = appIcon;
 
-                        dockItem->m_items.push_back(childItem);
-                        m_dockitems.push_back(std::move(dockItem));
+        // Create a child items
+        DockItem* childItem = new DockItem();
+        childItem->m_appname = dockItem->m_appname;
+        childItem->m_titlename = titlename;
+        childItem->m_realgroupname = dockItem->m_realgroupname;
+        childItem->m_instancename = dockItem->m_instancename;
+        childItem->m_window = dockItem->m_window;
+        childItem->m_xid = dockItem->m_xid;
+        childItem->m_image = NULLPB;
 
-            } else {
-                // find the item to remove;
-                int xid = wnck_window_get_xid(window);
-                        int i = 1;
-                        bool found = false;
-                for (; i < (int) m_dockitems.size(); i++) {
-                    for (auto ci : m_dockitems.at(i)->m_items) {
-                        if (ci->m_xid == xid) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found)
-                        break;
-                    }
-                if (xid > 0 && found) {
-                    auto item = m_dockitems.at(i);
-                    if (item->m_items.size() == 1) {
-                        // if is attached delete the child item.
-                        if (item->m_isAttached) {
-                            item->m_isDirty = true;
+        dockItem->m_items.push_back(childItem);
+        m_dockitems.push_back(std::move(dockItem));
 
-                                    delete( item->m_items.at(0));
-                                    item->m_items.erase(item->m_items.begin());
-                            return;
-                        }
-
-                        // remove this item
-                        delete( item->m_items.at(0));
-                                m_dockitems.erase(m_dockitems.begin() + i);
-
-                                // if is not attached then it is at the end on the list.
-                                // we need to reset the index.
-                                m_currentMoveIndex = -1;
-                        return;
-                    } else {
-                        // search for the xid and remove the item
-                        int idx = 0;
-                        for (auto c : item->m_items) {
-                            if (c->m_xid == xid) {
-                                delete(c);
-                                        item->m_items.erase(item->m_items.begin() + idx);
-
-                                return;
-                            }
-                            idx++;
-                        }
-                    }
+    } else {
+        // find the item to remove;
+        int xid = wnck_window_get_xid(window);
+        int i = 1;
+        bool found = false;
+        for (; i < (int) m_dockitems.size(); i++) {
+            for (auto ci : m_dockitems.at(i)->m_items) {
+                if (ci->m_xid == xid) {
+                    found = true;
+                    break;
                 }
             }
+            if (found)
+                break;
+        }
+        if (xid > 0 && found) {
+            auto item = m_dockitems.at(i);
+            if (item->m_items.size() == 1) {
+                // if is attached delete the child item.
+                if (item->m_isAttached) {
+                    item->m_isDirty = true;
+
+                    delete( item->m_items.at(0));
+                    item->m_items.erase(item->m_items.begin());
+                    return;
+                }
+
+                // remove this item
+                delete( item->m_items.at(0));
+                m_dockitems.erase(m_dockitems.begin() + i);
+
+                // if is not attached then it is at the end on the list.
+                // we need to reset the index.
+                m_currentMoveIndex = -1;
+                return;
+            } else {
+                // search for the xid and remove the item
+                int idx = 0;
+                for (auto c : item->m_items) {
+                    if (c->m_xid == xid) {
+                        delete(c);
+                        item->m_items.erase(item->m_items.begin() + idx);
+
+                        return;
+                    }
+                    idx++;
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -1392,27 +1413,27 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
 bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     Glib::RefPtr<Gdk::Pixbuf> icon = NULLPB;
 
-            DockPosition::getDockItemGeometry(m_dockitems.size(), m_cellwidth, m_iconsize);
-            bool resizeNeeded = m_cellwidth != DEF_CELLWIDTH;
+    DockPosition::getDockItemGeometry(m_dockitems.size(), m_cellwidth, m_iconsize);
+    bool resizeNeeded = m_cellwidth != DEF_CELLWIDTH;
 
     if (m_cellwidth == DEF_CELLWIDTH)
-            m_cellheight = DEF_CELLHIGHT;
+        m_cellheight = DEF_CELLHIGHT;
 
-            //g_print("m_iconsize %d\n", m_iconsize);
+    //g_print("m_iconsize %d\n", m_iconsize);
 
-            // compute the cell height if need to resized
-        if ((resizeNeeded && m_previousCellwidth != m_cellwidth)) {
+    // compute the cell height if need to resized
+    if ((resizeNeeded && m_previousCellwidth != m_cellwidth)) {
 
-            int iconrestsapce = DEF_CELLHIGHT - (DEF_ICONSIZE + DEF_ICONTOPCELLMARGIN);
-                    int substractpixels = (DEF_CELLHIGHT - (m_iconsize + DEF_ICONTOPCELLMARGIN)) - iconrestsapce;
+        int iconrestsapce = DEF_CELLHIGHT - (DEF_ICONSIZE + DEF_ICONTOPCELLMARGIN);
+        int substractpixels = (DEF_CELLHIGHT - (m_iconsize + DEF_ICONTOPCELLMARGIN)) - iconrestsapce;
 
-                    m_cellheight = DEF_CELLHIGHT - substractpixels;
-                    m_previousCellwidth = m_cellwidth;
+        m_cellheight = DEF_CELLHIGHT - substractpixels;
+        m_previousCellwidth = m_cellwidth;
 
-                    MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels);
+        MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels);
 
-                    //g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
-        }
+        //g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
+    }
 
 
 
@@ -1420,47 +1441,47 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     // Timer control for the title Window
     if (m_mouseIn && m_currentMoveIndex == -1) {
         m_titlewindow.hide();
-                m_infowindow.hide();
+        m_infowindow.hide();
 
         if (m_previewWindowActive)
-                m_preview.hideMe();
-        }
+            m_preview.hideMe();
+    }
 
     if (m_mouseIn && m_currentMoveIndex != -1) {
         if (m_titleItemOldindex != m_currentMoveIndex) {
             m_titleItemOldindex = m_currentMoveIndex;
-                    m_titleElapsedSeconds = 0;
-                    m_titleTimer.start();
-                    m_titleShow = false;
+            m_titleElapsedSeconds = 0;
+            m_titleTimer.start();
+            m_titleShow = false;
 
-                    m_titlewindow.hide();
-                    m_infowindow.hide();
+            m_titlewindow.hide();
+            m_infowindow.hide();
             if (m_previewWindowActive)
-                    m_preview.hideMe();
+                m_preview.hideMe();
 
-            }
+        }
 
         if (m_titleItemOldindex == m_currentMoveIndex) {
             if (m_titleElapsedSeconds > 0.3 && m_titleShow == false && !m_previewWindowActive) {
 
                 DockItem* item = m_dockitems.at(m_currentMoveIndex);
-                        std::string title = item->getTitle();
+                std::string title = item->getTitle();
 
                 if (item->m_items.size() > 1) {
                     char buff[NAME_MAX];
-                            sprintf(buff, "%s (%d)", title.c_str(), (int) item->m_items.size());
-                            title = buff;
+                    sprintf(buff, "%s (%d)", title.c_str(), (int) item->m_items.size());
+                    title = buff;
                 }
 
                 m_titlewindow.setText(title);
-                        int centerpos = DockPosition::getDockItemCenterPos(
+                int centerpos = DockPosition::getDockItemCenterPos(
                         m_dockitems.size(),
                         m_currentMoveIndex,
                         m_titlewindow.get_width()
                         );
 
-                        m_titlewindow.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - 30);
-                        m_titleShow = true;
+                m_titlewindow.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - 30);
+                m_titleShow = true;
 
             }
 
@@ -1469,9 +1490,9 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     }
 
     int center = MonitorGeometry::getGeometry().width / 2;
-            int col = center - (m_dockitems.size() * m_cellwidth) / 2;
-            int pos_x = col = center - ((m_dockitems.size() * m_cellwidth) / 2);
-            Configuration::Theme theme = Configuration::getTheme();
+    int col = center - (m_dockitems.size() * m_cellwidth) / 2;
+    int pos_x = col = center - ((m_dockitems.size() * m_cellwidth) / 2);
+    Configuration::Theme theme = Configuration::getTheme();
 
     if (theme.forWindow().enabled()) {
 
@@ -1481,7 +1502,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
                 theme.forWindow().background().blue,
                 theme.forWindow().background().alpha);
 
-                cr->paint();
+        cr->paint();
     }
 
 
@@ -1500,54 +1521,54 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
         if (item->m_image == NULLPB)
             continue;
 
-            if (theme.forPanel().enabled()) {
+        if (theme.forPanel().enabled()) {
 
-                // draw cells
-                cr->set_source_rgba(
-                        theme.forPanel().background().red,
-                        theme.forPanel().background().green,
-                        theme.forPanel().background().blue,
-                        theme.forPanel().background().alpha);
+            // draw cells
+            cr->set_source_rgba(
+                    theme.forPanel().background().red,
+                    theme.forPanel().background().green,
+                    theme.forPanel().background().blue,
+                    theme.forPanel().background().alpha);
 
-                        Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
-                        m_cellheight, theme.forPanel().roundedRatious());
-                        cr->fill();
+            Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
+                    m_cellheight, theme.forPanel().roundedRatious());
+            cr->fill();
 
 
-                        // Draw Rectangles
-                        cr->set_source_rgba(
-                        theme.forPanel().foreground().red,
-                        theme.forPanel().foreground().green,
-                        theme.forPanel().foreground().blue,
-                        theme.forPanel().foreground().alpha);
+            // Draw Rectangles
+            cr->set_source_rgba(
+                    theme.forPanel().foreground().red,
+                    theme.forPanel().foreground().green,
+                    theme.forPanel().foreground().blue,
+                    theme.forPanel().foreground().alpha);
 
-                        cr->set_line_width(theme.forPanel().lineWith());
-                        Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
-                        m_cellheight, theme.forPanel().roundedRatious());
-                        cr->stroke();
+            cr->set_line_width(theme.forPanel().lineWith());
+            Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
+                    m_cellheight, theme.forPanel().roundedRatious());
+            cr->stroke();
 
-            }
+        }
 
 
         // Draw circles
         double radius = 2.0;
-                int margin = 4;
+        int margin = 4;
 
         if (m_iconsize <= 25) {
             radius = 1.5;
-                    margin = 3;
+            margin = 3;
         }
         cr->set_source_rgb(1.0, 1.0, 1.0);
         if (item->m_items.size() == 1) {
             cr->arc(col + (m_cellwidth / 2), m_cellheight, radius, 0, 2 * M_PI);
         } else if (item->m_items.size() > 1) {
             cr->arc((col + (m_cellwidth / 2)) - margin, m_cellheight, radius, 0, 2 * M_PI);
-                    cr->arc((col + (m_cellwidth / 2)) + margin, m_cellheight, radius, 0, 2 * M_PI);
+            cr->arc((col + (m_cellwidth / 2)) + margin, m_cellheight, radius, 0, 2 * M_PI);
         }
         cr->fill();
 
-                // Draw icons
-                cr->save();
+        // Draw icons
+        cr->save();
         if (resizeNeeded) {
             // scale_simple is very fast. 
             // However this will not happen often.
@@ -1567,12 +1588,12 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
         }
 
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_ICONTOPMARGIN);
-                cr->paint();
-                cr->restore();
+        cr->paint();
+        cr->restore();
 
 
-                idx++;
-                col += m_cellwidth;
+        idx++;
+        col += m_cellwidth;
     }
 
 
@@ -1580,7 +1601,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
 
         int col = center - (m_dockitems.size() * m_cellwidth) / 2;
-                int pos_x = col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex) - m_cellwidth / 2;
+        int pos_x = col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex) - m_cellwidth / 2;
 
         if (theme.forPanelSelector().enabled()) {
 
@@ -1590,23 +1611,23 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
                     theme.forPanelSelector().background().blue,
                     theme.forPanelSelector().background().alpha);
 
-                    Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
+            Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
                     m_cellwidth - 1, m_cellheight,
                     theme.forPanelSelector().roundedRatious());
 
-                    cr->fill();
+            cr->fill();
 
-                    cr->set_source_rgba(
+            cr->set_source_rgba(
                     theme.forPanelSelector().foreground().red,
                     theme.forPanelSelector().foreground().green,
                     theme.forPanelSelector().foreground().blue,
                     theme.forPanelSelector().foreground().alpha);
 
-                    cr->set_line_width(theme.forPanelSelector().lineWith());
-                    Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
+            cr->set_line_width(theme.forPanelSelector().lineWith());
+            Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
                     m_cellwidth - 1, m_cellheight,
                     theme.forPanelSelector().roundedRatious());
-                    cr->stroke();
+            cr->stroke();
         }
 
     }
@@ -1626,13 +1647,13 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event) {
     if (index < 1)
         return;
 
-        DockItem * dockitem = m_dockitems.at(index);
-            int itemscount = dockitem->m_items.size();
+    DockItem * dockitem = m_dockitems.at(index);
+    int itemscount = dockitem->m_items.size();
 
 
-        if (dockitem->m_dockitemSesssionGrpId == 1 && dockitem->m_items.size() == 0) {
-            return;
-        }
+    if (dockitem->m_dockitemSesssionGrpId == 1 && dockitem->m_items.size() == 0) {
+        return;
+    }
 
     if (itemscount == 0 && dockitem->m_isAttached) {
         if (!Launcher::Launch(dockitem)) {
@@ -1649,32 +1670,32 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event) {
     //        return;
 
     int previewWidth = DEF_PREVIEW_WIDTH;
-            int previewHeight = DEF_PREVIEW_HEIGHT;
+    int previewHeight = DEF_PREVIEW_HEIGHT;
 
-            DockPosition::getPreviewItemGeometry(itemscount, previewWidth, previewHeight);
+    DockPosition::getPreviewItemGeometry(itemscount, previewWidth, previewHeight);
 
     if (previewHeight < DEF_PREVIEW_MINHEIGHT) {
 
         // TODO: add text to a string resource
         char message[PATH_MAX];
-                sprintf(message, _("(%s) %d windows.\nthere are to many windows open for a Preview.\nClose some windows and try again."),
+        sprintf(message, _("(%s) %d windows.\nthere are to many windows open for a Preview.\nClose some windows and try again."),
                 dockitem->getTitle().c_str(), itemscount);
 
-                m_infowindow.setText(message);
-                int centerpos = DockPosition::getDockItemCenterPos(
+        m_infowindow.setText(message);
+        int centerpos = DockPosition::getDockItemCenterPos(
                 (int) m_dockitems.size(),
                 m_currentMoveIndex,
                 m_infowindow.get_width()
                 );
 
-                m_infowindow.move(centerpos,
+        m_infowindow.move(centerpos,
                 MonitorGeometry::getAppWindowTopPosition() - 90);
 
         return;
     }
 
     m_previewWindowActive = true;
-            m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
+    m_preview.Activate(dockitem, (int) m_dockitems.size(), index);
 }
 
 int DockPanel::loadAttachments() {
@@ -1682,111 +1703,111 @@ int DockPanel::loadAttachments() {
     DIR* dirFile = opendir(m_applicationAttachmentsPath.c_str());
     if (dirFile == 0) {
         if (ENOENT == errno)
-                g_critical("Error loading attachments: Directory does not exist.\n");
+            g_critical("Error loading attachments: Directory does not exist.\n");
 
-            return -1;
-        }
+        return -1;
+    }
 
     struct dirent* hFile;
-            errno = 0;
-    int sessionnumber = 1;        
+    errno = 0;
+    int sessionnumber = 1;
     while ((hFile = readdir(dirFile)) != NULL) {
         if (!strcmp(hFile->d_name, ".")) continue;
-            if (!strcmp(hFile->d_name, "..")) continue;
-                if ((hFile->d_name[0] == '.')) continue; // in linux hidden files all start with '.'
+        if (!strcmp(hFile->d_name, "..")) continue;
+        if ((hFile->d_name[0] == '.')) continue; // in linux hidden files all start with '.'
 
-                    if (strstr(hFile->d_name, ".png")) {
+        if (strstr(hFile->d_name, ".png")) {
 
-                        std::string filename = hFile->d_name;
-                                std::string imageFilePath = std::string(m_applicationAttachmentsPath) +
-                                std::string("/") + filename;
+            std::string filename = hFile->d_name;
+            std::string imageFilePath = std::string(m_applicationAttachmentsPath) +
+                    std::string("/") + filename;
 
-                                std::vector<std::string> tokens = Utilities::split(filename, '_');
-                                std::size_t found = filename.find_last_of(".");
-                        if (found < 1)
-                            continue;
+            std::vector<std::string> tokens = Utilities::split(filename, '_');
+            std::size_t found = filename.find_last_of(".");
+            if (found < 1)
+                continue;
 
-                            std::string appname = filename.substr(0, found);
-                                std::replace(appname.begin(), appname.end(), '_', ' ');
+            std::string appname = filename.substr(0, found);
+            std::replace(appname.begin(), appname.end(), '_', ' ');
 
-                                std::string index = appname.substr(0, 2);
-                                appname = appname.substr(3, appname.length() - 3);
+            std::string index = appname.substr(0, 2);
+            appname = appname.substr(3, appname.length() - 3);
 
-                                int idx;
-                            try {
-                                idx = std::stoi(index.c_str());
+            int idx;
+            try {
+                idx = std::stoi(index.c_str());
 
-                            } catch (std::invalid_argument fex) {
-                                g_critical("loadAttachments: std::invalid_argument\n");
-                                        closedir(dirFile);
-                                return -1;
+            } catch (std::invalid_argument fex) {
+                g_critical("loadAttachments: std::invalid_argument\n");
+                closedir(dirFile);
+                return -1;
 
-                            } catch (std::out_of_range) {
-                                g_critical("loadAttachments: std::out_of_range\n");
-                                        closedir(dirFile);
-                                return -1;
-                            }
+            } catch (std::out_of_range) {
+                g_critical("loadAttachments: std::out_of_range\n");
+                closedir(dirFile);
+                return -1;
+            }
 
-                        std::string titlename =
-                                Launcher::getTitleNameFromDesktopFile(appname);
+            std::string titlename =
+                    Launcher::getTitleNameFromDesktopFile(appname);
 
-                                DockItem * item = new DockItem();
-                                item->m_appname = appname;
-                                item->m_attachedIndex = idx;
-                                item->m_instancename = Utilities::stringToLower(appname.c_str());
-                                item->m_realgroupname = appname;
-                                item->m_titlename = titlename;
-                                item->m_window = NULL;
-                                item->m_xid = 0;
-                                item->m_image = NULLPB;
-                                
-                                if( appname =="Session-group") {
-                                    
-                                    char buffer[100];
-                                    sprintf(buffer,"Session-group %d", sessionnumber);
-                                    item->m_titlename= buffer;
-                                    
-                                    item->m_dockitemSesssionGrpId =1;
-                                    sessionnumber++;
-                                }
-                                
+            DockItem * item = new DockItem();
+            item->m_appname = appname;
+            item->m_attachedIndex = idx;
+            item->m_instancename = Utilities::stringToLower(appname.c_str());
+            item->m_realgroupname = appname;
+            item->m_titlename = titlename;
+            item->m_window = NULL;
+            item->m_xid = 0;
+            item->m_image = NULLPB;
 
-                        try {
+            if (appname == "Session-group") {
 
-                            item->m_image = Gdk::Pixbuf::create_from_file(imageFilePath,
-                                    DEF_ICONSIZE, DEF_ICONSIZE, true);
+                char buffer[100];
+                sprintf(buffer, "Session-group %d", sessionnumber);
+                item->m_titlename = buffer;
 
-                        } catch (Glib::FileError fex) {
-                            g_critical("Attachment file not found %s\n", appname.c_str());
-                                    closedir(dirFile);
-                            return -1;
+                item->m_dockitemSesssionGrpId = 1;
+                sessionnumber++;
+            }
 
-                        } catch (Gdk::PixbufError bex) {
-                            g_critical("Attachment file PixbufError %s\n", appname.c_str());
-                                    closedir(dirFile);
-                            return -1;
-                        }
 
-                        item->m_isAttached = true;
-                                item->m_isDirty = true;
+            try {
 
-                                m_dockitems.push_back(item);
-                    }
+                item->m_image = Gdk::Pixbuf::create_from_file(imageFilePath,
+                        DEF_ICONSIZE, DEF_ICONSIZE, true);
+
+            } catch (Glib::FileError fex) {
+                g_critical("Attachment file not found %s\n", appname.c_str());
+                closedir(dirFile);
+                return -1;
+
+            } catch (Gdk::PixbufError bex) {
+                g_critical("Attachment file PixbufError %s\n", appname.c_str());
+                closedir(dirFile);
+                return -1;
+            }
+
+            item->m_isAttached = true;
+            item->m_isDirty = true;
+
+            m_dockitems.push_back(item);
+        }
     }
 
     closedir(dirFile);
 
 
-            // Sort by index
-            int size = (int) m_dockitems.size();
-            int i, m, j;
+    // Sort by index
+    int size = (int) m_dockitems.size();
+    int i, m, j;
 
     for (i = 0; i < size - 1; i = i + 1) {
         m = i;
         for (j = i + 1; j < size; j = j + 1) {
 
             int a = m_dockitems.at(j)->m_attachedIndex;
-                    int b = m_dockitems.at(m)->m_attachedIndex;
+            int b = m_dockitems.at(m)->m_attachedIndex;
 
             if (a < b) {
                 m = j;
@@ -1804,29 +1825,29 @@ int DockPanel::loadAttachments() {
         if (idx == item->m_attachedIndex)
             continue;
 
-            std::string appname = item->m_appname;
-                std::replace(appname.begin(), appname.end(), ' ', '_');
+        std::string appname = item->m_appname;
+        std::replace(appname.begin(), appname.end(), ' ', '_');
 
 
-                char filename[NAME_MAX];
-                char newmame[NAME_MAX];
-                sprintf(filename, "%s/%2d_%s.png",
+        char filename[NAME_MAX];
+        char newmame[NAME_MAX];
+        sprintf(filename, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
                 item->m_attachedIndex, appname.c_str());
 
-                sprintf(newmame, "%s/%2d_%s.png",
+        sprintf(newmame, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
                 idx, appname.c_str());
 
 
-                //g_print("%d %s\n", idx, item->m_appname.c_str());
+        //g_print("%d %s\n", idx, item->m_appname.c_str());
 
-                int rc = std::rename(filename, newmame);
-            if (rc) {
-                g_critical("Attachment file could not be renamed: %s\n", newmame);
+        int rc = std::rename(filename, newmame);
+        if (rc) {
+            g_critical("Attachment file could not be renamed: %s\n", newmame);
 
-                return 1;
-            }
+            return 1;
+        }
 
         item->m_attachedIndex = idx;
     }
@@ -1836,11 +1857,22 @@ int DockPanel::loadAttachments() {
     return 0;
 }
 
+void DockPanel::createPreferences() {
+
+
+    if (m_preferences == nullptr) {
+        m_preferences = new Preferences();
+        m_preferences->init(*this);
+        m_preferences->show_all();
+    }
+
+}
+
 void DockPanel::createLauncher(DockItem* item) {
     if (m_launcherWindow == nullptr) {
         m_launcherWindow = new LauncherWindow(); // TODO: free space in dtor
-                m_launcherWindow->init(*this, item);
-                m_launcherWindow->show_all();
+        m_launcherWindow->init(*this, item);
+        m_launcherWindow->show_all();
     }
 
 }

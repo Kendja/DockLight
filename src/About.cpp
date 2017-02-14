@@ -15,6 +15,10 @@ m_logoPath(Utilities::getExecPath(DEF_LOGONAME))
     this->signal_response().
             connect(sigc::mem_fun(this, &About::signal_about_dlg_response));
 
+    
+    //set_default_size(400,500);
+   
+    
 }
 
 void About::signal_about_dlg_response(int response_id)
@@ -30,9 +34,12 @@ void About::show(Gtk::Window* gtkwindow)
     init(window);
     
     this->show_all();
+
     int x, y;
     DockPosition::getCenterScreenPos(this->get_width(), this->get_height(), x, y);
     this->move(x, y);
+
+   
     
    
     Gtk::AboutDialog::show();

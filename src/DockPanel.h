@@ -39,6 +39,7 @@
 #include "LauncherWindow.h"
 #include "About.h"
 #include "DragDropWindow.h"
+#include "Preferences.h"
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -61,6 +62,7 @@ public:
     //static bool m_launcherWnckWindowSet;
     //static WnckWindow* m_launcherWnckWindow;
     LauncherWindow* m_launcherWindow;
+    Preferences* m_preferences;
 
     bool ispopupMenuActive();
 private:
@@ -111,6 +113,7 @@ private:
     int loadAttachments();
     void SelectWindow(int index, GdkEventButton * event);
     void createLauncher(DockItem* item);
+    void createPreferences();
 
     void on_QuitMenu_event();
     void on_AboutMenu_event();
@@ -133,7 +136,7 @@ private:
     void on_HomeUnMinimizeAllWindows_event();
     void on_HomeMinimizeAllWindowsExceptActive_event();
     void on_HomeAddSessionGrp_event();
-
+    void on_HomePreferences_event();  
     void on_AutohideToggled_event();
     void on_MenuDeactivated_event();
     //bool on_MenuEnterNotify_event (GdkEventCrossing* crossing_event);
@@ -147,6 +150,8 @@ private:
     Gtk::MenuItem m_AboutMenuItem;
     Gtk::MenuItem m_QuitMenuItem;
     Gtk::CheckMenuItem m_AutohideMenuItem;
+    Gtk::MenuItem m_preferencesMenuItem;
+    
 
     // Item menu
     Gtk::Menu m_Menu_Popup;
@@ -178,6 +183,7 @@ private:
     Gtk::SeparatorMenuItem m_separatorMenuItem6;
     Gtk::SeparatorMenuItem m_separatorMenuItem7;
     Gtk::SeparatorMenuItem m_separatorMenuItem8;
+    Gtk::SeparatorMenuItem m_separatorMenuItem9;
 
     gboolean m_mouseLeftButtonDown;
     gboolean m_mouseRightButtonDown;

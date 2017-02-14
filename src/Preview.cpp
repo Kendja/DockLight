@@ -614,7 +614,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 theme.forPreviewTitle().background().blue,
                 theme.forPreviewTitle().foreground().alpha);
         cr->rectangle(pos_x, pos_y + 2, pos_width + 2, pos_height);
-        cr->clip_preserve();
+       // cr->clip_preserve();
         cr->fill();
 
         cr->set_source_rgba(
@@ -627,18 +627,27 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         cr->stroke();
 
 
-        auto layout = create_pango_layout(item->m_titlename);
-        layout->set_font_description(font);
 
+       // draw title the clipping rectangle
+        //cr->set_source_rgba(1.0, 1.0, 1.0, 0.0);
+        
+        cr->rectangle(pos_x, pos_y + 2, pos_width, pos_height);
+        cr->clip_preserve();
+        cr->stroke();
 
-
+        
+        
+        
         cr->set_source_rgba(
                 theme.forPreviewTitleText().foreground().red,
                 theme.forPreviewTitleText().foreground().green,
                 theme.forPreviewTitleText().foreground().blue,
                 theme.forPreviewTitleText().foreground().alpha);
-
-        cr->move_to(pos_x, pos_y + 4);
+        
+        auto layout = create_pango_layout(item->m_titlename);
+        layout->set_font_description(font);
+        //cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
+        cr->move_to(pos_x, pos_y);
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
 
@@ -652,18 +661,22 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             pos_width = m_previewWidth + 1;
             pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
+            //cr->save();
             cr->set_source_rgba(
                     theme.forPreviewSelector().background().red,
                     theme.forPreviewSelector().background().green,
                     theme.forPreviewSelector().background().blue,
-                    theme.forPreviewSelector().background().alpha);
+                    theme.forPreviewSelector().background().alpha);//!!!
 
-            cr->set_source_rgba(1.0, 1.0, 1.8, 0.08);
+           //HACK: need to find what happen here. alpha increesing it's  value
+           // ,0.08 Alpha is not a correct value but work best for now. 
+           //cr->set_source_rgba(1.0, 1.0, 1.0, 0.08); 
+                
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
-                    theme.forPreviewSelector().roundedRatious());
-            cr->fill();
-
-
+                   theme.forPreviewSelector().roundedRatious());
+               cr->fill();
+            
+         
             cr->set_source_rgba(
                     theme.forPreviewSelector().foreground().red,
                     theme.forPreviewSelector().foreground().green,
@@ -682,7 +695,9 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                     theme.forPreviewSelectorClose().background().blue,
                     theme.forPreviewSelectorClose().background().alpha);
 
-
+           
+         
+            
             pos_x = (m_previewWidth - 5) + (m_previewWidth * m_currentIndex);
             cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING);
 
@@ -699,7 +714,10 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             // Close X text
             cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING - 1);
             cr->show_text("X");
-
+            
+            
+            
+          
         }
 
         if (item->m_imageLoadedRequired) {

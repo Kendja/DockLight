@@ -8,24 +8,20 @@
 #include "Utilities.h"
 #include  "Defines.h" 
 
-namespace Configuration
-{
+namespace Configuration {
 
     Theme m_theme;
     bool m_autohide = false;
     bool m_panelScaleOnHover;
 
-    Color::Color()
-    {
+    Color::Color() {
     };
 
-    Color::Color(const double red, const double green, const double blue, const double alpha)
-    {
+    Color::Color(const double red, const double green, const double blue, const double alpha) {
         set(red, green, blue, alpha);
     }
 
-    void Color::set(const double red, const double green, const double blue, const double alpha)
-    {
+    void Color::set(const double red, const double green, const double blue, const double alpha) {
         this->red = red;
         this->green = green;
         this->blue = blue;
@@ -33,19 +29,16 @@ namespace Configuration
 
     }
 
-    ColorWindow::ColorWindow()
-    {
+    ColorWindow::ColorWindow() {
     }
 
     ColorWindow::ColorWindow(const bool enabled, const Color background, const Color foreground,
-            const double lineWith, const double roundedRatious)
-    {
+            const double lineWith, const double roundedRatious) {
         this->set(enabled, background, foreground, lineWith, roundedRatious);
     }
 
     void ColorWindow::set(const bool enabled, const Color background, const Color foreground,
-            const double lineWith, const double roundedRatious)
-    {
+            const double lineWith, const double roundedRatious) {
 
         this->m_enabled = enabled;
         this->m_background = background;
@@ -57,8 +50,7 @@ namespace Configuration
     /**
      * Constructs the default theme
      */
-    Theme::Theme()
-    {
+    Theme::Theme() {
         Color backColor(0.27, 0.44, 0.58, 1.0);
         Color foreColor(1.0, 1.0, 1.0, 1.0);
 
@@ -78,14 +70,12 @@ namespace Configuration
 
     }
 
-    Theme getTheme()
-    {
+    Theme getTheme() {
         return m_theme;
     };
 
     void getColorFromString(const std::string& s, bool& enable, double& lineWidth, double& roundedRadius,
-            Color& background, Color& foreground)
-    {
+            Color& background, Color& foreground) {
 
         if (!Utilities::isNumeric(s)) {
             g_critical("The color string is not numeric: [%s]\n", s.c_str());
@@ -135,8 +125,9 @@ namespace Configuration
 
     }
 
-    void Load()
-    {
+    void Load() {
+
+
 
         std::string filepath = Utilities::getExecPath(DEF_INITNAME);
         GError *error = NULL;
@@ -155,7 +146,7 @@ namespace Configuration
                 return;
             }
         }
-        
+
         m_autohide = g_key_file_get_boolean(key_file, "DockLight", "Autohide", &error);
         if (error) {
             g_critical("configuration Key (Autohide) could not be found!! %s\n", error->message);
@@ -175,20 +166,23 @@ namespace Configuration
                 g_print("configuration Key (Theme) could not be found. use default\n");
                 g_error_free(error);
                 error = NULL;
-                g_key_file_free(key_file);
-                return;
+
             }
+
+            g_key_file_free(key_file);
+            return;
         }
 
-        
-        bool panelScaleOnHover = g_key_file_get_boolean(key_file,themename, "PanelScaleOnHover", &error);
+       
+
+        bool panelScaleOnHover = g_key_file_get_boolean(key_file, themename, "PanelScaleOnHover", &error);
 
         if (error) {
             g_print("configuration Key (Theme PanelScaleOnHover) could not be found. use default\n");
             g_error_free(error);
             error = NULL;
             panelScaleOnHover = false;
-           
+
         }
 
         char* windowString = g_key_file_get_string(key_file, themename, "Window", &error);
@@ -271,9 +265,9 @@ namespace Configuration
         double roundedRadius;
         Color background;
         Color foreground;
-        
+
         m_theme.setPanelScaleOnhover(panelScaleOnHover);
-                       
+
 
         if (windowString != NULL) {
             getColorFromString(windowString, enable, lineWidth, roundedRadius, background, foreground);
@@ -318,17 +312,15 @@ namespace Configuration
 
     }
 
-    bool getAutohide()
-    {
+    bool getAutohide() {
         return m_autohide;
     }
 
-    void setAutohide(bool value)
-    {
+    void setAutohide(bool value) {
         m_autohide = value;
     }
 
-   
+
 
 
 }

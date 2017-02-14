@@ -116,7 +116,7 @@ bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
          
         Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
                 theme.forPanelTitle().roundedRatious());
-        cr->clip_preserve();
+       //cr->clip_preserve();
         cr->stroke();
 
         auto layout = create_pango_layout(m_Label.get_text());
@@ -128,6 +128,7 @@ bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 theme.forPanelTitleText().foreground().blue,
                 theme.forPanelTitleText().foreground().alpha);
         
+         //cr->set_source_rgba(1.0,1.0,1.0,1.0);
         cr->move_to(6, 6);
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 

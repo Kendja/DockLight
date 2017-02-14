@@ -52,6 +52,8 @@ docklight_SOURCES =  \
  WindowControl.h \
  Configuration.h \
  Configuration.cpp \
+ Preferences.cpp \
+ Preferences.h \
  About.cpp \
  About.h \
  main.cpp \
