@@ -1521,9 +1521,10 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
         if (item->m_image == NULLPB)
             continue;
 
+
         if (theme.forPanel().enabled()) {
 
-            // draw cells
+            // draw BACKGROUND cells
             cr->set_source_rgba(
                     theme.forPanel().background().red,
                     theme.forPanel().background().green,
@@ -1535,6 +1536,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
             cr->fill();
 
 
+
             // Draw Rectangles
             cr->set_source_rgba(
                     theme.forPanel().foreground().red,
@@ -1543,11 +1545,101 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
                     theme.forPanel().foreground().alpha);
 
             cr->set_line_width(theme.forPanel().lineWith());
-            Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
-                    m_cellheight, theme.forPanel().roundedRatious());
-            cr->stroke();
+            if (theme.getPanelBinaryValue() == 0) {
+                Utilities::RoundedRectangle(cr, col, DEF_CELLTOPMARGIN, m_cellwidth - 1,
+                        m_cellheight, theme.forPanel().roundedRatious());
+                cr->stroke();
+            } else {
+
+                int value = theme.getPanelBinaryValue();
+                /* Vertical Left*/
+                int bit = CHECK_BIT(value, 3);
+                if (bit == 1) {
+                    cr->move_to(col, DEF_CELLTOPMARGIN);
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->line_to(col, DEF_CELLTOPMARGIN);
+                    cr->line_to(col, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->stroke();
+
+                }
+                /* Top */
+                bit = CHECK_BIT(value, 2);
+                if (bit == 1) {
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->move_to(col, DEF_CELLTOPMARGIN);
+                    cr->line_to(col + 4, DEF_CELLTOPMARGIN);
+                    cr->line_to(col + m_cellwidth - 4, DEF_CELLTOPMARGIN);
+                    cr->stroke();
+
+                }
+
+                /* Vertical Right */
+                bit = CHECK_BIT(value, 1);
+                if (bit == 1) {
+                    cr->move_to(col + m_cellwidth, DEF_CELLTOPMARGIN);
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->line_to(col + m_cellwidth, DEF_CELLTOPMARGIN);
+                    cr->line_to(col + m_cellwidth, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->stroke();
+
+                }
+
+                /* Bottom  */
+                bit = CHECK_BIT(value, 0);
+                if (bit == 1) {
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->move_to(col, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->line_to(col + 4, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->line_to(col + m_cellwidth - 4, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->stroke();
+
+                }
+
+                /* Vertical Left*/
+                /*
+                cr->move_to(col,DEF_CELLTOPMARGIN );
+                cr->set_line_width(theme.forPanel().lineWith());
+                cr->line_to(col, DEF_CELLTOPMARGIN);
+                cr->line_to(col, DEF_CELLTOPMARGIN+m_cellheight);
+                cr->stroke();
+                 */
+
+                /* Vertical Right*/
+                /*
+                cr->move_to(col+m_cellwidth ,DEF_CELLTOPMARGIN );
+                cr->set_line_width(theme.forPanel().lineWith());
+                cr->line_to(col+m_cellwidth , DEF_CELLTOPMARGIN);
+                cr->line_to(col+m_cellwidth , DEF_CELLTOPMARGIN+m_cellheight);
+                cr->stroke();
+                 */
+                /* TOP
+                cr->set_line_width(theme.forPanel().lineWith());
+                cr->move_to(col ,DEF_CELLTOPMARGIN );
+                cr->line_to(col+4 , DEF_CELLTOPMARGIN);
+                cr->line_to(col + m_cellwidth-4, DEF_CELLTOPMARGIN);
+                cr->stroke();
+                 */
+
+
+
+                //                int mask =  1 << value;
+                //                int masked_n = 1 & mask;
+                //                int thebit = masked_n >> value;
+                //                
+
+                //  int mask = (1 >> value) & 1;
+
+                //
+                //                cr->set_line_width(theme.forPanel().lineWith());
+                //                cr->move_to(col, DEF_CELLTOPMARGIN + m_cellheight);
+                //                cr->line_to(col + 4, DEF_CELLTOPMARGIN + m_cellheight);
+                //                cr->line_to(col + m_cellwidth - 4, DEF_CELLTOPMARGIN + m_cellheight);
+                //                cr->stroke();
+            }
 
         }
+
+
 
 
         // Draw circles
@@ -1624,10 +1716,63 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
                     theme.forPanelSelector().foreground().alpha);
 
             cr->set_line_width(theme.forPanelSelector().lineWith());
-            Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
-                    m_cellwidth - 1, m_cellheight,
-                    theme.forPanelSelector().roundedRatious());
-            cr->stroke();
+
+            if (theme.getPanelBinaryValue() == 0) {
+                Utilities::RoundedRectangle(cr, pos_x, DEF_CELLTOPMARGIN,
+                        m_cellwidth - 1, m_cellheight,
+                        theme.forPanelSelector().roundedRatious());
+                cr->stroke();
+            }else{
+                
+                int value = theme.getPanelSelectorBinaryValue();
+                /* Vertical Left*/
+                int bit = CHECK_BIT(value, 3);
+                if (bit == 1) {
+                    cr->move_to(pos_x, DEF_CELLTOPMARGIN);
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->line_to(pos_x, DEF_CELLTOPMARGIN);
+                    cr->line_to(pos_x, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->stroke();
+
+                }
+                /* Top */
+                bit = CHECK_BIT(value, 2);
+                if (bit == 1) {
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->move_to(pos_x, DEF_CELLTOPMARGIN);
+                    cr->line_to(pos_x + 4, DEF_CELLTOPMARGIN);
+                    cr->line_to(pos_x + m_cellwidth -2, DEF_CELLTOPMARGIN);
+                    cr->stroke();
+
+                }
+
+                /* Vertical Right */
+                bit = CHECK_BIT(value, 1);
+                if (bit == 1) {
+                    cr->move_to(pos_x + m_cellwidth, DEF_CELLTOPMARGIN);
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->line_to(pos_x + m_cellwidth, DEF_CELLTOPMARGIN);
+                    cr->line_to(pos_x + m_cellwidth, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->stroke();
+
+                }
+
+                /* Bottom  */
+                bit = CHECK_BIT(value, 0);
+                if (bit == 1) {
+                    cr->set_line_width(theme.forPanel().lineWith());
+                    cr->move_to(pos_x, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->line_to(pos_x + 4, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->line_to(pos_x + m_cellwidth - 4, DEF_CELLTOPMARGIN + m_cellheight);
+                    cr->stroke();
+
+                }
+                
+            }
+            
+            
+            
+            
         }
 
     }

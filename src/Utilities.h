@@ -33,6 +33,8 @@
 namespace Utilities
 {
 
+    #define CHECK_BIT(var,pos) ((var & (1 << pos)) == (1 << pos))
+
     std::string getExecPath();
     std::string getExecPath(const std::string& str);
         

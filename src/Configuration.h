@@ -71,6 +71,7 @@ namespace Configuration
         bool m_enabled = false;
         double m_lineWith = 1.0;
         double m_roundedRatious = 2.0;
+        
 
 
     };
@@ -141,6 +142,51 @@ namespace Configuration
             m_panelScaleOnhover=value;
         }
         
+        int getPanelBinaryValue()
+        {
+            return m_panelLinesBinaryValue;
+        }
+        
+        int getPanelSelectorBinaryValue()
+        {
+            return m_panelSelectorLinesBinaryValue;
+        }
+        
+        void setPanelSelectorBinaryValue(int value)
+        {
+            m_panelSelectorLinesBinaryValue = value;
+        }
+              
+        
+        int getPreviewBinaryValue()
+        {
+            return m_previewLinesBinaryValue;
+        }
+        
+        void setPanelBinaryValue(int value)
+        {
+            m_panelLinesBinaryValue = value;
+        }
+        
+        
+        void setPreviewBinaryValue(int value)
+        {
+            m_previewLinesBinaryValue = value;
+        }
+        
+        
+        void setPreviewSelectorBinaryValue(int value)
+        {
+            m_previewSelectorLinesBinaryValue = value;
+        }
+        
+         int getPreviewSelectorBinaryValue()
+        {
+            return m_previewSelectorLinesBinaryValue;
+        }
+        
+        
+          
 
     private:
         ColorWindow* m_window;
@@ -159,6 +205,15 @@ namespace Configuration
         
 
         bool m_panelScaleOnhover = true;
+        
+        
+        int m_panelLinesBinaryValue = 0;
+        int m_panelSelectorLinesBinaryValue = 0;
+        int m_previewSelectorLinesBinaryValue =0;
+        int m_previewLinesBinaryValue = 0;
+        
+        
+        
 
     };
 

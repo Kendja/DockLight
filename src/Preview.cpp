@@ -47,8 +47,7 @@ bool Preview::m_mouseIn;
  */
 Preview::Preview()
 : Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
-m_initialItemMax(0)
-{
+m_initialItemMax(0) {
     m_mouseIn = false;
     m_canLeave = true;
     m_currentIndex = -1;
@@ -111,16 +110,14 @@ m_initialItemMax(0)
 /**
  * dtor
  */
-Preview::~Preview()
-{
+Preview::~Preview() {
 }
 
 /**
  * Sets the caller pointer 
  * @param DockItem* item
  */
-void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/)
-{
+void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/) {
 
     if (item == NULL)
         return;
@@ -174,8 +171,7 @@ void Preview::init(DockItem* item/*, int &width, int &height, int &windowWidth*/
     }
 }
 
-void Preview::Activate(DockItem* item, int dockitemscount, int index)
-{
+void Preview::Activate(DockItem* item, int dockitemscount, int index) {
     m_isActive = false;
     m_canLeave = false;
 
@@ -225,8 +221,7 @@ void Preview::Activate(DockItem* item, int dockitemscount, int index)
  * @param crossing_event
  * @return true to stop other handlers from being invoked for the event. false to propagate the event further
  */
-bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
-{
+bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event) {
     m_canLeave = true;
     m_mouseIn = true;
     m_dockpanelReference->m_previewWindowActive = true;
@@ -243,8 +238,7 @@ bool Preview::on_enter_notify_event(GdkEventCrossing* crossing_event)
  * @param crossing_event
  * @return true to stop other handlers from being invoked for the event. false to propagate the event further
  */
-bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
-{
+bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event) {
     if (!m_canLeave) {
         return true;
     }
@@ -259,8 +253,7 @@ bool Preview::on_leave_notify_event(GdkEventCrossing* crossing_event)
 /**
  * Hide the window and reset values;
  */
-void Preview::hideMe()
-{
+void Preview::hideMe() {
     hide();
 
     m_canLeave = true;
@@ -286,8 +279,7 @@ void Preview::hideMe()
  * If  the flag m_canLeave is set to FALSE we need to check the mouseY coordinate.
  * If the mouseY value is less the the window height then we hide the Preview  
  */
-bool Preview::on_timeoutDraw()
-{
+bool Preview::on_timeoutDraw() {
     if (!m_isVisible)
         return true;
 
@@ -312,8 +304,7 @@ bool Preview::on_timeoutDraw()
  * @param y
  * @return the DockItem index 
  */
-int Preview::getIndex(int x, int y)
-{
+int Preview::getIndex(int x, int y) {
 
     int col = 0;
     int idx = 0;
@@ -338,8 +329,7 @@ int Preview::getIndex(int x, int y)
  * @param GdkEventScroll event
  * @return true to stop other handlers,false to propagate the event further.
  */
-bool Preview::on_scroll_event(GdkEventScroll * event)
-{
+bool Preview::on_scroll_event(GdkEventScroll * event) {
     int count = m_previewtems.size();
     if (count == 0)
         return false;
@@ -377,8 +367,7 @@ bool Preview::on_scroll_event(GdkEventScroll * event)
  * @param WnckWindow* window
  * @param gpointer data
  */
-void Preview::on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer data)
-{
+void Preview::on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer data) {
     if (!m_mouseIn)
         return;
 
@@ -401,8 +390,7 @@ void Preview::on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer 
  * @param WnckWindow window
  * @param gpointer data
  */
-void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
-{
+void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data) {
 
     if ((int) m_previewtems.size() == 0) {
         return;
@@ -472,8 +460,7 @@ void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer 
  * @return true to stop other handlers,false to propagate the event further.
  * here we acivate the window and also close the window. 
  */
-bool Preview::on_button_press_event(GdkEventButton *event)
-{
+bool Preview::on_button_press_event(GdkEventButton *event) {
 
     if ((event->type == GDK_BUTTON_PRESS)) {
         // Check if the event is a left button click.
@@ -520,8 +507,7 @@ bool Preview::on_button_press_event(GdkEventButton *event)
  * @param event GdkEventMotion
  * @return true/false
  */
-bool Preview::on_motion_notify_event(GdkEventMotion*event)
-{
+bool Preview::on_motion_notify_event(GdkEventMotion*event) {
     m_currentIndex = getIndex(event->x, event->y);
     return true;
 }
@@ -531,8 +517,7 @@ bool Preview::on_motion_notify_event(GdkEventMotion*event)
  * @param Cairo::Context cr
  * @return Gtk::Window::on_draw(cr)
  */
-bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
-{
+bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
     Configuration::Theme theme = Configuration::getTheme();
     if (theme.forPreview().enabled()) {
 
@@ -544,7 +529,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 theme.forPreview().background().alpha);
 
         Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
-                theme.forPanel().roundedRatious());
+                theme.forPreview().roundedRatious());
 
         cr->fill();
 
@@ -586,6 +571,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         int pos_width = m_previewWidth - DEF_PREVIEW_LEFT_MARGING;
         int pos_height = 20;
 
+
         cr->set_source_rgba(
                 theme.forPreview().foreground().red,
                 theme.forPreview().foreground().green,
@@ -597,26 +583,76 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         if (item->m_imageLoadedRequired)
             cr->set_line_width(theme.forPreview().lineWith() + 0.5);
 
-        Utilities::RoundedRectangle(cr,
-                DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx),
-                16, m_previewWidth,
-                m_previewHeight - DEF_PREVIEW_RIGHT_MARGING,
-                theme.forPanel().roundedRatious());
+        if (theme.getPreviewBinaryValue() == 0) {
+            Utilities::RoundedRectangle(cr,
+                    DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx),
+                    16, m_previewWidth,
+                    m_previewHeight - DEF_PREVIEW_RIGHT_MARGING,
+                    theme.forPreview().roundedRatious());
 
-        cr->stroke();
+            cr->stroke();
+        } else {
+            cr->set_line_width(theme.forPreview().lineWith());
+            int pos_x = DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx);
+            int y_pos = 16;
+            int width = m_previewWidth;
+            int height = m_previewHeight;
+            int value = theme.getPreviewBinaryValue();
+            /* Vertical Left*/
+            int bit = CHECK_BIT(value, 3);
+            if (bit == 1) {
+
+                cr->set_line_width(theme.forPreview().lineWith());
+                cr->move_to(pos_x, y_pos);
+                cr->line_to(pos_x, y_pos);
+                cr->line_to(pos_x, y_pos + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                cr->stroke();
+
+            }
+            /* Top */
+            bit = CHECK_BIT(value, 2);
+            if (bit == 1) {
+                cr->set_line_width(theme.forPreview().lineWith());
+                cr->move_to(pos_x, y_pos);
+                cr->line_to(pos_x, y_pos);
+                cr->line_to(pos_x + (m_previewWidth), y_pos);
+                cr->stroke();
+            }
+
+            /* Right vertical */
+            bit = CHECK_BIT(value, 1);
+            if (bit == 1) {
+                cr->set_line_width(theme.forPreview().lineWith());
+                cr->move_to(pos_x + m_previewWidth, y_pos);
+                cr->line_to(pos_x + m_previewWidth, y_pos);
+                cr->line_to(pos_x + m_previewWidth, y_pos + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                cr->stroke();
+            }
+
+            bit = CHECK_BIT(value, 0);
+            if (bit == 1) {
+                cr->set_line_width(theme.forPreview().lineWith());
+                cr->move_to(pos_x, y_pos + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                cr->line_to(pos_x, y_pos + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                cr->line_to(pos_x + m_previewWidth, y_pos + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                cr->stroke();
+            }
+
+        }
 
 
-
+        // TEXT 
         // draw title and create clipping rectangle
+        //  JG        
         cr->set_source_rgba(
                 theme.forPreviewTitle().background().red,
                 theme.forPreviewTitle().background().green,
                 theme.forPreviewTitle().background().blue,
                 theme.forPreviewTitle().foreground().alpha);
         cr->rectangle(pos_x, pos_y + 2, pos_width + 2, pos_height);
-       // cr->clip_preserve();
+        // cr->clip_preserve();
         cr->fill();
-
+        //    JG
         cr->set_source_rgba(
                 theme.forPreviewTitle().foreground().red,
                 theme.forPreviewTitle().foreground().green,
@@ -628,26 +664,26 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 
 
-       // draw title the clipping rectangle
+        // draw title the clipping rectangle
         //cr->set_source_rgba(1.0, 1.0, 1.0, 0.0);
-        
+
         cr->rectangle(pos_x, pos_y + 2, pos_width, pos_height);
         cr->clip_preserve();
         cr->stroke();
 
-        
-        
-        
+
+
+
         cr->set_source_rgba(
                 theme.forPreviewTitleText().foreground().red,
                 theme.forPreviewTitleText().foreground().green,
                 theme.forPreviewTitleText().foreground().blue,
                 theme.forPreviewTitleText().foreground().alpha);
-        
+
         auto layout = create_pango_layout(item->m_titlename);
         layout->set_font_description(font);
         //cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
-        cr->move_to(pos_x, pos_y);
+        cr->move_to(pos_x + 2, pos_y + 4);
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
 
@@ -661,33 +697,82 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             pos_width = m_previewWidth + 1;
             pos_height = m_previewHeight - DEF_PREVIEW_RIGHT_MARGING;
 
-            //cr->save();
             cr->set_source_rgba(
                     theme.forPreviewSelector().background().red,
                     theme.forPreviewSelector().background().green,
                     theme.forPreviewSelector().background().blue,
-                    theme.forPreviewSelector().background().alpha);//!!!
+                    theme.forPreviewSelector().background().alpha);
 
-           //HACK: need to find what happen here. alpha increesing it's  value
-           // ,0.08 Alpha is not a correct value but work best for now. 
-           //cr->set_source_rgba(1.0, 1.0, 1.0, 0.08); 
-                
+            // cr->set_source_rgba(1.0, 1.0, 1.8, 0.08);
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
-                   theme.forPreviewSelector().roundedRatious());
-               cr->fill();
-            
-         
+                    theme.forPreviewSelector().roundedRatious());
+            cr->fill();
+
+
+
             cr->set_source_rgba(
                     theme.forPreviewSelector().foreground().red,
                     theme.forPreviewSelector().foreground().green,
                     theme.forPreviewSelector().foreground().blue,
                     theme.forPreviewSelector().foreground().alpha);
             cr->set_line_width(theme.forPreviewSelector().lineWith());
+            
+            if (theme.getPreviewSelectorBinaryValue() == 0) {
+                
+                Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
+                        theme.forPreviewSelector().roundedRatious());
+                cr->stroke();
+            } else {
+                
+//                int pos_x = DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx);
+//                int y_pos = 16;
+//                int width = m_previewWidth;
+//                int height = m_previewHeight;
+                
+                int value = theme.getPreviewSelectorBinaryValue();
+//                /* Vertical Left*/
+                int bit = CHECK_BIT(value, 3);
+                if (bit == 1) {
+
+                  
+                    cr->move_to(pos_x, pos_y);
+                    cr->line_to(pos_x, pos_y);
+                    cr->line_to(pos_x, pos_y + (pos_height));
+                    cr->stroke();
+
+                }
+                /* Top */
+                bit = CHECK_BIT(value, 2);
+                if (bit == 1) {
+                   
+                    cr->move_to(pos_x, pos_y);
+                    cr->line_to(pos_x, pos_y);
+                    cr->line_to(pos_x + (pos_width), pos_y);
+                    cr->stroke();
+                }
+
+                /* Right vertical */
+                bit = CHECK_BIT(value, 1);
+                if (bit == 1) {
+                   
+                    cr->move_to(pos_x + pos_width, pos_y);
+                    cr->line_to(pos_x + pos_width, pos_y);
+                    cr->line_to(pos_x + pos_width, pos_y + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                    cr->stroke();
+                }
+
+                bit = CHECK_BIT(value, 0);
+                if (bit == 1) {
+                    
+                    cr->move_to(pos_x, pos_y + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                    cr->line_to(pos_x, pos_y + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                    cr->line_to(pos_x + m_previewWidth, pos_y + (m_previewHeight - DEF_PREVIEW_RIGHT_MARGING));
+                    cr->stroke();
+                }
+            }
 
 
-            Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
-                    theme.forPreviewSelector().roundedRatious());
-            cr->stroke();
+
 
             cr->set_source_rgba(
                     theme.forPreviewSelectorClose().background().red,
@@ -695,9 +780,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                     theme.forPreviewSelectorClose().background().blue,
                     theme.forPreviewSelectorClose().background().alpha);
 
-           
-         
-            
+
             pos_x = (m_previewWidth - 5) + (m_previewWidth * m_currentIndex);
             cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING);
 
@@ -714,10 +797,8 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             // Close X text
             cr->move_to(pos_x + 3, DEF_PREVIEW_RIGHT_MARGING - 1);
             cr->show_text("X");
-            
-            
-            
-          
+
+
         }
 
         if (item->m_imageLoadedRequired) {
@@ -764,8 +845,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
  * @param GdkPixbuf* scaledpb
  * @param the current idx
  */
-void Preview::showPreview(const Cairo::RefPtr<Cairo::Context>& cr, GdkPixbuf* scaledpb, int idx)
-{
+void Preview::showPreview(const Cairo::RefPtr<Cairo::Context>& cr, GdkPixbuf* scaledpb, int idx) {
     Glib::RefPtr<Gdk::Pixbuf> preview = IconLoader::PixbufConvert(scaledpb);
     Gdk::Cairo::set_source_pixbuf(cr, preview, (m_previewWidth * idx) +
             20, DEF_PREVIEW_PIXBUF_TOP);
@@ -788,8 +868,7 @@ void Preview::showPreview(const Cairo::RefPtr<Cairo::Context>& cr, GdkPixbuf* sc
  * @return GdkPixbuf* 
  * 
  */
-GdkPixbuf* Preview::getScaledPixbuf(DockItem* item)
-{
+GdkPixbuf* Preview::getScaledPixbuf(DockItem* item) {
     GdkWindow *wm_window = gdk_x11_window_foreign_new_for_display(
             gdk_display_get_default(), item->m_xid);
     GdkRectangle boundingbox;

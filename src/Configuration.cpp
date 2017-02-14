@@ -13,6 +13,8 @@ namespace Configuration {
     Theme m_theme;
     bool m_autohide = false;
     bool m_panelScaleOnHover;
+    int m_panelLinesBinaryValue = 0;
+    int m_previewLinesBinaryValue = 0;
 
     Color::Color() {
     };
@@ -74,7 +76,9 @@ namespace Configuration {
         return m_theme;
     };
 
-    void getColorFromString(const std::string& s, bool& enable, double& lineWidth, double& roundedRadius,
+    void getColorFromString(const std::string& s, bool& enable,
+            double& lineWidth, double& roundedRadius,
+            int& panelBinaryValue, int& previewBinaryValue,
             Color& background, Color& foreground) {
 
         if (!Utilities::isNumeric(s)) {
@@ -84,7 +88,7 @@ namespace Configuration {
         const int MAXBUFF = 50;
         int maxlength = s.size();
         std::string token = "";
-        double values[MAXBUFF] = {-1};
+        double values[MAXBUFF] = {0};
         int index = 0;
         for (int i = 0; i < maxlength; i++) {
 
@@ -122,6 +126,26 @@ namespace Configuration {
         foreground.green = values[8];
         foreground.blue = values[9];
         foreground.alpha = values[10];
+
+        //        panelBinaryValue =  values[11];
+        //        previewBinaryValue =  values[12];
+
+
+        //foreground.alpha = values[10];
+
+
+    }
+
+    void getColorFromString(const std::string& s, bool& enable,
+            double& lineWidth, double& roundedRadius,
+            Color& background, Color& foreground) {
+
+        int panelBinaryValue;
+        int previewBinaryValue;
+
+        getColorFromString(s, enable, lineWidth, roundedRadius,
+                panelBinaryValue, previewBinaryValue,
+                background, foreground);
 
     }
 
@@ -173,7 +197,7 @@ namespace Configuration {
             return;
         }
 
-       
+
 
         bool panelScaleOnHover = g_key_file_get_boolean(key_file, themename, "PanelScaleOnHover", &error);
 
@@ -184,6 +208,43 @@ namespace Configuration {
             panelScaleOnHover = false;
 
         }
+
+
+        int panelLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PanelLinesBinaryValue", &error);
+
+        if (error) {
+            g_print("configuration Key (Theme %s PanelLinesBinaryValue ) could not be found. use default\n", themename);
+            g_error_free(error);
+            error = NULL;
+        }
+
+        int panelSelectorLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PanelSelectorLinesBinaryValue", &error);
+
+        if (error) {
+            g_print("configuration Key (Theme %s PanelSelectorLinesBinaryValue ) could not be found. use default\n", themename);
+            g_error_free(error);
+            error = NULL;
+        }
+        
+        
+        int previewlLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PreviewLinesBinaryValue", &error);
+
+        if (error) {
+            g_print("configuration Key (Theme %s PreviewLinesBinaryValue ) could not be found. use default\n", themename);
+            g_error_free(error);
+            error = NULL;
+        }
+        
+                
+        int previewSelectorLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PreviewSelectorLinesBinaryValue", &error);
+
+        if (error) {
+            g_print("configuration Key (Theme %s PreviewSelectorLinesBinaryValue ) could not be found. use default\n", themename);
+            g_error_free(error);
+            error = NULL;
+        }
+
+
 
         char* windowString = g_key_file_get_string(key_file, themename, "Window", &error);
         if (windowString == NULL) {
@@ -265,7 +326,7 @@ namespace Configuration {
         double roundedRadius;
         Color background;
         Color foreground;
-
+        
         m_theme.setPanelScaleOnhover(panelScaleOnHover);
 
 
@@ -306,6 +367,23 @@ namespace Configuration {
             m_theme.forPreviewSelector().set(enable, background, foreground, lineWidth, roundedRadius);
         }
 
+
+        m_theme.setPanelBinaryValue(panelLinesBinaryValue);
+        
+        m_theme.setPanelSelectorBinaryValue(panelSelectorLinesBinaryValue);
+
+        m_theme.setPreviewBinaryValue(previewlLinesBinaryValue);
+        m_theme.setPreviewSelectorBinaryValue(previewSelectorLinesBinaryValue);
+        
+        
+
+
+        //
+        //        getColorFromString(PreviewSelectorString, enable, lineWidth, roundedRadius,
+        //                 panelBinaryValue,previewBinaryValue,background, foreground);
+
+       // m_theme.setPanelBinaryValue(panelBinaryValue);
+       // m_theme.setPreviewBinaryValue(previewBinaryValue);
 
         g_key_file_free(key_file);
         return;
