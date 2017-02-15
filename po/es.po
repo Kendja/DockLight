@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.12\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-01 21:46+0700\n"
-"PO-Revision-Date: 2017-02-01 21:47+0700\n"
+"POT-Creation-Date: 2017-02-15 17:32+0700\n"
+"PO-Revision-Date: 2017-02-15 17:55+0700\n"
 "Last-Translator: FULL NAME <j-gonzalez@email.de>\n"
 "Language-Team: SPAIN\n"
 "Language: es\n"
@@ -33,7 +33,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.11\n"
 
-#: ../src/About.cpp:86
+#: ../src/About.cpp:93
 msgid ""
 "This program is a lightweight Dock Launcher for opening common applications "
 "for the GNOME Desktop"
@@ -207,64 +207,82 @@ msgstr "No se ha podido encontrar el navegador.\n"
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "Los campos Nombre y Comando no pueden estar vacíos!\n"
 
-#: ../src/DockPanel.cpp:112 ../src/DockPanel.cpp:113
+#: ../src/DockPanel.cpp:114 ../src/DockPanel.cpp:115
 msgid "Desktop"
 msgstr "Escritorio"
 
 #. Menus
 #. Home Menu items
-#: ../src/DockPanel.cpp:126
+#: ../src/DockPanel.cpp:128
 msgid "Autohide"
 msgstr "Esconder automaticamente"
 
-#: ../src/DockPanel.cpp:131 ../src/DockPanel.cpp:213
+#: ../src/DockPanel.cpp:133 ../src/DockPanel.cpp:235
 msgid "Show all"
 msgstr "Mostrar todo"
 
-#: ../src/DockPanel.cpp:135 ../src/DockPanel.cpp:217
+#: ../src/DockPanel.cpp:137 ../src/DockPanel.cpp:239
 msgid "Minimize all except active"
 msgstr "Minimizar todo menos lo activo"
 
-#: ../src/DockPanel.cpp:140 ../src/DockPanel.cpp:221
+#: ../src/DockPanel.cpp:142 ../src/DockPanel.cpp:243
 msgid "Minimize all"
 msgstr "Minimizar todo"
 
-#: ../src/DockPanel.cpp:144 ../src/DockPanel.cpp:231
+#: ../src/DockPanel.cpp:146 ../src/DockPanel.cpp:253
 msgid "Close all except active"
 msgstr "Cierra todo menos lo activo"
 
-#: ../src/DockPanel.cpp:149 ../src/DockPanel.cpp:235
+#: ../src/DockPanel.cpp:151 ../src/DockPanel.cpp:257
 msgid "Close all"
 msgstr "Cierra todo"
 
 #. m_HomeMenu_Popup.signal_enter_notify_event().
 #. connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
-#: ../src/DockPanel.cpp:171
+#. on_HomePreferences_event
+#: ../src/DockPanel.cpp:176 ../src/Preferences.cpp:25
+msgid "Preferences"
+msgstr "Preferencias"
+
+#: ../src/DockPanel.cpp:181
+msgid "Session-group"
+msgstr "Session de grupos"
+
+#: ../src/DockPanel.cpp:186
 msgid "Help"
 msgstr "Ayuda"
 
-#: ../src/DockPanel.cpp:176
+#: ../src/DockPanel.cpp:191
 msgid "About"
 msgstr "Acerca de"
 
-#: ../src/DockPanel.cpp:180
+#: ../src/DockPanel.cpp:195
 msgid "Quit"
 msgstr "Salir"
 
 #. Item Menu
-#: ../src/DockPanel.cpp:194
+#: ../src/DockPanel.cpp:216 ../src/DockPanel.cpp:651
 msgid "Open new"
 msgstr "Abrir nuevo"
 
-#: ../src/DockPanel.cpp:201
+#: ../src/DockPanel.cpp:223
 msgid "Attach to Dock"
 msgstr "Adjuntar al Dock"
 
-#: ../src/DockPanel.cpp:206
+#: ../src/DockPanel.cpp:228
 msgid "Detach from Dock"
 msgstr "Desconectarse de el Dock"
 
-#: ../src/DockPanel.cpp:1440
+#: ../src/DockPanel.cpp:655
+msgid "Add active"
+msgstr "Añadir activo"
+
+#: ../src/DockPanel.cpp:1209
+#, c-format
+msgid "Session-group %d"
+msgstr "Session de grupos %d"
+
+#: ../src/DockPanel.cpp:1829
 #, c-format
 msgid ""
 "(%s) %d windows.\n"
@@ -276,12 +294,20 @@ msgstr ""
 "Cierre algunas ventanas e inténtelo de nuevo."
 
 #: ../src/Launcher.cpp:12
-msgid "gpk-update-viewer"
+msgid "Gpk-update-viewer"
 msgstr "Actualizador de paquetes"
 
 #: ../src/Launcher.cpp:13
-msgid "gpk-application"
+msgid "Gpk-application"
 msgstr "Paquetes"
+
+#: ../src/Preferences.cpp:22
+msgid "Autohide on start"
+msgstr "Esconder automaticamente al iniciar"
+
+#, fuzzy
+#~ msgid "Session group"
+#~ msgstr "Grupos des sesions"
 
 #~ msgid "nemo"
 #~ msgstr "Nemo Administrador de archivos"

@@ -63,7 +63,7 @@ void About::init(Window* window)
     this->set_authors(m_authors);
     this->m_artists.push_back("Juan Álvarez https://github.com/yoosamui/docklight");
     this->set_artists(m_artists);
-    this->set_translator_credits("Juan Álvarez\nSuppaluk Srisaeng");
+    this->set_translator_credits("Juan Álvarez\nPete Satawat");
     this->set_website_label("docklight on github");
     this->set_website("https://github.com/yoosamui/docklight");
     

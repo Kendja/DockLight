@@ -2,6 +2,7 @@
 #include "Preferences.h"
 #include "DockPanel.h"
 #include "Configuration.h"
+#include  <glibmm/i18n.h>
 
 ExampleRow::ExampleRow(const Glib::ustring& text, int sort_id)
 : m_label(text),
@@ -18,10 +19,10 @@ m_ScrolledWindow(),
 m_VBox_Row(Gtk::ORIENTATION_VERTICAL),
 m_HBox_Row(Gtk::ORIENTATION_HORIZONTAL),
 m_VBox(Gtk::ORIENTATION_VERTICAL),
-m_CheckButton_Autohide("Autohide on start", /* mnemonic= */ false),
+m_CheckButton_Autohide(_("Autohide on start"), /* mnemonic= */ false),
 m_ListBox(), m_FrameTop(), m_Frame() {
 
-    set_title("Preferences");
+    set_title(_("Preferences"));
     set_default_size(300, 300);
 
     this->set_resizable(false);

@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "Utilities.h"
 #include  "Defines.h" 
+#include <locale>
 
 namespace Configuration {
 
@@ -78,13 +79,15 @@ namespace Configuration {
 
     void getColorFromString(const std::string& s, bool& enable,
             double& lineWidth, double& roundedRadius,
-            int& panelBinaryValue, int& previewBinaryValue,
             Color& background, Color& foreground) {
 
         if (!Utilities::isNumeric(s)) {
             g_critical("The color string is not numeric: [%s]\n", s.c_str());
         }
 
+        std::string currentLocale = setlocale(LC_NUMERIC,NULL);
+        setlocale(LC_NUMERIC,"C");
+                
         const int MAXBUFF = 50;
         int maxlength = s.size();
         std::string token = "";
@@ -98,17 +101,19 @@ namespace Configuration {
                     token += c;
                 }
 
-                if (c == ',' || i + 1 == maxlength) {
+                if ((c == ',') || i + 1 == maxlength) {
 
-                    double value;
+                    double value = 0.0;
                     try {
-                        value = std::stod(token);
+                       value = std::stod(token);
+                       values[ index ] = value;
+                       //g_print(" %d........:%f (%s)\n", index, value,token.c_str());
+                       
                     } catch (std::invalid_argument) {
                         g_critical("getColorFromString: can't convert the token: %s\n", s.c_str());
                     }
 
-                    values[ index ] = value;
-                    //g_print(" %d........:%f\n", index, value);
+
                     token = "";
                     index++;
                 }
@@ -127,31 +132,13 @@ namespace Configuration {
         foreground.blue = values[9];
         foreground.alpha = values[10];
 
-        //        panelBinaryValue =  values[11];
-        //        previewBinaryValue =  values[12];
-
-
-        //foreground.alpha = values[10];
+        setlocale(LC_NUMERIC,currentLocale.c_str());
 
 
     }
 
-    void getColorFromString(const std::string& s, bool& enable,
-            double& lineWidth, double& roundedRadius,
-            Color& background, Color& foreground) {
 
-        int panelBinaryValue;
-        int previewBinaryValue;
-
-        getColorFromString(s, enable, lineWidth, roundedRadius,
-                panelBinaryValue, previewBinaryValue,
-                background, foreground);
-
-    }
-
-    void Load() {
-
-
+   void Load() {
 
         std::string filepath = Utilities::getExecPath(DEF_INITNAME);
         GError *error = NULL;
@@ -225,8 +212,8 @@ namespace Configuration {
             g_error_free(error);
             error = NULL;
         }
-        
-        
+
+
         int previewlLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PreviewLinesBinaryValue", &error);
 
         if (error) {
@@ -234,8 +221,8 @@ namespace Configuration {
             g_error_free(error);
             error = NULL;
         }
-        
-                
+
+
         int previewSelectorLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PreviewSelectorLinesBinaryValue", &error);
 
         if (error) {
@@ -326,7 +313,7 @@ namespace Configuration {
         double roundedRadius;
         Color background;
         Color foreground;
-        
+
         m_theme.setPanelScaleOnhover(panelScaleOnHover);
 
 
@@ -369,21 +356,12 @@ namespace Configuration {
 
 
         m_theme.setPanelBinaryValue(panelLinesBinaryValue);
-        
+
         m_theme.setPanelSelectorBinaryValue(panelSelectorLinesBinaryValue);
 
         m_theme.setPreviewBinaryValue(previewlLinesBinaryValue);
         m_theme.setPreviewSelectorBinaryValue(previewSelectorLinesBinaryValue);
-        
-        
 
-
-        //
-        //        getColorFromString(PreviewSelectorString, enable, lineWidth, roundedRadius,
-        //                 panelBinaryValue,previewBinaryValue,background, foreground);
-
-       // m_theme.setPanelBinaryValue(panelBinaryValue);
-       // m_theme.setPreviewBinaryValue(previewBinaryValue);
 
         g_key_file_free(key_file);
         return;

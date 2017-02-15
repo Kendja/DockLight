@@ -11,6 +11,8 @@ namespace Launcher
     std::map<std::string, std::string> dictionary = {
         {"Gpk-update-viewer", _("Gpk-update-viewer")},
         {"Gpk-application", _("Gpk-application")}
+       
+        
     };
 
     /**
@@ -153,7 +155,8 @@ namespace Launcher
             if (value.empty())
                 return appname;
 
-            return gettext(value.c_str());
+            std::string s = gettext(value.c_str());
+            return s;
         }
 
         // build the desktop file path 

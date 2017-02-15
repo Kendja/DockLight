@@ -178,7 +178,7 @@ int DockPanel::preInit(Gtk::Window* window) {
             connect(sigc::mem_fun(*this, &DockPanel::on_HomePreferences_event));
 
 
-    m_homeSessionGrp.set_label(_("Session group"));
+    m_homeSessionGrp.set_label(_("Session-group"));
     m_homeSessionGrp.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeAddSessionGrp_event));
 
@@ -462,7 +462,7 @@ void DockPanel::saveAttachments(int aIdx, int bIdx) {
 
         char filename[NAME_MAX];
         std::string s = item->m_realgroupname;
-        std::replace(s.begin(), s.end(), ' ', '_');
+        std::replace(s.begin(), s.end(), ' ', '-');
 
         sprintf(filename, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
@@ -1166,13 +1166,13 @@ void DockPanel::attachToSessiongrp() {
 int DockPanel::getNextSessionGrpNumber() {
 
 
-    int count = 0;
+    int count = 1;
     for (DockItem* items : m_dockitems)
         if (items->m_dockitemSesssionGrpId == 1)
             count++;
 
 
-    return (count > 0 ? count + 1 : count);
+    return count;//(count > 0 ? count + 1 : count);
 }
 
 void DockPanel::CreateSessionDockItemGrp() {
@@ -1193,11 +1193,7 @@ void DockPanel::CreateSessionDockItemGrp() {
         return;
     }
 
-    //
-    //    dockItem->m_appname = _("Desktop");
-    //    dockItem->m_realgroupname = _("Desktop");
-    //    m_dockitems.push_back(dockItem);
-
+ 
     // Create a new Item
 
     int number = getNextSessionGrpNumber();
@@ -1206,13 +1202,16 @@ void DockPanel::CreateSessionDockItemGrp() {
     dockItem->m_appname = "session-group";
 
     char buff[100];
-    sprintf(buff, "Session-group %d", number);
+    sprintf(buff, _("Session-group %d"), number);
     dockItem->m_titlename = buff;
+   
+    
     dockItem->m_realgroupname = "Session-group";
     dockItem->m_instancename = "session-group";
     dockItem->m_window = NULL;
     dockItem->m_xid = 0;
 
+    
     m_dockitems.push_back(std::move(dockItem));
 
 }
@@ -1909,9 +1908,10 @@ int DockPanel::loadAttachments() {
             if (appname == "Session-group") {
 
                 char buffer[100];
-                sprintf(buffer, "Session-group %d", sessionnumber);
+                sprintf(buffer, _("Session-group %d"), sessionnumber);
                 item->m_titlename = buffer;
-
+                item->m_realgroupname="Session group";
+                item->m_instancename="session-group";
                 item->m_dockitemSesssionGrpId = 1;
                 sessionnumber++;
             }

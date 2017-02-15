@@ -3,8 +3,9 @@
 for i in *.po
 do
 	d=${i%.*}
-    modir="/usr/local/share/locale/$d/LC_MESSAGES"
-    mofile="/usr/local/share/locale/$d/LC_MESSAGES/docklight.mo"
+
+    modir="/usr/lib/docklight/share/locale/$d/LC_MESSAGES"
+    mofile="/usr/lib/docklight/share/locale/$d/LC_MESSAGES/docklight.mo"
 	
 	if [ ! -d "$modir" ]; then
 		mkdir $modir  
