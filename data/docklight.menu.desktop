@@ -1,8 +1,11 @@
 [Desktop Entry]
 Name=DockLight
+Comment=this programm is a lightweight Dock launcher for opening common applications.
+Comment[de]=Docklight ist ein leichtes Dock Panel zum Öffnen gemeinsamer Anwendungen für den GNOME Desktop
+Comment[es]=Docklight es un Programa para abrir aplicaciones  para el escritorio de GNOME.
+Comment[th]=โปรแกรมนี้ใช้งานไม่ยาก Dock Launcher สำหรับการใช้งานเท่าไปเท่านั้น จัดทำเพื่อแปลภาษาหน้าเดสก์ท็อปของ GNOME 
 Version=1.0
 Exec=/usr/lib/docklight/bin/docklight
-Comment=this programm is a lightweight Dock launcher for opening common applications.
 Icon=docklight.home
 Type=Application
 Terminal=false
