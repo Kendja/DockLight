@@ -45,11 +45,12 @@ m_Label("", false)
 
 
     font.set_family("System");
+    font.set_size(8 * PANGO_SCALE);
     font.set_weight(Pango::WEIGHT_NORMAL);
 
     Gtk::Window::set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_TOOLTIP);
     m_HBox.set_margin_left(6);
-    m_HBox.set_margin_right(10);
+    m_HBox.set_margin_right(6);
     m_HBox.set_margin_top(6);
     m_HBox.set_margin_bottom(6);
 
@@ -77,7 +78,7 @@ TitleWindow::~TitleWindow()
 void TitleWindow::setText(const Glib::ustring text)
 {
     m_Label.set_text(text);
-    resize(2, get_height()); // Trick to auto resize the window
+    resize( 2, get_height()); // Trick to auto resize the window
     show_all();
 }
 

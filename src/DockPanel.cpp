@@ -1277,7 +1277,8 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
 
     std::string titlename =
-            Launcher::getTitleNameFromDesktopFile(instancename, realgroupname);
+            Launcher::getTitleNameFromDesktopFile(realgroupname,instancename);
+            //Launcher::getTitleNameFromDesktopFile(instancename, realgroupname);
 
     if (realgroupname == "Wine")
         realgroupname = instancename;

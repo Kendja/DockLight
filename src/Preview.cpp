@@ -89,6 +89,7 @@ m_initialItemMax(0) {
 
 
     font.set_family("System");
+    font.set_size(8 * PANGO_SCALE);
     font.set_weight(Pango::WEIGHT_NORMAL);
 
     Glib::signal_timeout().
@@ -683,7 +684,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
         auto layout = create_pango_layout(item->m_titlename);
         layout->set_font_description(font);
         //cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
-        cr->move_to(pos_x + 2, pos_y + 4);
+        cr->move_to(pos_x + 2, pos_y + 2);
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
 
