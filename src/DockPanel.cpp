@@ -399,7 +399,7 @@ bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event) {
         }
 
 
-        DockPanel::setItemImdexFromActiveWindow(window);
+        DockPanel::setItemImdexFromActiveWindow();
     }
     return true;
 }
@@ -414,7 +414,7 @@ void DockPanel::previewWindowClosed() {
     }
 
 
-    DockPanel::setItemImdexFromActiveWindow(window);
+    DockPanel::setItemImdexFromActiveWindow();
 }
 
 /**
@@ -816,7 +816,7 @@ void DockPanel::on_AttachToDock_event() {
 
     char filename[NAME_MAX];
     std::string s = dockitem->m_realgroupname;
-    std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
+    std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '_'
     sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
             m_currentMoveIndex,
             s.c_str());
@@ -847,7 +847,7 @@ void DockPanel::on_DetachFromDock_event() {
     char filename[PATH_MAX];
 
     std::string s = dockitem->m_realgroupname;
-    std::replace(s.begin(), s.end(), ' ', '_'); // replace all ' ' to '_'
+    std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '_'
 
     sprintf(filename, "%s/%2d_%s.png",
             m_applicationAttachmentsPath.c_str(),
@@ -869,7 +869,7 @@ void DockPanel::on_DetachFromDock_event() {
 
     int idx = m_currentMoveIndex;
     WnckWindow *window = dockitem->m_window;
-    setItemImdexFromActiveWindow(window);
+    setItemImdexFromActiveWindow();
 
     delete(dockitem);
     m_dockitems.erase(m_dockitems.begin() + idx);
@@ -1066,13 +1066,17 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         return;
     }
 
-    DockPanel::setItemImdexFromActiveWindow(window);
+    DockPanel::setItemImdexFromActiveWindow();
 }
 
-void DockPanel::setItemImdexFromActiveWindow(WnckWindow *window) {
+void DockPanel::setItemImdexFromActiveWindow() {
     if (DockPanel::m_dragdropsStarts)
         return;
 
+    WnckWindow *window = WindowControl::getActive();
+    if( window == nullptr)
+        return;
+    
     int xid = wnck_window_get_xid(window);
 
     int idx = 0;

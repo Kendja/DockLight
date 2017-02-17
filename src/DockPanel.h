@@ -76,7 +76,7 @@ private:
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
-    static void setItemImdexFromActiveWindow(WnckWindow *window);
+    static void setItemImdexFromActiveWindow();
     static void updateSessioWindow(WnckWindow *window);
     void CreateSessionDockItemGrp();
     void attachToSessiongrp();
