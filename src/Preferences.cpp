@@ -134,7 +134,8 @@ bool Preferences::on_delete_event(GdkEventAny* event) {
 
     this->m_panel->m_preferences = nullptr;
     delete(this);
-    return true;
+  
+    return false;
 }
 
 void Preferences::on_row_selected(Gtk::ListBoxRow* row) {
