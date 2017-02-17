@@ -49,7 +49,7 @@ m_Label("", false)
 
     Gtk::Window::set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_TOOLTIP);
     m_HBox.set_margin_left(6);
-    m_HBox.set_margin_right(6);
+    m_HBox.set_margin_right(10);
     m_HBox.set_margin_top(6);
     m_HBox.set_margin_bottom(6);
 

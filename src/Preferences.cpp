@@ -128,10 +128,11 @@ void Preferences::init(DockPanel& panel) {
 
 }
 //TODO change this with a Signal handler.
-
+bool deleteSet = false;
 bool Preferences::on_delete_event(GdkEventAny* event) {
 
-
+    deleteSet = true;
+    
     this->m_panel->m_preferences = nullptr;
     delete(this);
   
@@ -140,6 +141,8 @@ bool Preferences::on_delete_event(GdkEventAny* event) {
 
 void Preferences::on_row_selected(Gtk::ListBoxRow* row) {
 
+    if( deleteSet )
+        return;
 
     ExampleRow* erow = (ExampleRow*) row;
     std::string themename = erow->getLabelText();
