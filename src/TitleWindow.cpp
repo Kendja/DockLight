@@ -18,6 +18,8 @@
 //
 //****************************************************************
 
+#include "pango/pango-layout.h"
+
 #include "TitleWindow.h"
 #include "Configuration.h"
 #include "Utilities.h"
@@ -103,10 +105,7 @@ bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
 
 
-
         // draw title the clipping rectangle
-       // cr->set_source_rgba(1.0, 1.0, 1.0, 0.0);
-
         cr->set_source_rgba(
                 theme.forPanelTitle().foreground().red,
                 theme.forPanelTitle().foreground().green,
@@ -117,11 +116,10 @@ bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
          
         Utilities::RoundedRectangle(cr, 0, 0, this->get_width(), this->get_height(),
                 theme.forPanelTitle().roundedRatious());
-       //cr->clip_preserve();
         cr->stroke();
 
-        auto layout = create_pango_layout(m_Label.get_text());
-        layout->set_font_description(font);
+        Glib::RefPtr<Pango::Layout> layout = create_pango_layout(m_Label.get_text());
+        pango_layout_set_alignment(layout->gobj(),PANGO_ALIGN_CENTER ); 
         
         cr->set_source_rgba(
                 theme.forPanelTitleText().foreground().red,
@@ -131,6 +129,7 @@ bool TitleWindow::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         
          //cr->set_source_rgba(1.0,1.0,1.0,1.0);
         cr->move_to(6, 6);
+        //layout->set_alignment("center");
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
 

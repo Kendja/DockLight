@@ -1228,6 +1228,7 @@ void DockPanel::CreateSessionDockItemGrp() {
  */
 void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
 
+/*
     int cw;
     int iw;
     DockPosition::getDockItemGeometry(m_dockitems.size() + 1, cw, iw);
@@ -1236,7 +1237,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
         g_warning("there are to many dock Items. Please close some windows and try again.");
         return;
     }
-
+*/
 
     WnckWindowType wt = wnck_window_get_window_type(window);
 
@@ -1248,15 +1249,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
     }
 
     const std::string extensions[] = {".py", ".exe", ".sh"};
-
-    //    WnckApplication* app = wnck_application_get (wnck_window_get_xid(window));
-    //    
-    //    
-    //      g_print (_("Name: %s\n"), wnck_application_get_name (app));
-    //      g_print (_("Icon Name: %s\n"), wnck_application_get_icon_name (app));
-
-
-
+   
     const char* _appname = wnck_window_get_name(window);
     if (_appname == NULL) {
         g_print("Update: No Application name....\n");
@@ -1279,10 +1272,11 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
 
     std::string realgroupname(_realgroupname);
     realgroupname = Utilities::removeExtension(realgroupname, extensions);
+    std::replace(realgroupname.begin(), realgroupname.end(), ' ', '-'); 
 
     std::string titlename =
             Launcher::getTitleNameFromDesktopFile(realgroupname,instancename);
-            //Launcher::getTitleNameFromDesktopFile(instancename, realgroupname);
+          
 
     if (realgroupname == "Wine")
         realgroupname = instancename;
@@ -1292,10 +1286,12 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype) {
         return;
 
     //DEBUG
-    g_print("appname: %s, %s, %s title:%s\n", appname.c_str(),
+    g_print("...appname: %s, %s, %s title:%s\n", 
+appname.c_str(),
             instancename.c_str(),
             realgroupname.c_str(),
             titlename.c_str());
+
 
     if (actiontype == Window_action::OPEN) {
 
@@ -1942,6 +1938,11 @@ int DockPanel::loadAttachments() {
             item->m_isDirty = true;
 
             m_dockitems.push_back(item);
+//            g_print("Loaded:%s %s %s %s\n,",
+//                    item->m_appname.c_str(),
+//                    item->m_instancename.c_str(),
+//                    item->m_realgroupname.c_str(),
+//                    item->m_titlename.c_str());
         }
     }
 
