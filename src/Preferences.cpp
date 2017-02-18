@@ -68,8 +68,7 @@ Preferences::~Preferences() {
 
 void Preferences::init(DockPanel& panel) {
     this->m_panel = &panel;
-
-
+ 
 
     std::string filepath = Utilities::getExecPath(DEF_INITNAME);
     GError *error = NULL;
@@ -131,7 +130,7 @@ void Preferences::init(DockPanel& panel) {
 bool deleteSet = false;
 bool Preferences::on_delete_event(GdkEventAny* event) {
 
-    deleteSet = true;
+    deleteSet = false;
     
     this->m_panel->m_preferences = nullptr;
     delete(this);
