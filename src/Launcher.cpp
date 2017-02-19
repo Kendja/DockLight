@@ -189,6 +189,20 @@ namespace Launcher {
         std::string lang(elang);
         lang = lang.substr(0, 2);
         if (lang == "en") {
+
+            char* titlename = g_key_file_get_string(key_file,
+                    "Desktop Entry", "Name", &error);
+            if (titlename != NULL) {
+                dictionary[theappname] = titlename;
+                g_key_file_free(key_file);
+                return titlename;
+            }
+
+            if (error) {
+                g_error_free(error);
+                error = NULL;
+            }
+
             dictionary[theappname] = theappname;
             g_key_file_free(key_file);
             return theappname;
@@ -320,7 +334,7 @@ namespace Launcher {
 
         }
 
-         if (!xNameTranslatedText.empty() &&
+        if (!xNameTranslatedText.empty() &&
                 xNameTranslatedText != theappname) {
 
             dictionary[theappname] = xNameTranslatedText;
@@ -329,7 +343,7 @@ namespace Launcher {
             return dictionary[theappname];
 
         }
-       
+
         dictionary[theappname] = theappname;
         g_key_file_free(key_file);
         delete mo;
