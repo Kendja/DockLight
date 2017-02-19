@@ -54,6 +54,8 @@ docklight_SOURCES =  \
  Configuration.cpp \
  Preferences.cpp \
  Preferences.h \
+ MoReader.h \
+ MoReader.cpp \
  About.cpp \
  About.h \
  main.cpp \

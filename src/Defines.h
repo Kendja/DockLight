@@ -34,6 +34,10 @@
 #define DEF_LAUCHERSCRIPTPATH   "data/docklight.launcher.sh"
 
 
+#define DEF_LOCALEPATH          "/usr/share/locale"
+#define DEF_LOCALEPACKPATH      "/usr/share/locale-langpack"
+
+
 #define DOCKLIGHT_INSTANCENAME "docklight"
 #define DOCKLIGHTLAUNCHER "DockLight Launcher"
 

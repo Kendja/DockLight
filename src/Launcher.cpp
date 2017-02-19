@@ -1,26 +1,43 @@
+//*****************************************************************
+//
+//  Copyright (C) 2015 Juan R. Gonzalez
+//  Created on January  2017
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//****************************************************************
 
+#include <string.h>
 #include "Launcher.h"
 #include "DockItem.h"
 #include "gio/gdesktopappinfo.h"
 #include <map>
 #include <glibmm/i18n.h>
+#include "MoReader.h"
 
-
-namespace Launcher
-{
+namespace Launcher {
     std::map<std::string, std::string> dictionary = {
         {"Gpk-update-viewer", _("Gpk-update-viewer")},
         {"Gpk-application", _("Gpk-application")}
-       
-        
+
     };
 
     /**
      * Launch an application from a desktop file or from bash.
      * @param DockItem* item
      */
-    bool Launch(DockItem* item)
-    {
+    bool Launch(DockItem* item) {
         std::string lowerrealgroupname(Utilities::stringToLower(item->m_realgroupname.c_str()));
 
         // Extract  desktop file.
@@ -85,163 +102,243 @@ namespace Launcher
         return false;
     }
 
-    std::string getWindowTitle(WnckWindow *window)
-    {
-        const char* _instancename = wnck_window_get_class_instance_name(window);
-        if (_instancename == NULL) {
-            return "";
-        }
-        const std::string extensions[] = {".py", ".exe", ".sh"};
-        std::string instanceName(_instancename);
-        instanceName = Utilities::removeExtension(instanceName, extensions);
-        std::replace(instanceName.begin(), instanceName.end(), ' ', '-');
+    gboolean getDesktopFile(GKeyFile *key_file, const char* appname) {
 
-        if (dictionary.count(instanceName) == 1) {
-            std::string value = dictionary[instanceName];
+        if (appname == NULL)
+            return FALSE;
+
+        if (appname == "Untitled Window")
+            return FALSE;
+
+        if (appname == "untitled window")
+            return FALSE;
+
+        if (appname == "Wine")
+            return FALSE;
+
+
+        GError *error = NULL;
+
+        std::string name(appname);
+        std::string lowername = Utilities::stringToLower(appname);
+
+        const std::string desktopfilename[] = {
+            {appname},
+            {lowername},
+            {"org.gnome." + name},
+            {"org.gnome." + lowername}
+        };
+
+        const std::string filelocaltion[] = {
+            {"/usr/share/applications/"},
+            {"/usr/local/share/applications/"}
+        };
+
+        char filepath[PATH_MAX];
+        for (auto p : filelocaltion) {
+            for (auto f : desktopfilename) {
+                sprintf(filepath, "%s%s.desktop", p.c_str(), f.c_str());
+
+                gboolean found = g_key_file_load_from_file(key_file,
+                        filepath, GKeyFileFlags::G_KEY_FILE_NONE, &error);
+
+                if (error) {
+                    g_error_free(error);
+                    error = NULL;
+                    continue;
+                }
+
+                if (found)
+                    return TRUE;
+
+            }
+        }
+
+        return true;
+    }
+
+    std::string getTitleNameFromDesktopFile(const std::string appname) {
+
+        std::string theappname(appname);
+        std::replace(theappname.begin(), theappname.end(), ' ', '-');
+
+        if (dictionary.count(theappname) == 1) {
+            std::string value = dictionary[theappname];
             if (value.empty())
-                return "";
+                return theappname;
 
             return gettext(value.c_str());
         }
 
-        return "";
-
-    }
-
-    gboolean getDesktopFile(GKeyFile *key_file, std::string& desktopFileName)
-    {
         GError *error = NULL;
+        GKeyFile *key_file = g_key_file_new();
+        const char* _appname = theappname.c_str();
+        if (!getDesktopFile(key_file, _appname)) {
+            dictionary[theappname] = theappname;
+            g_key_file_free(key_file);
+            return theappname;
+        }
 
-        char filepath[PATH_MAX];
-        sprintf(filepath, "/usr/share/applications/%s.desktop", desktopFileName.c_str());
+        char* elang = getenv("LANG");
+        if (elang == NULL) {
+            dictionary[theappname] = theappname;
+            g_key_file_free(key_file);
+            return theappname;
+        }
 
-        gboolean found = g_key_file_load_from_file(key_file,
-                filepath, GKeyFileFlags::G_KEY_FILE_NONE, &error);
+        std::string lang(elang);
+        lang = lang.substr(0, 2);
+        if (lang == "en") {
+            dictionary[theappname] = theappname;
+            g_key_file_free(key_file);
+            return theappname;
+        }
+
+
+        // check if the GenericName Entry exists
+        std::string langNameKey = "GenericName[" + lang + "]";
+        char* titlename = g_key_file_get_string(key_file,
+                "Desktop Entry", langNameKey.c_str(), &error);
+        if (titlename != NULL) {
+            dictionary[theappname] = titlename;
+            g_key_file_free(key_file);
+            return titlename;
+        }
 
         if (error) {
             g_error_free(error);
             error = NULL;
         }
 
-        if (found)
-            return TRUE;
-
-        sprintf(filepath, "/usr/local/share/applications/%s.desktop", desktopFileName.c_str());
-        found = g_key_file_load_from_file(key_file,
-                filepath, GKeyFileFlags::G_KEY_FILE_NONE, &error);
-
-        if (error)
-            g_error_free(error);
-
-        return found;
-    }
-
-    std::string getTitleNameFromDesktopFile(std::string appname)
-    {
-        if (appname.empty())
-            return "";
-
-        if (appname == "untitled window")
-            return "";
-
-        if (appname == "wine")
-            return "";
-
-
-        std::replace(appname.begin(), appname.end(), ' ', '-');
-
-        if (dictionary.count(appname) == 1) {
-            std::string value = dictionary[appname];
-            if (value.empty())
-                return appname;
-
-            std::string s = gettext(value.c_str());
-            return s;
+        // check if the Name Entry exists
+        langNameKey = "Name[" + lang + "]";
+        titlename = g_key_file_get_string(key_file,
+                "Desktop Entry", langNameKey.c_str(), &error);
+        if (titlename != NULL) {
+            dictionary[theappname] = titlename;
+            g_key_file_free(key_file);
+            return titlename;
         }
 
-        // build the desktop file path 
-        std::string appnameLowercase = Utilities::stringToLower(appname.c_str());
-        std::string desktopfile = appname;
-        std::string desktopfile_Lowercase = appnameLowercase;
-        std::string desktopfile_orgGnome = "org.gnome." + appname;
-        std::string desktopfile_orgGnomeLowercase = "org.gnome." + appnameLowercase;
+        if (error) {
+            g_error_free(error);
+            error = NULL;
+        }
 
-        // trying to find a desktop file.
-        GError *error = NULL;
-        gchar* titlename = NULL;
-        GKeyFile *key_file = g_key_file_new();
-        gboolean desktopFilefound = FALSE;
 
-        desktopFilefound = getDesktopFile(key_file, desktopfile);
-        if (desktopFilefound == FALSE)
-            desktopFilefound = getDesktopFile(key_file, desktopfile_Lowercase);
-        if (desktopFilefound == FALSE)
-            desktopFilefound = getDesktopFile(key_file, desktopfile_orgGnome);
-        if (desktopFilefound == FALSE)
-            desktopFilefound = getDesktopFile(key_file, desktopfile_orgGnomeLowercase);
-
-        if (desktopFilefound) {
-
-            std::string langNameKey = "Name";
-            std::string genericName = "";
-            char* elang = getenv("LANG");
-            if (elang != NULL) {
-                std::string eviromentlang = elang;
-                std::string lang = eviromentlang.substr(0, 2);
-
-                if (lang != "en") {
-                    langNameKey = "Name[" + lang + "]";
-                    genericName = "GenericName[" + lang + "]";
-                }
-
-            }
-
-            // check if the Icon Desktop Entry name exists
-            titlename = g_key_file_get_string(key_file,
-                    "Desktop Entry", langNameKey.c_str(), &error);
-
+        // check if the dektop file is a Domain file 
+        langNameKey = "X-Ubuntu-Gettext-Domain";
+        char* mofile = g_key_file_get_string(key_file,
+                "Desktop Entry", langNameKey.c_str(), &error);
+        if (mofile == NULL) {
             if (error) {
                 g_error_free(error);
                 error = NULL;
             }
 
-            if (titlename == NULL && !genericName.empty()) {
-                titlename = g_key_file_get_string(key_file,
-                        "Desktop Entry", genericName.c_str(), &error);
+            dictionary[theappname] = theappname;
+            g_key_file_free(key_file);
+            return theappname;
+        }
 
-                if (error) {
-                    g_error_free(error);
-                    error = NULL;
-                }
-
+        langNameKey = "X-GNOME-FullName";
+        char* xFullname = g_key_file_get_string(key_file,
+                "Desktop Entry", langNameKey.c_str(), &error);
+        if (xFullname == NULL) {
+            if (error) {
+                g_error_free(error);
+                error = NULL;
             }
+        }
 
-            if (titlename == NULL) {
-                titlename = g_key_file_get_string(key_file,
-                        "Desktop Entry", "Name", &error);
-
-                if (error)
-                    g_error_free(error);
+        langNameKey = "GenericName";
+        char* xGenericName = g_key_file_get_string(key_file,
+                "Desktop Entry", langNameKey.c_str(), &error);
+        if (xGenericName == NULL) {
+            if (error) {
+                g_error_free(error);
+                error = NULL;
             }
+        }
+
+        langNameKey = "Name";
+        char* xName = g_key_file_get_string(key_file,
+                "Desktop Entry", langNameKey.c_str(), &error);
+        if (xName == NULL) {
+            if (error) {
+                g_error_free(error);
+                error = NULL;
+            }
+        }
+
+        MoReader* mo = new MoReader();
+        std::string moFilePath("/usr/share/locale-langpack/" +
+                lang + "/LC_MESSAGES/" + mofile + ".mo");
+
+        if (mo->Load(moFilePath.c_str()) < 0) {
+
+            dictionary[theappname] = theappname;
+            g_key_file_free(key_file);
+
+            delete mo;
+            return theappname;
 
         }
 
-        if (titlename == NULL) {
-            dictionary[appname] = appname;
-            g_print("Application (%s) without desktop launcher\n", appname.c_str());
-        } else {
-            dictionary[appname] = titlename;
+        std::string xFullnameTranslatedText = "";
+        std::string xGenericNameTranslatedText = "";
+        std::string xNameTranslatedText = "";
+
+
+        if (xFullname != NULL)
+            xFullnameTranslatedText = mo->getText(xFullname);
+
+        if (xGenericName != NULL)
+            xGenericNameTranslatedText = mo->getText(xGenericName);
+
+        if (xName != NULL)
+            xNameTranslatedText = mo->getText(xName);
+
+
+        if (!xFullnameTranslatedText.empty() &&
+                xFullnameTranslatedText != theappname) {
+
+            dictionary[theappname] = xFullnameTranslatedText;
+            g_key_file_free(key_file);
+            delete mo;
+            return dictionary[theappname];
+
         }
 
+        if (!xGenericNameTranslatedText.empty() &&
+                xGenericNameTranslatedText != theappname) {
+
+            dictionary[theappname] = xGenericNameTranslatedText;
+            g_key_file_free(key_file);
+            delete mo;
+            return dictionary[theappname];
+
+        }
+
+         if (!xNameTranslatedText.empty() &&
+                xNameTranslatedText != theappname) {
+
+            dictionary[theappname] = xNameTranslatedText;
+            g_key_file_free(key_file);
+            delete mo;
+            return dictionary[theappname];
+
+        }
+       
+        dictionary[theappname] = theappname;
         g_key_file_free(key_file);
+        delete mo;
 
-
-        return dictionary[appname];
+        return dictionary[theappname];
 
     }
 
-    std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2)
-    {
+    std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2) {
         std::string result = getTitleNameFromDesktopFile(desktopfile);
         if (result == "")
             result = getTitleNameFromDesktopFile(desktopfile2);
