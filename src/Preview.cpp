@@ -536,18 +536,7 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
     }
 
-    //    
-    //    cr->set_source_rgba(1.0, 1.0, 1.8, 0.8);
-    //    Utilities::RoundedRectangle(cr,
-    //            0, 0, this->get_width(), this->get_height(), 6.0);
-    //    cr->fill();
-    //    
 
-    //
-    //    cr->set_source_rgba(0.0, 0.0, 0.8, 0.4);
-    //    Utilities::RoundedRectangle(cr,
-    //            0, 0, this->get_width(), this->get_height(), 6.0);
-    //    cr->fill();
 
 
     if (!m_isActive) {
@@ -684,13 +673,49 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
         auto layout = create_pango_layout(item->m_titlename);
         layout->set_font_description(font);
         //cr->set_source_rgba(1.0, 1.0, 1.0, 1.0); // white text
-        cr->move_to(pos_x + 2, pos_y + 2);
+        cr->move_to(pos_x , pos_y + 2);
         layout->show_in_cairo_context(cr);
         cr->reset_clip(); // Reset the clipping 
 
 
+
+        if (item->m_imageLoadedRequired) {
+            GdkPixbuf *scaledpb = getScaledPixbuf(item);
+
+            if (scaledpb == nullptr) {
+                continue;
+            }
+
+            // show the loaded image. 
+            showPreview(cr, scaledpb, idx);
+
+            // Checks if the image have movement.
+            if (item->isMovementDetected(scaledpb) && !item->m_isDynamic) {
+                item->m_isDynamic = true;
+            }
+
+            // if no movement has been detected, means that the image 
+            // is static and we don't need to reload it again 
+            if (++item->m_frames > 3 && !item->m_isDynamic) {
+                item->m_scaledPixbuf = scaledpb;
+                item->m_frames = 0;
+                item->m_imageLoadedRequired = false;
+            }
+
+            // if the image is static do not unreference the scaledpb.
+            if (item->m_imageLoadedRequired)
+                g_object_unref(scaledpb);
+
+        } else {
+            // show the loaded static image. 
+            showPreview(cr, item->m_scaledPixbuf, idx);
+
+        }
+
+        
+        
         // selector
-        if (m_currentIndex >= 0) {
+        if (m_currentIndex == idx) {
 
             // rectangle background selector
             pos_x = DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * m_currentIndex);
@@ -704,12 +729,9 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
                     theme.forPreviewSelector().background().blue,
                     theme.forPreviewSelector().background().alpha);
 
-            // cr->set_source_rgba(1.0, 1.0, 1.8, 0.08);
             Utilities::RoundedRectangle(cr, pos_x, pos_y, pos_width, pos_height,
                     theme.forPreviewSelector().roundedRatious());
             cr->fill();
-
-
 
             cr->set_source_rgba(
                     theme.forPreviewSelector().foreground().red,
@@ -725,10 +747,6 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
                 cr->stroke();
             } else {
                 
-//                int pos_x = DEF_PREVIEW_LEFT_MARGING + (m_previewWidth * idx);
-//                int y_pos = 16;
-//                int width = m_previewWidth;
-//                int height = m_previewHeight;
                 
                 int value = theme.getPreviewSelectorBinaryValue();
 //                /* Vertical Left*/
@@ -773,8 +791,6 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
             }
 
 
-
-
             cr->set_source_rgba(
                     theme.forPreviewSelectorClose().background().red,
                     theme.forPreviewSelectorClose().background().green,
@@ -801,40 +817,10 @@ bool Preview::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
 
         }
-
-        if (item->m_imageLoadedRequired) {
-            GdkPixbuf *scaledpb = getScaledPixbuf(item);
-
-            if (scaledpb == nullptr) {
-                continue;
-            }
-
-            // show the loaded image. 
-            showPreview(cr, scaledpb, idx);
-
-            // Checks if the image have movement.
-            if (item->isMovementDetected(scaledpb) && !item->m_isDynamic) {
-                item->m_isDynamic = true;
-            }
-
-            // if no movement has been detected, means that the image 
-            // is static and we don't need to reload it again 
-            if (++item->m_frames > 3 && !item->m_isDynamic) {
-                item->m_scaledPixbuf = scaledpb;
-                item->m_frames = 0;
-                item->m_imageLoadedRequired = false;
-            }
-
-            // if the image is static do not unreference the scaledpb.
-            if (item->m_imageLoadedRequired)
-                g_object_unref(scaledpb);
-
-        } else {
-            // show the loaded static image. 
-            showPreview(cr, item->m_scaledPixbuf, idx);
-
-        }
-
+        
+        
+        
+        
         idx++;
     }
     return Gtk::Window::on_draw(cr);

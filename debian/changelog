@@ -1,3 +1,9 @@
+docklight (1.0-15) UNRELEASED; urgency=medium
+
+  * Buf Fix in selector background alpha channel 
+
+ -- yoo <yoo@osx.odx.com>  Mon, 20 Feb 2017 19:49:56 +0700
+
 docklight (1.0-14) UNRELEASED; urgency=medium
 
   * add Languages es,de,th

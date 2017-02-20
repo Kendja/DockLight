@@ -1595,46 +1595,6 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
                 }
 
-                /* Vertical Left*/
-                /*
-                cr->move_to(col,DEF_CELLTOPMARGIN );
-                cr->set_line_width(theme.forPanel().lineWith());
-                cr->line_to(col, DEF_CELLTOPMARGIN);
-                cr->line_to(col, DEF_CELLTOPMARGIN+m_cellheight);
-                cr->stroke();
-                 */
-
-                /* Vertical Right*/
-                /*
-                cr->move_to(col+m_cellwidth ,DEF_CELLTOPMARGIN );
-                cr->set_line_width(theme.forPanel().lineWith());
-                cr->line_to(col+m_cellwidth , DEF_CELLTOPMARGIN);
-                cr->line_to(col+m_cellwidth , DEF_CELLTOPMARGIN+m_cellheight);
-                cr->stroke();
-                 */
-                /* TOP
-                cr->set_line_width(theme.forPanel().lineWith());
-                cr->move_to(col ,DEF_CELLTOPMARGIN );
-                cr->line_to(col+4 , DEF_CELLTOPMARGIN);
-                cr->line_to(col + m_cellwidth-4, DEF_CELLTOPMARGIN);
-                cr->stroke();
-                 */
-
-
-
-                //                int mask =  1 << value;
-                //                int masked_n = 1 & mask;
-                //                int thebit = masked_n >> value;
-                //                
-
-                //  int mask = (1 >> value) & 1;
-
-                //
-                //                cr->set_line_width(theme.forPanel().lineWith());
-                //                cr->move_to(col, DEF_CELLTOPMARGIN + m_cellheight);
-                //                cr->line_to(col + 4, DEF_CELLTOPMARGIN + m_cellheight);
-                //                cr->line_to(col + m_cellwidth - 4, DEF_CELLTOPMARGIN + m_cellheight);
-                //                cr->stroke();
             }
 
         }
@@ -1690,7 +1650,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
 
     // Selector
-    if (m_currentMoveIndex != -1/* && m_mouseIn*/) {
+    if (m_currentMoveIndex != -1 ) {
 
         int col = center - (m_dockitems.size() * m_cellwidth) / 2;
         int pos_x = col + (m_cellwidth / 2) + (m_cellwidth * m_currentMoveIndex) - m_cellwidth / 2;
