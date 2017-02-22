@@ -40,6 +40,7 @@
 #include "About.h"
 #include "DragDropWindow.h"
 #include "Preferences.h"
+#include "SessionWindow.h"
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -59,10 +60,9 @@ public:
         return m_currentMoveIndex;
     };
 
-    //static bool m_launcherWnckWindowSet;
-    //static WnckWindow* m_launcherWnckWindow;
     LauncherWindow* m_launcherWindow;
     Preferences* m_preferences;
+    SessionWindow* m_sessionWindow;
 
     bool ispopupMenuActive();
 private:
@@ -79,6 +79,7 @@ private:
     static void setItemImdexFromActiveWindow();
     static void updateSessioWindow(WnckWindow *window);
     void CreateSessionDockItemGrp();
+    
     void attachToSessiongrp();
     int getNextSessionGrpNumber(); 
 
@@ -114,6 +115,7 @@ private:
     void SelectWindow(int index, GdkEventButton * event);
     void createLauncher(DockItem* item);
     void createPreferences();
+    void createSessionWindow();
 
     void on_QuitMenu_event();
     void on_AboutMenu_event();

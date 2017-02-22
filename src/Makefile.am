@@ -48,8 +48,6 @@ docklight_SOURCES =  \
  DockPosition.h \
  LauncherWindow.cpp \
  LauncherWindow.h \
- WindowControl.cpp \
- WindowControl.h \
  Configuration.h \
  Configuration.cpp \
  Preferences.cpp \
@@ -58,6 +56,10 @@ docklight_SOURCES =  \
  MoReader.cpp \
  About.cpp \
  About.h \
+ WindowControl.cpp \
+ WindowControl.h \
+ SessionWindow.h \
+ SessionWindow.cpp \
  main.cpp \
  $(NULL)
 

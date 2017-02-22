@@ -26,11 +26,22 @@
 #include "Utilities.h"
 #include <libwnck/libwnck.h>
 
-class DockItem;
-
 namespace Launcher
 {
-    bool Launch(DockItem* item);
+    
+    bool Launch(const std::string& appname);
+    bool Launch(const char* appname);
+    bool Launch(const char* applicationName, const char* parameters);
+    
+    gboolean getDesktopFile(GKeyFile *key_file, const char* appname);
+    
+    std::string getAppNameByWindow(WnckWindow* window);
+   gboolean getAppNameByWindow(WnckWindow* window,
+            std::string& the_appname,
+            std::string& the_instancename,
+            std::string& the_groupname,
+            std::string& the_titlename);
+    
     std::string getTitleNameFromDesktopFile(std::string desktopfile);
     std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2 );
     std::string getWindowTitle(WnckWindow *window);

@@ -80,7 +80,7 @@ m_labelCategories(_("Categories: ")),
 m_Button_close(_("Close"))
 {
 
-    set_title(_("DockLight Launcher"));
+    set_title(_("Docklight Launcher"));
     set_size_request(440, 300);
     this->set_resizable(false);
     this->set_keep_above(true);
@@ -102,6 +102,9 @@ m_Button_close(_("Close"))
     m_FrameTop.add(m_labeInfo);
     m_FrameTop.set_size_request(-1, 50);
     m_FrameTop.set_margin_bottom(10);
+    
+   // m_Frame.set_size_request(-1, 50);
+   // m_Frame.set_margin_top(10);
 
     m_VBox.add(m_Frame);
     m_Frame.add(m_grid);

@@ -66,6 +66,7 @@ private:
     Gtk::CheckButton m_CheckButton_Autohide;
     
     Gtk::ScrolledWindow m_ScrolledWindow;
+    
 };
 
 

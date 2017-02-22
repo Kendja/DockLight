@@ -26,7 +26,8 @@
 #include <glibmm/i18n.h>
 #include "MoReader.h"
 
-namespace Launcher {
+namespace Launcher
+{
     std::map<std::string, std::string> dictionary = {
         {"Gpk-update-viewer", _("Gpk-update-viewer")},
         {"Gpk-application", _("Gpk-application")}
@@ -35,82 +36,186 @@ namespace Launcher {
 
     /**
      * Launch an application from a desktop file or from bash.
-     * @param DockItem* item
+     * @param applicationName
+     * @return true the application has been launched,
+     * false (application not found or other error)
      */
-    bool Launch(DockItem* item) {
-        std::string lowerrealgroupname(Utilities::stringToLower(item->m_realgroupname.c_str()));
+    bool Launch(const std::string& appname)
+    {
+        return Launch(appname.c_str(), NULL);
+    }
 
-        // Extract  desktop file.
-        std::size_t foundspace = lowerrealgroupname.find(" ");
-        if (foundspace > 0) {
-            std::string s = lowerrealgroupname;
-            std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
-            std::string msg = "Expected Desktop file : \n" + s + "\n";
-#pragma GCC diagnostic ignored "-Wformat-security"
-            g_print(msg.c_str());
+    /**
+     * Launch an application from a desktop file or from bash.
+     * @param applicationName
+     * @return true the application has been launched,
+     * false (application not found or other error)
+     */
 
-            lowerrealgroupname = s;
-        }
+    bool Launch(const char* appname)
+    {
+        return Launch(appname, NULL);
+    }
 
-        char command[PATH_MAX];
-        *command = 0;
-
-        // GDesktopAppInfo *desktop_info;
+    /**
+     * Launch an application from a desktop file or from bash.
+     * @param applicationName
+     * @param parameters
+     * @return true the application has been launched,
+     * false (application not found or other error)
+     */
+    bool Launch(const char* applicationName, const char* parameters)
+    {
         GError *error = NULL;
         GAppLaunchContext *context = NULL;
         GAppInfo *app_info = NULL;
+        GKeyFile *key_file = g_key_file_new();
+        char command[PATH_MAX];
+        *command = 0;
 
-        sprintf(command, "%s.desktop", lowerrealgroupname.c_str());
-        app_info = (GAppInfo*) g_desktop_app_info_new(command);
-        if (app_info == NULL) {
-            g_warning("Launcher could not locate desktop file : %s\n", command);
-            sprintf(command, "\"%s\"", lowerrealgroupname.c_str());
-            // Launch from command line
-            if (g_spawn_command_line_async(command, &error)) {
-                return true;
-            }
+        std::string appname(applicationName);
+        std::replace(appname.begin(), appname.end(), ' ', '-');
 
-            if (error) {
-                g_warning("Launcher could not execute: %s: Error: %s\n", command, error->message);
-                g_error_free(error);
-                error = NULL;
-            }
+        if (getDesktopFile(key_file, appname.c_str())) {
+            app_info = (GAppInfo*) g_desktop_app_info_new_from_keyfile(key_file);
+            if (app_info != NULL) {
+                char* uri = NULL;
+                GFile* file = NULL;
+                GList *glist_parameters = NULL;
 
-        } else {
-            // Launch desktop file
-            GdkDisplay *display = gdk_display_get_default();
-            context = (GAppLaunchContext*) gdk_display_get_app_launch_context(display);
-            if (g_app_info_launch(app_info, NULL, context, &error)) {
+                if (parameters != NULL && g_app_info_supports_uris(app_info)) {
+                    file = g_file_new_for_commandline_arg(parameters);
+                    uri = g_file_get_uri(file);
+                    glist_parameters = g_list_append(glist_parameters, uri);
+                }
+
+                GdkDisplay *display = gdk_display_get_default();
+                context = (GAppLaunchContext*) gdk_display_get_app_launch_context(display);
+                gboolean launched = g_app_info_launch_uris(app_info, glist_parameters, context, &error);
+
+                if (error) {
+                    g_warning("Launcher: Error %s %s \n", appname.c_str(), error->message);
+                    g_error_free(error);
+                    error = NULL;
+                }
 
                 g_object_unref(app_info);
                 g_object_unref(context);
 
-                return true;
-            }
-            if (error) {
-                g_warning("Failed to launch desktop file %s: Error: %s", command, error->message);
-                g_error_free(error);
-                error = NULL;
-            }
+                if (uri != NULL)
+                    g_free(uri);
 
-            g_object_unref(app_info);
-            if (context != NULL)
-                g_object_unref(context);
+                if (file != NULL)
+                    g_object_unref(file);
+
+                g_key_file_free(key_file);
+                return launched;
+            }
         }
 
-        g_critical("Launcher not found: %s.desktop\n", lowerrealgroupname.c_str());
-        return false;
+        std::string lowerappname(Utilities::stringToLower(appname.c_str()));
+        if (parameters == NULL)
+            sprintf(command, "\"%s\"", lowerappname.c_str());
+        else
+            sprintf(command, "\"%s\" %s", lowerappname.c_str(), parameters);
+
+        gboolean launched = g_spawn_command_line_async(command, &error);
+        if (error) {
+            g_warning("Launcher: Error %s %s \n", appname.c_str(), error->message);
+            g_error_free(error);
+            error = NULL;
+        }
+        g_key_file_free(key_file);
+        return launched && error == NULL;
     }
 
-    gboolean getDesktopFile(GKeyFile *key_file, const char* appname) {
+            
+    /**
+     * Get the Application names
+     * @param window
+     * @param std::string& the_appname
+     * @param std::string& the_instancename
+     * @param std::string& the_groupname
+     * @param std::string& the_titlename
+     * @return TRUE if the window is not a docklight instance.
+     */
+    gboolean getAppNameByWindow(WnckWindow* window,
+            std::string& the_appname,
+            std::string& the_instancename,
+            std::string& the_groupname,
+            std::string& the_titlename)
+    {
+        const std::string extensions[] = {".py", ".exe", ".sh"};
+        // Checks whether or not the window has a name. wnck_window_get_name() 
+        // will always return some value, even if window has no name set;
+        const char* _appname = wnck_window_get_name(window);
+
+        std::string appname(_appname);
+        // Returns the class instance name for window , or NULL if window has no class instance.
+        const char* _instancename = wnck_window_get_class_instance_name(window);
+        if (_instancename == NULL) {
+            _instancename = _appname;
+        }
+
+        std::string instancename(_instancename);
+        instancename = Utilities::removeExtension(instancename, extensions);
+
+        // Returns the class group name for window , or NULL if window belongs to no class group.
+        const char* _realgroupname = wnck_window_get_class_group_name(window);
+        if (_realgroupname == NULL) {
+            _realgroupname = _appname;
+        }
+
+        std::string realgroupname(_realgroupname);
+        realgroupname = Utilities::removeExtension(realgroupname, extensions);
+        std::replace(realgroupname.begin(), realgroupname.end(), ' ', '-');
+
+        if (realgroupname == "Wine")
+            realgroupname = instancename;
+
+        if (instancename == DOCKLIGHT_INSTANCENAME)
+            return FALSE;
+
+        the_appname = appname;
+        the_instancename = instancename;
+        the_groupname = realgroupname;
+        the_titlename = Launcher::getTitleNameFromDesktopFile(realgroupname, instancename);
+
+        return TRUE;
+    }
+
+    /**
+     * Get the Application names
+     * @param window
+     * @return TRUE if the window is not a docklight instance.
+     */
+    std::string getAppNameByWindow(WnckWindow* window)
+    {
+
+        std::string the_appname;
+        std::string the_instancename;
+        std::string the_groupname;
+        std::string the_titlename;
+
+
+        return getAppNameByWindow(window, the_appname,
+                the_instancename, the_groupname, the_titlename) == TRUE ?
+                the_groupname : "";
+    }
+
+    /**
+     * read a desktop file by Application Name
+     * @param key_file
+     * @param appname
+     * @return true desktop file found, false desktop could not be found.
+     */
+    gboolean getDesktopFile(GKeyFile *key_file, const char* appname)
+    {
 
         if (appname == NULL)
             return FALSE;
 
-        if (appname == "Untitled Window")
-            return FALSE;
-
-        if (appname == "untitled window")
+        if (appname == "Untitled window")
             return FALSE;
 
         if (appname == "Wine")
@@ -157,7 +262,13 @@ namespace Launcher {
         return true;
     }
 
-    std::string getTitleNameFromDesktopFile(const std::string appname) {
+    /**
+     * gets the Application Name from a Desktop file
+     * @param appname
+     * @return the Application Name (Translated)
+     */
+    std::string getTitleNameFromDesktopFile(const std::string appname)
+    {
 
         std::string theappname(appname);
         std::replace(theappname.begin(), theappname.end(), ' ', '-');
@@ -352,7 +463,8 @@ namespace Launcher {
 
     }
 
-    std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2) {
+    std::string getTitleNameFromDesktopFile(std::string desktopfile, std::string desktopfile2)
+    {
         std::string result = getTitleNameFromDesktopFile(desktopfile);
         if (result == "")
             result = getTitleNameFromDesktopFile(desktopfile2);
