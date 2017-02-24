@@ -3,6 +3,7 @@
 #include "DockPanel.h"
 #include "WindowControl.h"
 #include  <glibmm/i18n.h>
+#include <cstdio>
 
 
 WnckWindow* SessionWindow::m_activeWindow;
@@ -12,6 +13,7 @@ bool SessionWindow::m_deleteSet;
 ListRow::ListRow(
         const Glib::ustring& appname,
         const Glib::ustring& parameters,
+        const Glib::ustring& titlename,
         Glib::RefPtr<Gdk::Pixbuf> appIcon)
 :
 m_HBox(Gtk::ORIENTATION_HORIZONTAL),
@@ -22,6 +24,8 @@ m_launchButton(_("Launch")),
 m_grid()
 {
     if (!appname.empty()) {
+
+        this->m_titlename = titlename;
 
         m_parameters.set_text(parameters);
         m_parameters.set_max_length(MAX_INPUT);
@@ -131,7 +135,7 @@ m_ListBox()
     WnckScreen *wnckscreen = wnck_screen_get_default();
     g_signal_connect(wnckscreen, "active_window_changed",
             G_CALLBACK(SessionWindow::on_active_window_changed_callback), NULL);
-    
+
     signal_getactive().connect(sigc::mem_fun(*this,
             &SessionWindow::on_signal_getactive));
 
@@ -142,26 +146,58 @@ SessionWindow::~SessionWindow()
 {
     auto children = m_ListBox.get_children();
     for (int i = children.size() - 1; i >= 0; i--) {
-        ListRow* row = (ListRow* )m_ListBox.get_row_at_index(i);
+        ListRow* row = (ListRow*) m_ListBox.get_row_at_index(i);
         delete row;
-        
-        g_print("DELETED\n");
     }
-    
+
 }
 
-void SessionWindow::init(DockPanel& panel,const int id)
+void SessionWindow::init(DockPanel& panel, const int id)
 {
     this->m_panel = &panel;
     char buff[100];
-    sprintf(buff,_("Session Group %d"), id);
+    sprintf(buff, _("Session group %d"), id);
     this->set_title(buff);
+
+    sprintf(buff, "Session-group-%d", id);
+    m_sessiongrpname = buff;
     m_deleteSet = false;
+
+    FILE* f;
+    f = fopen(getFilePath().c_str(), "rb");
+    if (!f)
+        return;
+
+    struct sessionGrpData st;
+    GdkPixbufLoader *loader;
+    GdkPixbuf *pixbuf;
+
+    while (1) {
+        fread(&st, sizeof (st), 1, f);
+        if (feof(f) != 0)
+            break;
+
+        loader = gdk_pixbuf_loader_new();
+        gdk_pixbuf_loader_write(loader, st.pixbuff, sizeof (st.pixbuff), NULL);
+        pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+        auto gpixbuff = IconLoader::PixbufConvert(pixbuf);
+
+        auto row = Gtk::manage(new ListRow(
+                st.appname,
+                st.parameters,
+                st.titlename,
+                gpixbuff));
+
+        m_ListBox.append(*row);
+    }
+
+    m_ListBox.show_all();
+    fclose(f);
+
 }
 
 bool SessionWindow::on_delete_event(GdkEventAny* event)
 {
-
     m_deleteSet = true;
 
     this->m_panel->m_sessionWindow = nullptr;
@@ -192,28 +228,79 @@ void SessionWindow::addToList()
     appIcon = appIcon->scale_simple(DEF_ICONSIZE,
             DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
 
+    std::string the_appname;
+    std::string the_instancename;
+    std::string the_groupname;
+    std::string the_titlename;
+
+    if (Launcher::getAppNameByWindow(m_window,
+            the_appname,
+            the_instancename,
+            the_groupname,
+            the_titlename) == FALSE) {
+        return;
+    }
+
     auto row = Gtk::manage(new ListRow(
-            m_EntryAppName.get_text(), "", appIcon));
+            m_EntryAppName.get_text(), "",the_appname, appIcon));
 
     m_ListBox.append(*row);
     m_ListBox.show_all();
 }
 
+Glib::ustring SessionWindow::getFilePath()
+{
+    char filename[PATH_MAX];
+    std::string thispath = Utilities::getExecPath();
+    sprintf(filename, "%s/%s/%s.bin", thispath.c_str(),
+            DEF_ATTACHMENTDIR, m_sessiongrpname.c_str());
+
+    return filename;
+}
+
 void SessionWindow::save()
 {
-    
-    auto children = m_ListBox.get_children();
-    int idx = 0;
-    for( auto r : children ){
+    FILE* f;
+    f = fopen(getFilePath().c_str(), "wb");
+    if (!f)
+        return;
+
+    gchar* iconBuffer;
+    gsize buffer_size;
+    GError *error = NULL;
+    struct sessionGrpData st;
+    int i;
+    int maxrows = m_ListBox.get_children().size();
+    for (i = 0; i < maxrows; i++) {
+        ListRow* row = (ListRow*) m_ListBox.get_row_at_index(i);
+        Glib::RefPtr<Gdk::Pixbuf> appIcon = row->get_pixbuf();
+        GdkPixbuf *pixbuf = appIcon->gobj();
+        if (!gdk_pixbuf_save_to_buffer(pixbuf, &iconBuffer,
+                &buffer_size, "png", &error, NULL, "100", NULL)) {
+
+            if (error) {
+                g_error_free(error);
+                error = NULL;
+            }
+
+            continue;
+        }
+
+        std::string appname = row->get_appname();
+        std::string parameters = row->get_parameters();
+        std::string titlename = row->get_titlename();
         
-        ListRow* row = (ListRow* )m_ListBox.get_row_at_index(idx);
-        
-        g_print("Row %s %d\n", row->get_appname().c_str(), idx);
-        idx++;
+
+        memcpy(st.pixbuff, iconBuffer, buffer_size);
+        strcpy(st.appname, appname.c_str());
+        strcpy(st.parameters, parameters.c_str());
+        strcpy(st.titlename, titlename.c_str());
+
+        fwrite(&st, sizeof (st), 1, f);
     }
-    
-    
-   // this->close();
+
+    fclose(f);
+
 }
 
 SessionWindow::type_signal_getactive SessionWindow::signal_getactive()

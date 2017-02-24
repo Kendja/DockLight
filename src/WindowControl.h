@@ -33,6 +33,14 @@
 
 namespace WindowControl
 {
+    struct windowData
+    {
+        WnckWindow* window = nullptr;
+        char appname[60] = {'\0'};
+        char titlename[PATH_MAX] = {'\0'};
+        
+    };
+    
     void HomeCloseAllExceptActive();
     void HomeCloseAllWindows();
     void HomeMinimizeAll();
@@ -64,6 +72,9 @@ namespace WindowControl
     
     
     WnckWindow* getActive();
+    WnckWindow* getWindowByName(const std::string& appname,std::string& tittle);
+    int getWindowsByName(const std::string& appname, std::vector<windowData>& data);
+    
     bool isWindowExists(XID xid);
     
     void hideWindow(Gtk::Window* instance);

@@ -8,7 +8,6 @@
 #ifndef SESSIONWINDOW_H
 #define	SESSIONWINDOW_H
 
-
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE  1
 
 #include "Utilities.h"
@@ -30,33 +29,48 @@
 
 class DockPanel;
 
-
 #define DEF_BUTTON_ADDTOLIST 3
 #define DEF_BUTTON_OK 4
 #define DEF_BUTTON_CANCEL 5
+
+struct sessionGrpData
+{
+    guint8 pixbuff[ 1024 * 6 ]={0};
+    char appname[60]={'\0'};
+    char parameters[MAX_INPUT]={'\0'};
+    char titlename[MAX_INPUT]={'\0'};
+};
 
 class ListRow : public Gtk::ListBoxRow
 {
 public:
     ListRow(const Glib::ustring& appname,
             const Glib::ustring& parameters,
+            const Glib::ustring& titlename,
             Glib::RefPtr<Gdk::Pixbuf> appIcon);
 
     Glib::ustring get_appname() const
     {
         return m_appname.get_text();
     }
+
     Glib::ustring get_parameters() const
     {
         return m_parameters.get_text();
     }
 
+    Glib::ustring get_titlename() const
+    {
+        return m_titlename;
+    }
     
+    Glib::RefPtr<Gdk::Pixbuf> get_pixbuf()
+    {
+        return m_image.get_pixbuf();
+    }
 protected:
     void on_launch_button_clicked(ListRow& row);
 private:
-
-    
     Gtk::Button m_launchButton;
     Gtk::Image m_image;
     Gtk::Grid m_grid;
@@ -65,6 +79,8 @@ private:
     Gtk::Box m_HBox;
     Gtk::Label m_appname;
     
+    Glib::ustring m_titlename;
+
 };
 
 class SessionWindow : public Gtk::Window
@@ -73,7 +89,7 @@ public:
 
     SessionWindow();
     ~SessionWindow();
-    void init(DockPanel& panel, const int id );
+    void init(DockPanel& panel, const int id);
 
 protected:
     // Signal handlers.
@@ -92,39 +108,27 @@ private:
     static type_signal_getactive m_signal_getactive;
     void on_signal_getactive(WnckWindow* window);
 
+    Glib::ustring getFilePath() ;
     void save();
     void addToList();
-   
-   
 
     WnckWindow* m_window = nullptr;
     DockPanel* m_panel;
     static bool m_deleteSet;
+    std::string m_sessiongrpname;
 
     // Member data.
     Gtk::Grid m_grid;
     Gtk::Box m_VBox;
     Gtk::Box m_HBox;
     Gtk::Box m_HBoxBottom;
-
     Gtk::Label m_labelAddActive;
-    
-
-
     Gtk::Entry m_EntryAppName;
-   
-
     Gtk::Button m_OkButton;
     Gtk::Button m_CancelButton;
-
-
-   
     Gtk::Button m_AddToGroupButton;
-
     Gtk::ScrolledWindow m_ScrolledWindow;
     Gtk::ListBox m_ListBox;
-
-
 
 };
 

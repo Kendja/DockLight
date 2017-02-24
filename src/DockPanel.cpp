@@ -27,7 +27,7 @@
 #include "WindowControl.h"
 #include "Configuration.h"
 #include "Launcher.h"
-
+#include "SessionWindow.h"
 
 
 #include  <glibmm/i18n.h>
@@ -41,6 +41,8 @@
 
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
+std::vector<sessionGrpData> DockPanel::m_sessiondata;
+DockItem* DockPanel::m_currentsessionItem;
 int DockPanel::m_currentMoveIndex;
 bool DockPanel::m_previewWindowActive;
 bool DockPanel::m_dragdropsStarts;
@@ -70,6 +72,7 @@ m_SessionGrpIconFilePath(Utilities::getExecPath(DEF_SEISSIONICONNAME)),
 m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
 {
 
+    DockPanel::m_currentsessionItem = nullptr;
     DockPanel::m_dragdropsStarts = false;
     DockPanel::m_currentMoveIndex = -1;
 
@@ -820,9 +823,7 @@ void DockPanel::on_menuNew_event()
     DockItem* item = m_dockitems.at(index);
 
     if (item->m_dockitemSesssionGrpId > 0) {
-
         createSessionWindow();
-        
         return;
 
     }
@@ -851,13 +852,13 @@ void DockPanel::on_AttachToDock_event()
     sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
             m_currentMoveIndex,
             s.c_str());
-//
-//    if( dockitem->m_dockitemSesssionGrpId > 0 ) {
-//        sprintf(filename, "%s/%2d_%s-%d.png", m_applicationAttachmentsPath.c_str(),
-//            m_currentMoveIndex,
-//            s.c_str(),dockitem->m_dockitemSesssionGrpId);
-//    } 
-    
+    //
+    //    if( dockitem->m_dockitemSesssionGrpId > 0 ) {
+    //        sprintf(filename, "%s/%2d_%s-%d.png", m_applicationAttachmentsPath.c_str(),
+    //            m_currentMoveIndex,
+    //            s.c_str(),dockitem->m_dockitemSesssionGrpId);
+    //    } 
+
     dockitem->m_isAttached = true;
     dockitem->m_isDirty = true;
     dockitem->m_image->save(filename, "png");
@@ -1088,7 +1089,7 @@ void DockPanel::updateSessioWindow(WnckWindow *window)
 {
 
     for (DockItem* item : m_dockitems) {
-        if (item->m_dockitemSesssionGrpId > 0 ) {
+        if (item->m_dockitemSesssionGrpId > 0) {
             for (int i = item->m_items.size() - 1; i >= 0; i--) {
                 DockItem* child = item->m_items[i];
                 if (child->m_window == window) {
@@ -1154,73 +1155,67 @@ void DockPanel::setItemImdexFromActiveWindow()
         m_currentMoveIndex = -1;
 }
 
-void DockPanel::attachToSessiongrp()
+void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parameters)
 {
-
-
-    WnckWindow* window = WindowControl::getActive();
     if (window == nullptr)
         return;
 
-    // Prevent same window instance.
-    for (DockItem* items : m_dockitems) {
-        for (DockItem* child : items->m_items) {
-            if (items->m_dockitemSesssionGrpId > 0 &&
-                    child->m_window == window) {
-                return;
-            }
+
+    for (DockItem* child : m_currentsessionItem->m_items) {
+        if (child->m_window == window) {
+            g_warning("DOUBLE INDTANCE\n");
+            return;
         }
     }
 
+    // Prevent same window instance.
+    //    for (DockItem* items : m_dockitems) {
+    //        for (DockItem* child : items->m_items) {
+    //            if (items->m_dockitemSesssionGrpId > 0 &&
+    //                    child->m_window == window) {
+    //                g_warning("DOUBLE INDTANCE\n");
+    //                return;
+    //            }
+    //        }
+    //    }
 
-    const std::string extensions[] = {".py", ".exe", ".sh"};
 
-    const char* _appname = wnck_window_get_name(window);
-    if (_appname == NULL) {
-        g_print("Update: No Application name....\n");
+    std::string the_appname;
+    std::string the_instancename;
+    std::string the_groupname;
+    std::string the_titlename;
+
+    if (Launcher::getAppNameByWindow(window,
+            the_appname,
+            the_instancename,
+            the_groupname,
+            the_titlename) == FALSE) {
+        g_warning("NAME RETURN\n");
         return;
     }
-    std::string appname(_appname);
 
-    const char* _instancename = wnck_window_get_class_instance_name(window);
-    if (_instancename == NULL) {
-        _instancename = _appname;
+
+    // g_print("COMPARE >>>app %s, param %s\n",the_appname.c_str(),parameters.c_str() );
+
+    //auto const pos = parameters.find_last_of('/');
+    // if(parameters.empty() || 
+    //        ( !parameters.empty() && the_appname ==  parameters.substr(pos+1) ) )
+    {
+
+        DockItem* dockItem = m_currentsessionItem;
+        DockItem* childItem = new DockItem();
+
+        childItem->m_appname = the_appname;
+        childItem->m_titlename = the_titlename;
+        childItem->m_realgroupname = the_groupname;
+        childItem->m_instancename = the_instancename;
+        childItem->m_window = window;
+        childItem->m_xid = childItem->m_xid = wnck_window_get_xid(window);
+        childItem->m_image = NULLPB;
+
+        dockItem->m_items.push_back(childItem);
+        //dockItem.push_back(std::move(childItem));
     }
-
-    std::string instancename(_instancename);
-    instancename = Utilities::removeExtension(instancename, extensions);
-
-    const char* _realgroupname = wnck_window_get_class_group_name(window);
-    if (_realgroupname == NULL) {
-        _realgroupname = _appname;
-    }
-
-    std::string realgroupname(_realgroupname);
-    realgroupname = Utilities::removeExtension(realgroupname, extensions);
-
-    std::string titlename =
-            Launcher::getTitleNameFromDesktopFile(instancename, realgroupname);
-
-    if (realgroupname == "Wine")
-        realgroupname = instancename;
-
-    DockItem* dockItem = m_dockitems.at(m_currentMoveIndex);
-    DockItem* childItem = new DockItem();
-
-    childItem->m_appname = appname;
-    childItem->m_titlename = titlename;
-    childItem->m_realgroupname = instancename;
-    childItem->m_instancename = instancename;
-    childItem->m_window = window;
-    childItem->m_xid = childItem->m_xid = wnck_window_get_xid(window);
-    childItem->m_image = NULLPB;
-
-
-
-
-    dockItem->m_items.push_back(childItem);
-    //dockItem.push_back(std::move(childItem));
-
 
 }
 
@@ -1258,7 +1253,7 @@ void DockPanel::CreateSessionDockItemGrp()
     int number = getNextSessionGrpNumber();
     dockItem->m_dockitemSesssionGrpId = number;
     dockItem->m_isAttached = false;
-    dockItem->m_appname = "session-group-"+number;
+    dockItem->m_appname = "session-group-" + number;
 
     char buff[100];
     sprintf(buff, _("Session-group %d"), number);
@@ -1266,10 +1261,10 @@ void DockPanel::CreateSessionDockItemGrp()
 
     sprintf(buff, "Session-group-%d", number);
     dockItem->m_realgroupname = buff;
-    
+
     sprintf(buff, "session-group-%d", number);
     dockItem->m_instancename = buff;
-    
+
     dockItem->m_window = NULL;
     dockItem->m_xid = 0;
 
@@ -1296,7 +1291,6 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
     }
 
 
-
     if (actiontype == Window_action::OPEN) {
 
         std::string the_appname;
@@ -1320,11 +1314,17 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
                 the_titlename.c_str());
 
 
-
-
+        if (m_currentsessionItem != nullptr && m_sessiondata.size() > 0) {
+            for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
+                std::string appname(m_sessiondata[i].appname);
+                if (appname == the_groupname) {
+                    m_sessiondata.erase(m_sessiondata.begin() + i);
+                    attachToSessiongrp(window, "");
+                }
+            }
+        }
 
         Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
-
         appIcon = IconLoader::GetWindowIcon(window);
         appIcon = appIcon->scale_simple(DEF_ICONSIZE,
                 DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
@@ -1783,14 +1783,53 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
     if (index < 1)
         return;
 
-    DockItem * dockitem = m_dockitems.at(index);
-    int itemscount = dockitem->m_items.size();
+    DockItem* dockitem = m_dockitems.at(index);
 
+    m_currentsessionItem = nullptr;
+    m_sessiondata.clear();
 
+    // Check session group
     if (dockitem->m_dockitemSesssionGrpId > 0 && dockitem->m_items.size() == 0) {
+        m_currentsessionItem = dockitem;
+        if (Launcher::getSessionGroupData(m_sessiondata, m_currentsessionItem->m_realgroupname.c_str()) > 0) {
+            std::vector<WindowControl::windowData> existingWindows;
+            for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
+                std::string appname = m_sessiondata[i].appname;
+                std::string titlename = m_sessiondata[i].titlename;
+
+                int n = WindowControl::getWindowsByName(appname, existingWindows);
+                if (n == 0)
+                    continue;
+
+                for (int x = existingWindows.size() - 1; x >= 0; x--) {
+                    std::string appname2 = existingWindows[x].appname;
+                    std::string titlename2 = existingWindows[x].titlename;
+
+                    if (appname != appname2)
+                        continue;
+                    
+                    if( titlename == titlename2 ) {
+                        m_sessiondata.erase(m_sessiondata.begin() + i);
+                        attachToSessiongrp(existingWindows[x].window, "");
+                        break;
+                    }
+                }
+            }
+
+            g_print("LEFT %d\n",m_sessiondata.size());
+            for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
+                  Launcher::Launch( m_sessiondata[i].appname, m_sessiondata[i].parameters);
+            }
+           
+
+        } else {
+            createSessionWindow();
+
+        }
         return;
     }
 
+    int itemscount = dockitem->m_items.size();
     if (itemscount == 0 && dockitem->m_isAttached) {
         if (!Launcher::Launch(dockitem->m_realgroupname)) {
             createLauncher(dockitem);
@@ -1847,7 +1886,7 @@ int DockPanel::loadAttachments()
 
     struct dirent* hFile;
     errno = 0;
-    
+
     while ((hFile = readdir(dirFile)) != NULL) {
         if (!strcmp(hFile->d_name, ".")) continue;
         if (!strcmp(hFile->d_name, "..")) continue;
@@ -1900,21 +1939,21 @@ int DockPanel::loadAttachments()
 
             std::string::size_type p = appname.find("Session-group-");
             if (p != std::string::npos) {
-                p+= appname.length()-1 ;
-                int sessionnumber = atoi( appname.substr(p,2).c_str() );
-                
+                p += appname.length() - 1;
+                int sessionnumber = atoi(appname.substr(p, 2).c_str());
+
                 char buffer[100];
                 sprintf(buffer, _("Session-group %d"), sessionnumber);
                 item->m_titlename = buffer;
-                
+
                 sprintf(buffer, "Session-group-%d", sessionnumber);
                 item->m_realgroupname = buffer;
-                
+
                 sprintf(buffer, "session-group-%d", sessionnumber);
                 item->m_instancename = buffer;
-                
+
                 item->m_dockitemSesssionGrpId = sessionnumber;
-               
+
             }
 
 
@@ -1938,7 +1977,7 @@ int DockPanel::loadAttachments()
             item->m_isDirty = true;
 
             m_dockitems.push_back(item);
-            
+
         }
     }
 
@@ -2008,7 +2047,7 @@ void DockPanel::createSessionWindow()
     if (m_sessionWindow == nullptr) {
         m_sessionWindow = new SessionWindow();
         DockItem* dockitem = m_dockitems.at(m_currentMoveIndex);
-        m_sessionWindow->init(*this,dockitem->m_dockitemSesssionGrpId);
+        m_sessionWindow->init(*this, dockitem->m_dockitemSesssionGrpId);
         m_sessionWindow->show_all();
     }
 

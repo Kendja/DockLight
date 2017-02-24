@@ -79,8 +79,10 @@ private:
     static void setItemImdexFromActiveWindow();
     static void updateSessioWindow(WnckWindow *window);
     void CreateSessionDockItemGrp();
+    static std::vector<sessionGrpData> m_sessiondata;
+    static DockItem* m_currentsessionItem;
     
-    void attachToSessiongrp();
+    static void attachToSessiongrp(WnckWindow* window,const std::string& parameters);
     int getNextSessionGrpNumber(); 
 
     std::string m_applicationpath;

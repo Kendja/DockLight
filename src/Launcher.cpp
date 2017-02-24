@@ -25,9 +25,12 @@
 #include <map>
 #include <glibmm/i18n.h>
 #include "MoReader.h"
+#include <vector>
+
 
 namespace Launcher
 {
+
     std::map<std::string, std::string> dictionary = {
         {"Gpk-update-viewer", _("Gpk-update-viewer")},
         {"Gpk-application", _("Gpk-application")}
@@ -129,7 +132,6 @@ namespace Launcher
         return launched && error == NULL;
     }
 
-            
     /**
      * Get the Application names
      * @param window
@@ -471,4 +473,56 @@ namespace Launcher
 
         return result;
     }
+
+    void LaunchSessionGroup(const char* sessiongrpName)
+    {
+        char filename[PATH_MAX];
+        std::string thispath = Utilities::getExecPath();
+        sprintf(filename, "%s/%s/%s.bin", thispath.c_str(),
+                DEF_ATTACHMENTDIR, sessiongrpName);
+
+        FILE* f;
+        f = fopen(filename, "rb");
+        if (!f)
+            return ;
+
+        struct sessionGrpData st;
+        while (1) {
+            fread(&st, sizeof (st), 1, f);
+            if (feof(f) != 0)
+                break;
+
+            Launch(st.appname,st.parameters );
+        }
+
+        
+        fclose(f);
+        
+    }
+    int getSessionGroupData(std::vector<sessionGrpData>& data, const char* sessiongrpName)
+    {
+        char filename[PATH_MAX];
+        std::string thispath = Utilities::getExecPath();
+        sprintf(filename, "%s/%s/%s.bin", thispath.c_str(),
+                DEF_ATTACHMENTDIR, sessiongrpName);
+
+        FILE* f;
+        f = fopen(filename, "rb");
+        if (!f)
+            return 0;
+
+        struct sessionGrpData st;
+        while (1) {
+            fread(&st, sizeof (st), 1, f);
+            if (feof(f) != 0)
+                break;
+
+            data.push_back(st);
+        }
+
+        
+        fclose(f);
+        return data.size();
+    }
+
 }

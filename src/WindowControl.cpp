@@ -18,7 +18,7 @@
 //
 //****************************************************************
 #include "WindowControl.h"
-
+#include "Launcher.h"
 
 
 namespace WindowControl
@@ -359,10 +359,10 @@ namespace WindowControl
 
                 continue;
             }
-            
-             count++;
+
+            count++;
         }
-        
+
         return count;
     }
 
@@ -401,6 +401,106 @@ namespace WindowControl
         }
 
         return count;
+    }
+
+    int getWindowsByName(const std::string& appname, std::vector<windowData>& data)
+    {
+        WnckScreen *screen;
+        GList *window_l;
+        struct windowData st;
+        screen = wnck_screen_get_default();
+        wnck_screen_force_update(screen);
+
+        for (window_l = wnck_screen_get_windows(screen);
+                window_l != NULL; window_l = window_l->next) {
+
+            WnckWindow *window = WNCK_WINDOW(window_l->data);
+            if (window == NULL)
+                continue;
+
+            WnckWindowType wt = wnck_window_get_window_type(window);
+
+            if (wt == WNCK_WINDOW_DESKTOP ||
+                    wt == WNCK_WINDOW_DOCK ||
+                    wt == WNCK_WINDOW_TOOLBAR ||
+                    wt == WNCK_WINDOW_MENU) {
+
+                continue;
+            }
+
+            std::string the_appname;
+            std::string the_instancename;
+            std::string the_groupname;
+            std::string the_titlename;
+
+            if (Launcher::getAppNameByWindow(window,
+                    the_appname,
+                    the_instancename,
+                    the_groupname,
+                    the_titlename) == FALSE) {
+                return 0;
+            }
+
+
+            if (the_groupname == appname) {
+                st.window = window;
+                strcpy(st.appname,the_groupname.c_str());
+                strcpy(st.titlename,the_appname.c_str());
+                
+                data.push_back(st);
+            }
+
+        }
+
+        return data.size();
+    }
+
+    WnckWindow* getWindowByName(const std::string& appname, std::string& tittle)
+    {
+        WnckScreen *screen;
+        GList *window_l;
+
+        screen = wnck_screen_get_default();
+        wnck_screen_force_update(screen);
+
+        for (window_l = wnck_screen_get_windows(screen);
+                window_l != NULL; window_l = window_l->next) {
+
+            WnckWindow *window = WNCK_WINDOW(window_l->data);
+            if (window == NULL)
+                continue;
+
+            WnckWindowType wt = wnck_window_get_window_type(window);
+
+            if (wt == WNCK_WINDOW_DESKTOP ||
+                    wt == WNCK_WINDOW_DOCK ||
+                    wt == WNCK_WINDOW_TOOLBAR ||
+                    wt == WNCK_WINDOW_MENU) {
+
+                continue;
+            }
+
+            std::string the_appname;
+            std::string the_instancename;
+            std::string the_groupname;
+            std::string the_titlename;
+
+            if (Launcher::getAppNameByWindow(window,
+                    the_appname,
+                    the_instancename,
+                    the_groupname,
+                    the_titlename) == FALSE) {
+                return nullptr;
+            }
+
+            if (the_groupname == appname) {
+                tittle = the_appname;
+                return window;
+            }
+
+        }
+
+        return nullptr;
     }
 
     WnckWindow* getActive()
