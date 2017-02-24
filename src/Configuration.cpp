@@ -188,7 +188,7 @@ namespace Configuration {
         char* themename = g_key_file_get_string(key_file, "DockLight", "Theme", &error);
         if (themename == NULL) {
             if (error) {
-                g_print("configuration Key (Theme) could not be found. use default\n");
+                //g_print("configuration Key (Theme) could not be found. use default\n");
                 g_error_free(error);
                 error = NULL;
 
@@ -203,7 +203,7 @@ namespace Configuration {
         bool panelScaleOnHover = g_key_file_get_boolean(key_file, themename, "PanelScaleOnHover", &error);
 
         if (error) {
-            g_print("configuration Key (Theme PanelScaleOnHover) could not be found. use default\n");
+            //g_print("configuration Key (Theme PanelScaleOnHover) could not be found. use default\n");
             g_error_free(error);
             error = NULL;
             panelScaleOnHover = false;
@@ -214,7 +214,7 @@ namespace Configuration {
         int panelLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PanelLinesBinaryValue", &error);
 
         if (error) {
-            g_print("configuration Key (Theme %s PanelLinesBinaryValue ) could not be found. use default\n", themename);
+            //g_print("configuration Key (Theme %s PanelLinesBinaryValue ) could not be found. use default\n", themename);
             g_error_free(error);
             error = NULL;
         }
@@ -222,7 +222,7 @@ namespace Configuration {
         int panelSelectorLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PanelSelectorLinesBinaryValue", &error);
 
         if (error) {
-            g_print("configuration Key (Theme %s PanelSelectorLinesBinaryValue ) could not be found. use default\n", themename);
+            //g_print("configuration Key (Theme %s PanelSelectorLinesBinaryValue ) could not be found. use default\n", themename);
             g_error_free(error);
             error = NULL;
         }
@@ -231,7 +231,7 @@ namespace Configuration {
         int previewlLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PreviewLinesBinaryValue", &error);
 
         if (error) {
-            g_print("configuration Key (Theme %s PreviewLinesBinaryValue ) could not be found. use default\n", themename);
+            //g_print("configuration Key (Theme %s PreviewLinesBinaryValue ) could not be found. use default\n", themename);
             g_error_free(error);
             error = NULL;
         }
@@ -240,7 +240,7 @@ namespace Configuration {
         int previewSelectorLinesBinaryValue = g_key_file_get_integer(key_file, themename, "PreviewSelectorLinesBinaryValue", &error);
 
         if (error) {
-            g_print("configuration Key (Theme %s PreviewSelectorLinesBinaryValue ) could not be found. use default\n", themename);
+            //g_print("configuration Key (Theme %s PreviewSelectorLinesBinaryValue ) could not be found. use default\n", themename);
             g_error_free(error);
             error = NULL;
         }
@@ -250,7 +250,7 @@ namespace Configuration {
         char* windowString = g_key_file_get_string(key_file, themename, "Window", &error);
         if (windowString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s Window ) could not be found. use default\n", themename);
+               // g_print("configuration Key (Theme %s Window ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -258,7 +258,7 @@ namespace Configuration {
         char* panelString = g_key_file_get_string(key_file, themename, "Panel", &error);
         if (panelString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s Panel ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s Panel ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -268,7 +268,7 @@ namespace Configuration {
         char* PanelTitleString = g_key_file_get_string(key_file, themename, "PanelTitle", &error);
         if (PanelTitleString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s PanelTitle ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s PanelTitle ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -276,7 +276,7 @@ namespace Configuration {
         char* PanelTitleTextString = g_key_file_get_string(key_file, themename, "PanelTitleText", &error);
         if (PanelTitleTextString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s PanelTitleText ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s PanelTitleText ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -285,7 +285,7 @@ namespace Configuration {
         char* previewString = g_key_file_get_string(key_file, themename, "Preview", &error);
         if (previewString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s Preview ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s Preview ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -296,7 +296,7 @@ namespace Configuration {
         char* PanelSelectorString = g_key_file_get_string(key_file, themename, "PanelSelector", &error);
         if (PanelSelectorString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s PanelSelector ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s PanelSelector ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -307,7 +307,7 @@ namespace Configuration {
         char* PreviewTitleTextString = g_key_file_get_string(key_file, themename, "PreviewTitleText", &error);
         if (PreviewTitleTextString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s PreviewTitleText ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s PreviewTitleText ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }
@@ -316,7 +316,7 @@ namespace Configuration {
         char* PreviewSelectorString = g_key_file_get_string(key_file, themename, "PreviewSelector", &error);
         if (PreviewSelectorString == NULL) {
             if (error) {
-                g_print("configuration Key (Theme %s PreviewSelector ) could not be found. use default\n", themename);
+                //g_print("configuration Key (Theme %s PreviewSelector ) could not be found. use default\n", themename);
                 g_error_free(error);
                 error = NULL;
             }

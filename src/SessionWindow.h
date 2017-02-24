@@ -101,7 +101,6 @@ protected:
 
     static WnckWindow* m_activeWindow;
 private:
-
     //signal accessor:
     typedef sigc::signal<void, WnckWindow*> type_signal_getactive;
     type_signal_getactive signal_getactive();
@@ -131,8 +130,6 @@ private:
     Gtk::ListBox m_ListBox;
 
 };
-
-
 
 #endif	/* SESSIONWINDOW_H */
 

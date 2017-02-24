@@ -2,9 +2,8 @@
 #include "SessionWindow.h"
 #include "DockPanel.h"
 #include "WindowControl.h"
-#include  <glibmm/i18n.h>
+#include <glibmm/i18n.h>
 #include <cstdio>
-
 
 WnckWindow* SessionWindow::m_activeWindow;
 SessionWindow::type_signal_getactive SessionWindow::m_signal_getactive;
@@ -50,7 +49,6 @@ m_grid()
         this->m_grid.attach(m_appname, 0, 0, 1, 1);
         this->m_grid.attach(m_parameters, 0, 1, 2, 1);
 
-
         m_launchButton.signal_clicked().connect(sigc::bind<ListRow&>(
                 sigc::mem_fun(*this, &ListRow::on_launch_button_clicked), *this));
 
@@ -77,7 +75,7 @@ m_ListBox()
 {
 
     m_deleteSet = false;
-    //set_title(_("Session Group"));
+
     set_border_width(10);
     set_default_size(500, 550);
 
@@ -90,11 +88,9 @@ m_ListBox()
     m_VBox.set_margin_top(6);
     m_VBox.set_margin_bottom(6);
 
-
-    m_EntryAppName.set_max_length(40);
+    m_EntryAppName.set_max_length(60);
     m_EntryAppName.set_hexpand(true);
     m_EntryAppName.set_sensitive(false);
-
 
     m_grid.set_row_spacing(4);
     m_grid.set_column_spacing(4);
@@ -163,6 +159,7 @@ void SessionWindow::init(DockPanel& panel, const int id)
     m_sessiongrpname = buff;
     m_deleteSet = false;
 
+    size_t result;
     FILE* f;
     f = fopen(getFilePath().c_str(), "rb");
     if (!f)
@@ -173,9 +170,13 @@ void SessionWindow::init(DockPanel& panel, const int id)
     GdkPixbuf *pixbuf;
 
     while (1) {
-        fread(&st, sizeof (st), 1, f);
+        result = fread(&st, sizeof (st), 1, f);
+
         if (feof(f) != 0)
             break;
+
+        if (result == 0)
+            g_critical("SessionWindow::init: Error reading file> fread\n");
 
         loader = gdk_pixbuf_loader_new();
         gdk_pixbuf_loader_write(loader, st.pixbuff, sizeof (st.pixbuff), NULL);
@@ -208,7 +209,6 @@ bool SessionWindow::on_delete_event(GdkEventAny* event)
 
 void SessionWindow::on_button_clicked(guint buttonId)
 {
-
     switch (buttonId)
     {
         case DEF_BUTTON_ADDTOLIST: this->addToList();
@@ -218,7 +218,6 @@ void SessionWindow::on_button_clicked(guint buttonId)
         case DEF_BUTTON_CANCEL: this->close();
             break;
     }
-    g_print("Button %d\n", buttonId);
 }
 
 void SessionWindow::addToList()
@@ -242,7 +241,7 @@ void SessionWindow::addToList()
     }
 
     auto row = Gtk::manage(new ListRow(
-            m_EntryAppName.get_text(), "",the_appname, appIcon));
+            m_EntryAppName.get_text(), "", the_appname, appIcon));
 
     m_ListBox.append(*row);
     m_ListBox.show_all();
@@ -289,7 +288,7 @@ void SessionWindow::save()
         std::string appname = row->get_appname();
         std::string parameters = row->get_parameters();
         std::string titlename = row->get_titlename();
-        
+
 
         memcpy(st.pixbuff, iconBuffer, buffer_size);
         strcpy(st.appname, appname.c_str());
@@ -300,7 +299,7 @@ void SessionWindow::save()
     }
 
     fclose(f);
-
+    this->close();
 }
 
 SessionWindow::type_signal_getactive SessionWindow::signal_getactive()
@@ -326,16 +325,13 @@ void SessionWindow::on_signal_getactive(WnckWindow* window)
     m_EntryAppName.set_text(appname);
     m_window = window;
 
-
 }
 
 void SessionWindow::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
-
     if (m_deleteSet)
         return;
 
     m_signal_getactive.emit(previously_active_window);
-
 }

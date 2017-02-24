@@ -482,16 +482,20 @@ namespace Launcher
                 DEF_ATTACHMENTDIR, sessiongrpName);
 
         FILE* f;
+        size_t result;
         f = fopen(filename, "rb");
         if (!f)
             return ;
 
         struct sessionGrpData st;
         while (1) {
-            fread(&st, sizeof (st), 1, f);
+            result = fread(&st, sizeof (st), 1, f);
             if (feof(f) != 0)
                 break;
 
+            if(result==0 )
+                g_critical("LaunchSessionGroup: Error reading file> fread\n");
+            
             Launch(st.appname,st.parameters );
         }
 
@@ -506,6 +510,7 @@ namespace Launcher
         sprintf(filename, "%s/%s/%s.bin", thispath.c_str(),
                 DEF_ATTACHMENTDIR, sessiongrpName);
 
+        size_t result;
         FILE* f;
         f = fopen(filename, "rb");
         if (!f)
@@ -513,10 +518,13 @@ namespace Launcher
 
         struct sessionGrpData st;
         while (1) {
-            fread(&st, sizeof (st), 1, f);
+            result = fread(&st, sizeof (st), 1, f);
             if (feof(f) != 0)
                 break;
 
+             if(result==0 )
+                g_critical("getSessionGroupData: Error reading file> fread\n");
+            
             data.push_back(st);
         }
 

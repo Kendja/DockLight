@@ -3,3 +3,4 @@ src/LauncherWindow.cpp
 src/DockPanel.cpp
 src/Launcher.cpp
 src/Preferences.cpp
+src/SessionWindow.cpp

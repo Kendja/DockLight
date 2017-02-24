@@ -29,15 +29,11 @@
 #include "Launcher.h"
 #include "SessionWindow.h"
 
-
 #include  <glibmm/i18n.h>
 #include <gtkmm/window.h>
 #include <gtkmm/messagedialog.h>
 #include <gdkmm/cursor.h>
-
 #include <limits.h>
-
-
 
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
@@ -87,8 +83,6 @@ m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
             Gdk::ENTER_NOTIFY_MASK |
             Gdk::LEAVE_NOTIFY_MASK |
             Gdk::POINTER_MOTION_MASK);
-
-
 }
 
 /**
@@ -99,10 +93,8 @@ m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
  */
 int DockPanel::preInit(Gtk::Window* window)
 {
-
     this->m_AppWindow = window;
 
-    // assumes that the "docklight.home.ico" exists.
     const char* filename = m_homeiconFilePath.c_str();
     DockItem* dockItem = new DockItem();
     try {
@@ -117,7 +109,6 @@ int DockPanel::preInit(Gtk::Window* window)
         return -1;
     }
 
-
     dockItem->m_appname = _("Desktop");
     dockItem->m_realgroupname = _("Desktop");
     m_dockitems.push_back(dockItem);
@@ -125,10 +116,8 @@ int DockPanel::preInit(Gtk::Window* window)
     m_previewWindowActive = false;
     m_preview.setOwner(*this);
 
-
     if (loadAttachments() != 0)
         return -1;
-
 
     // Menus
     // Home Menu items
@@ -174,26 +163,17 @@ int DockPanel::preInit(Gtk::Window* window)
     m_HomeMenu_Popup.signal_deactivate().
             connect(sigc::mem_fun(*this, &DockPanel::on_MenuDeactivated_event));
 
-    // m_HomeMenu_Popup.signal_enter_notify_event().
-    //        connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
-
-
-    //on_HomePreferences_event
-
     m_preferencesMenuItem.set_label(_("Preferences"));
     m_preferencesMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomePreferences_event));
-
 
     m_homeSessionGrp.set_label(_("Session-group"));
     m_homeSessionGrp.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HomeAddSessionGrp_event));
 
-
     m_HelpMenuItem.set_label(_("Help"));
     m_HelpMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_HelpMenu_event));
-
 
     m_AboutMenuItem.set_label(_("About"));
     m_AboutMenuItem.signal_activate().
@@ -202,10 +182,6 @@ int DockPanel::preInit(Gtk::Window* window)
     m_QuitMenuItem.set_label(_("Quit"));
     m_QuitMenuItem.signal_activate().
             connect(sigc::mem_fun(*this, &DockPanel::on_QuitMenu_event));
-
-
-
-
 
     m_HomeMenu_Popup.append(m_preferencesMenuItem);
     m_HomeMenu_Popup.append(m_homeSessionGrp);
@@ -275,8 +251,6 @@ int DockPanel::preInit(Gtk::Window* window)
 
     m_Menu_Popup.show_all();
     m_Menu_Popup.accelerate(*this);
-
-
     return 0;
 }
 
@@ -286,7 +260,6 @@ int DockPanel::preInit(Gtk::Window* window)
  */
 void DockPanel::postInit()
 {
-
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
             &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
 
@@ -306,7 +279,6 @@ void DockPanel::postInit()
 
 DockPanel::~DockPanel()
 {
-
     if (m_launcherWindow != nullptr)
         delete(m_launcherWindow);
 
@@ -318,9 +290,6 @@ DockPanel::~DockPanel()
     if (m_sessionWindow != nullptr)
         delete(m_sessionWindow);
 
-
-
-
     m_titlewindow.close();
 
     for (auto item : m_dockitems)
@@ -329,7 +298,7 @@ DockPanel::~DockPanel()
     m_dockitems.clear();
 
     if (m_TimeoutConnection)
-        m_TimeoutConnection.disconnect(); //Will probably happen anyway, in the destrctor.
+        m_TimeoutConnection.disconnect(); //Will probably happen anyway, in the destructor.
 }
 
 /**
@@ -392,13 +361,9 @@ bool DockPanel::on_enter_notify_event(GdkEventCrossing* crossing_event)
  */
 bool DockPanel::on_leave_notify_event(GdkEventCrossing* crossing_event)
 {
-
     m_mouseIn = false;
     m_titlewindow.hide();
     m_infowindow.hide();
-    // if(!m_preview.m_mouseIn )
-    //   m_preview.hide();
-
 
     if (m_mouseRightClick) {
         m_mouseRightClick = false;
@@ -460,17 +425,15 @@ void DockPanel::on_MenuDeactivated_event()
 
 bool DockPanel::ispopupMenuActive()
 {
-
     return m_popupMenuOn || m_previewWindowActive;
-
 }
 
 void DockPanel::saveAttachments(int aIdx, int bIdx)
 {
     char filename[100];
-
     std::ostringstream command;
-    command << "exec rm -r /" << m_applicationAttachmentsPath << "/*";
+
+    command << "exec rm -f /" << m_applicationAttachmentsPath << "/*.png";
     if (system(command.str().c_str()) != 0) {
         g_critical("can't delete attachments! ");
         return;
@@ -602,7 +565,9 @@ bool DockPanel::on_button_press_event(GdkEventButton *event)
 
 /** 
  * bool DockPanel::on_button_release_event(GdkEventButton *event)
- * 
+ * Returning TRUE means we handled the event, so the signal
+ * emission should be stopped (don’t call any further callbacks
+ * that may be connected). Return FALSE to continue invoking callbacks.
  * handles Mouse button released : process mouse button event 
  * true to stop other handlers from being invoked for the event.
  * false to propagate the event further. 
@@ -638,28 +603,16 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
     if (!m_mouseIn)
         return true;
 
-
-
-
     if (m_mouseLeftButtonDown) {
-
-        //  m_selectedIndex = m_currentMoveIndex;
         SelectWindow(m_currentMoveIndex, event);
         m_mouseLeftButtonDown = false;
-
-        // Returning TRUE means we handled the event, so the signal
-        // emission should be stopped (don’t call any further callbacks
-        // that may be connected). Return FALSE to continue invoking callbacks.
         return TRUE;
-
     }
 
     if (m_mouseRightButtonDown) {
-
         m_preview.hideMe();
         m_mouseRightClick = true;
         m_mouseRightButtonDown = false;
-
 
         // Items 
         if (m_currentMoveIndex > 0) {
@@ -736,15 +689,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             return true;
         }
 
-        // Returning TRUE means we handled the event, so the signal
-        // emission should be stopped (don’t call any further callbacks
-        // that may be connected). Return FALSE to continue invoking callbacks.
         return TRUE;
     }
 
-    // Returning TRUE means we handled the event, so the signal
-    // emission should be stopped (don’t call any further callbacks
-    // that may be connected). Return FALSE to continue invoking callbacks.
     return TRUE;
 }
 
@@ -797,7 +744,6 @@ void DockPanel::on_HomeAddSessionGrp_event()
 
 void DockPanel::on_HelpMenu_event()
 {
-
     if (system("xdg-open https://github.com/yoosamui/DockLight/wiki") != 0) {
     }
 }
@@ -809,8 +755,6 @@ void DockPanel::on_AboutMenu_event()
 
 void DockPanel::on_QuitMenu_event()
 {
-
-
     m_AppWindow->close();
 }
 
@@ -852,25 +796,15 @@ void DockPanel::on_AttachToDock_event()
     sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
             m_currentMoveIndex,
             s.c_str());
-    //
-    //    if( dockitem->m_dockitemSesssionGrpId > 0 ) {
-    //        sprintf(filename, "%s/%2d_%s-%d.png", m_applicationAttachmentsPath.c_str(),
-    //            m_currentMoveIndex,
-    //            s.c_str(),dockitem->m_dockitemSesssionGrpId);
-    //    } 
 
     dockitem->m_isAttached = true;
     dockitem->m_isDirty = true;
     dockitem->m_image->save(filename, "png");
 
-
-    g_print("DockItem is now Attached for index : %d\n", m_currentMoveIndex);
-
 }
 
 void DockPanel::on_DetachFromDock_event()
 {
-
     if (m_currentMoveIndex < 0)
         return;
 
@@ -886,7 +820,7 @@ void DockPanel::on_DetachFromDock_event()
     char filename[PATH_MAX];
 
     std::string s = dockitem->m_realgroupname;
-    std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '_'
+    std::replace(s.begin(), s.end(), ' ', '-');
 
     sprintf(filename, "%s/%2d_%s.png",
             m_applicationAttachmentsPath.c_str(),
@@ -894,16 +828,24 @@ void DockPanel::on_DetachFromDock_event()
             s.c_str());
 
     if (remove(filename) != 0) {
-
         sprintf(filename, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
                 m_currentMoveIndex,
                 s.c_str());
         if (remove(filename) != 0) {
-
-            g_print("DetachFromDock_event. ERROR remove file. \n");
+            g_warning("DetachFromDock_event. ERROR remove file. \n");
             return;
         }
+    }
+
+    if (dockitem->m_dockitemSesssionGrpId > 0) {
+        sprintf(filename, "%s/%s.bin",
+                m_applicationAttachmentsPath.c_str(),
+                s.c_str());
+        if (remove(filename) != 0) {
+            g_warning("DetachFromDock_event. ERROR remove file. %s \n", filename);
+        }
+
     }
 
     int idx = m_currentMoveIndex;
@@ -912,8 +854,6 @@ void DockPanel::on_DetachFromDock_event()
 
     delete(dockitem);
     m_dockitems.erase(m_dockitems.begin() + idx);
-
-
 
 }
 
@@ -1031,7 +971,7 @@ bool DockPanel::on_scroll_event(GdkEventScroll * e)
 }
 
 
-int m_oldcellsize = DEF_CELLWIDTH;
+//int m_oldcellsize = DEF_CELLWIDTH;
 
 /**
  * Timeout handler to regenerate the frame. 
@@ -1039,7 +979,6 @@ int m_oldcellsize = DEF_CELLWIDTH;
  */
 bool DockPanel::on_timeoutDraw()
 {
-
     if (!m_previewWindowActive && !m_dragdropsStarts && m_dragdropItemIndex > 0 &&
             m_dragdropTimerSet && m_dragdropTimer.elapsed() > 0.5) {
         DockItem* item = m_dockitems.at(m_dragdropItemIndex);
@@ -1050,13 +989,9 @@ bool DockPanel::on_timeoutDraw()
                 m_iconsize, m_cellwidth,
                 m_dragdropMousePoint);
 
-
     }
 
-
     Gtk::Widget::queue_draw();
-
-
     return true;
 }
 
@@ -1079,15 +1014,12 @@ void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointe
  */
 void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
-
     updateSessioWindow(window);
     Update(window, Window_action::CLOSE);
-
 }
 
 void DockPanel::updateSessioWindow(WnckWindow *window)
 {
-
     for (DockItem* item : m_dockitems) {
         if (item->m_dockitemSesssionGrpId > 0) {
             for (int i = item->m_items.size() - 1; i >= 0; i--) {
@@ -1111,48 +1043,53 @@ void DockPanel::updateSessioWindow(WnckWindow *window)
 void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
         WnckWindow *previously_active_window, gpointer user_data)
 {
+    m_currentMoveIndex = -1;
 
     if (m_previewWindowActive || DockPanel::m_dragdropsStarts)
         return;
 
     WnckWindow * window = wnck_screen_get_active_window(screen);
-    if (window == NULL) {
-        m_currentMoveIndex = -1;
-
+    if (window == NULL)
         return;
-    }
 
     DockPanel::setItemImdexFromActiveWindow();
 }
 
 void DockPanel::setItemImdexFromActiveWindow()
 {
+
     if (DockPanel::m_dragdropsStarts)
         return;
+
+    m_currentMoveIndex = -1;
 
     WnckWindow *window = WindowControl::getActive();
     if (window == nullptr)
         return;
 
-    int xid = wnck_window_get_xid(window);
-
     int idx = 0;
     bool found = false;
     for (auto item : m_dockitems) {
+        if (item->m_dockitemSesssionGrpId > 0) {
+            idx++;
+            continue;
+        }
+
         for (auto chiditem : item->m_items) {
-            if (xid == chiditem->m_xid) {
-                m_currentMoveIndex = idx;
+            if (window == chiditem->m_window) {
                 found = true;
                 break;
             }
         }
         if (found)
             break;
+
         idx++;
     }
 
-    if (!found)
-        m_currentMoveIndex = -1;
+    if (found)
+        m_currentMoveIndex = idx;
+
 }
 
 void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parameters)
@@ -1160,25 +1097,11 @@ void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parame
     if (window == nullptr)
         return;
 
-
     for (DockItem* child : m_currentsessionItem->m_items) {
         if (child->m_window == window) {
-            g_warning("DOUBLE INDTANCE\n");
             return;
         }
     }
-
-    // Prevent same window instance.
-    //    for (DockItem* items : m_dockitems) {
-    //        for (DockItem* child : items->m_items) {
-    //            if (items->m_dockitemSesssionGrpId > 0 &&
-    //                    child->m_window == window) {
-    //                g_warning("DOUBLE INDTANCE\n");
-    //                return;
-    //            }
-    //        }
-    //    }
-
 
     std::string the_appname;
     std::string the_instancename;
@@ -1190,32 +1113,21 @@ void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parame
             the_instancename,
             the_groupname,
             the_titlename) == FALSE) {
-        g_warning("NAME RETURN\n");
         return;
     }
 
+    DockItem* dockItem = m_currentsessionItem;
+    DockItem* childItem = new DockItem();
 
-    // g_print("COMPARE >>>app %s, param %s\n",the_appname.c_str(),parameters.c_str() );
+    childItem->m_appname = the_appname;
+    childItem->m_titlename = the_titlename;
+    childItem->m_realgroupname = the_groupname;
+    childItem->m_instancename = the_instancename;
+    childItem->m_window = window;
+    childItem->m_xid = childItem->m_xid = wnck_window_get_xid(window);
+    childItem->m_image = NULLPB;
 
-    //auto const pos = parameters.find_last_of('/');
-    // if(parameters.empty() || 
-    //        ( !parameters.empty() && the_appname ==  parameters.substr(pos+1) ) )
-    {
-
-        DockItem* dockItem = m_currentsessionItem;
-        DockItem* childItem = new DockItem();
-
-        childItem->m_appname = the_appname;
-        childItem->m_titlename = the_titlename;
-        childItem->m_realgroupname = the_groupname;
-        childItem->m_instancename = the_instancename;
-        childItem->m_window = window;
-        childItem->m_xid = childItem->m_xid = wnck_window_get_xid(window);
-        childItem->m_image = NULLPB;
-
-        dockItem->m_items.push_back(childItem);
-        //dockItem.push_back(std::move(childItem));
-    }
+    dockItem->m_items.push_back(childItem);
 
 }
 
@@ -1226,8 +1138,7 @@ int DockPanel::getNextSessionGrpNumber()
         if (items->m_dockitemSesssionGrpId > 0)
             count++;
 
-
-    return count; //(count > 0 ? count + 1 : count);
+    return count;
 }
 
 void DockPanel::CreateSessionDockItemGrp()
@@ -1307,7 +1218,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
         }
 
         //DEBUG
-        g_print("...appname: %s, %s, %s title:%s\n",
+        g_print("...appnames: %s, %s, %s title:%s\n",
                 the_appname.c_str(),
                 the_instancename.c_str(),
                 the_groupname.c_str(),
@@ -1320,6 +1231,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
                 if (appname == the_groupname) {
                     m_sessiondata.erase(m_sessiondata.begin() + i);
                     attachToSessiongrp(window, "");
+                    break;
                 }
             }
         }
@@ -1759,14 +1671,9 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
             }
 
-
-
-
         }
 
     }
-
-
 
     return true;
 }
@@ -1779,7 +1686,6 @@ std::string DockPanel::getApplicationPath()
 
 void DockPanel::SelectWindow(int index, GdkEventButton * event)
 {
-
     if (index < 1)
         return;
 
@@ -1807,8 +1713,8 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
                     if (appname != appname2)
                         continue;
-                    
-                    if( titlename == titlename2 ) {
+
+                    if (titlename == titlename2) {
                         m_sessiondata.erase(m_sessiondata.begin() + i);
                         attachToSessiongrp(existingWindows[x].window, "");
                         break;
@@ -1816,11 +1722,9 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
                 }
             }
 
-            g_print("LEFT %d\n",m_sessiondata.size());
             for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
-                  Launcher::Launch( m_sessiondata[i].appname, m_sessiondata[i].parameters);
+                Launcher::Launch(m_sessiondata[i].appname, m_sessiondata[i].parameters);
             }
-           
 
         } else {
             createSessionWindow();
@@ -1837,12 +1741,6 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
         return;
     }
-
-
-
-    //
-    //    if (m_dockitems.at(index)->m_window == NULL)
-    //        return;
 
     int previewWidth = DEF_PREVIEW_WIDTH;
     int previewHeight = DEF_PREVIEW_HEIGHT;
