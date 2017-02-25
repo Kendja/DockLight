@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-02-25 17:52+0700\n"
-"PO-Revision-Date: 2017-02-25 17:58+0700\n"
+"PO-Revision-Date: 2017-02-25 22:55+0700\n"
 "Last-Translator: \n"
 "Language-Team: THAI <LL@li.org>\n"
 "Language: th\n"
@@ -18,8 +18,7 @@ msgstr ""
 "X-Generator: Poedit 1.8.11\n"
 
 #: ../src/About.cpp:113
-msgid ""
-"This program is a lightweight Dock Launcher for opening common applications for the GNOME Desktop"
+msgid "This program is a lightweight Dock Launcher for opening common applications for the GNOME Desktop"
 msgstr "โปรแกรมนี้ใช้งานไม่ยาก Dock Launcher สำหรับการใช้งานเท่าไปเท่านั้น จัดทำเพื่อแปลภาษาหน้าเดสก์ท็อปของ GNOME "
 
 #: ../src/LauncherWindow.cpp:35 ../src/LauncherWindow.cpp:72
@@ -293,7 +292,7 @@ msgstr "โปรแกรม"
 
 #: ../src/SessionWindow.cpp:109
 msgid "Add to list"
-msgstr "เพิ่มรายการสินค้า"
+msgstr "เพิ่มรายการ"
 
 #: ../src/SessionWindow.cpp:110
 msgid "Save"
