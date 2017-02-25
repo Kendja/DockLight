@@ -3,7 +3,7 @@ bin/
 debian/.debhelper
 debian/docklight
 src/.deps/
-
+/po/*.mo
 !package/*
 /src/data/attachments/*
 *.dh-orig

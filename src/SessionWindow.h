@@ -1,9 +1,22 @@
-/* 
- * File:   SessionWindow.h
- * Author: yoo
- *
- * Created on February 21, 2017, 2:42 PM
- */
+//*****************************************************************
+//
+//  Copyright (C) 2015-2017 Juan R. Gonzalez
+//  Created on February 21, 2017 
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//****************************************************************
 
 #ifndef SESSIONWINDOW_H
 #define	SESSIONWINDOW_H
@@ -26,6 +39,7 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/listbox.h>
 #include "IconLoader.h"
+#include <gdkmm/pixbufloader.h>
 
 class DockPanel;
 
@@ -33,12 +47,15 @@ class DockPanel;
 #define DEF_BUTTON_OK 4
 #define DEF_BUTTON_CANCEL 5
 
+#define DEF_PIXBUFFER_MAX 1024 << 3
+#define DEF_APPBUFFER_MAX 66
+
 struct sessionGrpData
 {
-    guint8 pixbuff[ 1024 * 6 ]={0};
-    char appname[60]={'\0'};
-    char parameters[MAX_INPUT]={'\0'};
-    char titlename[MAX_INPUT]={'\0'};
+    guint8 pixbuff[ DEF_PIXBUFFER_MAX] = {0};
+    char appname[DEF_APPBUFFER_MAX] = {'\0'};
+    char parameters[MAX_INPUT] = {'\0'};
+    char titlename[MAX_INPUT] = {'\0'};
 };
 
 class ListRow : public Gtk::ListBoxRow
@@ -61,26 +78,27 @@ public:
 
     Glib::ustring get_titlename() const
     {
-        return m_titlename;
+        return m_titlename.get_text();
     }
-    
+
     Glib::RefPtr<Gdk::Pixbuf> get_pixbuf()
     {
         return m_image.get_pixbuf();
     }
 protected:
     void on_launch_button_clicked(ListRow& row);
+    void on_remove_button_clicked(ListRow& row);
 private:
     Gtk::Button m_launchButton;
+    Gtk::Button m_removeButton;
     Gtk::Image m_image;
     Gtk::Grid m_grid;
     Gtk::Frame m_frame;
     Gtk::Entry m_parameters;
     Gtk::Box m_HBox;
+    Gtk::Box m_HSeparator;
     Gtk::Label m_appname;
-    
-    Glib::ustring m_titlename;
-
+    Gtk::Label m_titlename;
 };
 
 class SessionWindow : public Gtk::Window
@@ -107,7 +125,8 @@ private:
     static type_signal_getactive m_signal_getactive;
     void on_signal_getactive(WnckWindow* window);
 
-    Glib::ustring getFilePath() ;
+
+    Glib::ustring getFilePath();
     void save();
     void addToList();
 

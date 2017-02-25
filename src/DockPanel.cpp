@@ -1092,14 +1092,15 @@ void DockPanel::setItemImdexFromActiveWindow()
 
 }
 
-void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parameters)
+bool DockPanel::attachToSessiongrp(WnckWindow* window)
 {
     if (window == nullptr)
-        return;
+        return false;
 
     for (DockItem* child : m_currentsessionItem->m_items) {
         if (child->m_window == window) {
-            return;
+            g_print("\nattachToSessiongrp: window already exists!");
+            return false;
         }
     }
 
@@ -1113,7 +1114,7 @@ void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parame
             the_instancename,
             the_groupname,
             the_titlename) == FALSE) {
-        return;
+        return false;
     }
 
     DockItem* dockItem = m_currentsessionItem;
@@ -1129,6 +1130,7 @@ void DockPanel::attachToSessiongrp(WnckWindow* window, const std::string& parame
 
     dockItem->m_items.push_back(childItem);
 
+    return true;
 }
 
 int DockPanel::getNextSessionGrpNumber()
@@ -1229,9 +1231,10 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
             for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
                 std::string appname(m_sessiondata[i].appname);
                 if (appname == the_groupname) {
-                    m_sessiondata.erase(m_sessiondata.begin() + i);
-                    attachToSessiongrp(window, "");
-                    break;
+                    if (attachToSessiongrp(window)) {
+                        m_sessiondata.erase(m_sessiondata.begin() + i);
+                        break;
+                    }
                 }
             }
         }
@@ -1715,15 +1718,35 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
                         continue;
 
                     if (titlename == titlename2) {
-                        m_sessiondata.erase(m_sessiondata.begin() + i);
-                        attachToSessiongrp(existingWindows[x].window, "");
-                        break;
+                        if (attachToSessiongrp(existingWindows[x].window)) {
+                            g_print("\nSession Attach existing: app:%s, title:%s",
+                                    existingWindows[x].appname,
+                                    existingWindows[x].titlename);
+
+                            m_sessiondata.erase(m_sessiondata.begin() + i);
+                            break;
+                        }
                     }
                 }
             }
 
+
             for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
+                bool delay = false;
+                if (strstr(m_sessiondata[i].appname, "Firefox") != NULL)
+                    delay = true;
+
+                else if (strstr(m_sessiondata[i].appname, "chrome") != NULL)
+                    delay = true;
+
+                else if (strstr(m_sessiondata[i].appname, "Konqueror") != NULL)
+                    delay = true;
+
                 Launcher::Launch(m_sessiondata[i].appname, m_sessiondata[i].parameters);
+
+                if (delay) {
+                    usleep(1000000);
+                }
             }
 
         } else {
@@ -1943,6 +1966,7 @@ void DockPanel::createSessionWindow()
 {
 
     if (m_sessionWindow == nullptr) {
+
         m_sessionWindow = new SessionWindow();
         DockItem* dockitem = m_dockitems.at(m_currentMoveIndex);
         m_sessionWindow->init(*this, dockitem->m_dockitemSesssionGrpId);
@@ -1956,6 +1980,7 @@ void DockPanel::createPreferences()
 
 
     if (m_preferences == nullptr) {
+
         m_preferences = new Preferences();
         m_preferences->init(*this);
         m_preferences->show_all();

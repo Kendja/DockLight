@@ -438,7 +438,7 @@ namespace WindowControl
                     the_instancename,
                     the_groupname,
                     the_titlename) == FALSE) {
-                return 0;
+                continue;
             }
 
 

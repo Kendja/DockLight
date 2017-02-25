@@ -1,3 +1,22 @@
+//*****************************************************************
+//
+//  Copyright (C) 2015-2017 Juan R. Gonzalez
+//  Created on February 21, 2017 
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//****************************************************************
 
 #include "SessionWindow.h"
 #include "DockPanel.h"
@@ -16,23 +35,29 @@ ListRow::ListRow(
         Glib::RefPtr<Gdk::Pixbuf> appIcon)
 :
 m_HBox(Gtk::ORIENTATION_HORIZONTAL),
+m_HSeparator(Gtk::ORIENTATION_HORIZONTAL),
 m_appname(appname),
 m_image(appIcon),
 m_frame(),
 m_launchButton(_("Launch")),
-m_grid()
+m_removeButton(_("Remove")),
+m_grid(),
+m_titlename(titlename)
 {
     if (!appname.empty()) {
-
-        this->m_titlename = titlename;
+  
 
         m_parameters.set_text(parameters);
         m_parameters.set_max_length(MAX_INPUT);
+
 
         m_HBox.set_margin_left(6);
         m_HBox.set_margin_right(6);
         m_HBox.set_margin_top(6);
         m_HBox.set_margin_bottom(6);
+
+        m_HSeparator.set_margin_left(6);
+        m_HSeparator.set_margin_right(6);
 
         m_grid.set_row_spacing(4);
         m_grid.set_column_spacing(4);
@@ -42,15 +67,29 @@ m_grid()
 
         this->m_HBox.add(m_image);
         this->m_HBox.add(m_grid);
+        this->m_HBox.add(m_HSeparator);
         this->m_HBox.add(m_launchButton);
+        this->m_HBox.add(m_removeButton);
+
 
         this->m_parameters.set_hexpand(true);
         this->m_appname.set_halign(Gtk::Align::ALIGN_START);
+        this->m_appname.set_markup("<big>"+this->m_appname.get_text()+"</big>");
+        
+        this->m_titlename.set_halign(Gtk::Align::ALIGN_START);
+        
+         
         this->m_grid.attach(m_appname, 0, 0, 1, 1);
-        this->m_grid.attach(m_parameters, 0, 1, 2, 1);
+        this->m_grid.attach(m_titlename, 0, 1, 1, 1);
+        this->m_grid.attach(m_parameters, 0, 2, 2, 1);
 
         m_launchButton.signal_clicked().connect(sigc::bind<ListRow&>(
                 sigc::mem_fun(*this, &ListRow::on_launch_button_clicked), *this));
+
+        m_removeButton.signal_clicked().connect(sigc::bind<ListRow&>(
+                sigc::mem_fun(*this, &ListRow::on_remove_button_clicked), *this));
+
+
 
     }
 }
@@ -61,14 +100,20 @@ void ListRow::on_launch_button_clicked(ListRow& row)
             row.get_parameters().c_str());
 }
 
+void ListRow::on_remove_button_clicked(ListRow& row)
+{
+    row.remove();
+    delete &row;
+}
+
 SessionWindow::SessionWindow()
 : Gtk::Window(Gtk::WindowType::WINDOW_TOPLEVEL),
 m_VBox(Gtk::ORIENTATION_VERTICAL),
 m_HBox(Gtk::ORIENTATION_HORIZONTAL),
 m_HBoxBottom(Gtk::ORIENTATION_HORIZONTAL),
 m_labelAddActive(_("Application")),
-m_AddToGroupButton(_("Add to group list")),
-m_OkButton(_("Ok")),
+m_AddToGroupButton(_("Add to list")),
+m_OkButton(_("Save")),
 m_CancelButton(_("Cancel")),
 m_ScrolledWindow(),
 m_ListBox()
@@ -77,9 +122,9 @@ m_ListBox()
     m_deleteSet = false;
 
     set_border_width(10);
-    set_default_size(500, 550);
+    set_default_size(640, 550);
 
-    this->set_resizable(false);
+    this->set_resizable(true);
     this->set_keep_above(true);
     this->set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DIALOG);
 
@@ -96,6 +141,7 @@ m_ListBox()
     m_grid.set_column_spacing(4);
     m_grid.set_hexpand(true);
 
+    m_ListBox.set_vexpand_set(true);
     m_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
     m_ScrolledWindow.add(m_ListBox);
 
@@ -106,15 +152,21 @@ m_ListBox()
     m_VBox.pack_start(m_ScrolledWindow, true, true, Gtk::PACK_EXPAND_WIDGET);
     m_VBox.add(m_HBoxBottom);
 
+    m_HBoxBottom.set_margin_top(10);
+    m_HBoxBottom.set_margin_bottom(10);
+
     m_HBox.set_margin_top(10);
+    m_HBox.set_margin_bottom(10);
+
+
+    m_AddToGroupButton.set_halign(Gtk::Align::ALIGN_END);
     m_HBox.pack_start(m_AddToGroupButton, Gtk::PACK_EXPAND_WIDGET, 0);
 
     m_grid.attach(m_labelAddActive, 0, 0, 1, 1);
     m_grid.attach(m_EntryAppName, 1, 0, 1, 1);
 
-
-    m_HBoxBottom.pack_start(m_OkButton, true, true, Gtk::PACK_SHRINK);
-    m_HBoxBottom.pack_start(m_CancelButton, true, true, Gtk::PACK_SHRINK);
+    m_HBoxBottom.pack_start(m_OkButton, true, true, Gtk::PACK_EXPAND_WIDGET);
+    m_HBoxBottom.pack_start(m_CancelButton, true, true, Gtk::PACK_EXPAND_WIDGET);
 
 
     m_AddToGroupButton.signal_clicked().connect(sigc::bind<guint>(
@@ -150,6 +202,7 @@ SessionWindow::~SessionWindow()
 
 void SessionWindow::init(DockPanel& panel, const int id)
 {
+
     this->m_panel = &panel;
     char buff[100];
     sprintf(buff, _("Session group %d"), id);
@@ -166,8 +219,7 @@ void SessionWindow::init(DockPanel& panel, const int id)
         return;
 
     struct sessionGrpData st;
-    GdkPixbufLoader *loader;
-    GdkPixbuf *pixbuf;
+
 
     while (1) {
         result = fread(&st, sizeof (st), 1, f);
@@ -178,23 +230,30 @@ void SessionWindow::init(DockPanel& panel, const int id)
         if (result == 0)
             g_critical("SessionWindow::init: Error reading file> fread\n");
 
-        loader = gdk_pixbuf_loader_new();
-        gdk_pixbuf_loader_write(loader, st.pixbuff, sizeof (st.pixbuff), NULL);
-        pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-        auto gpixbuff = IconLoader::PixbufConvert(pixbuf);
+        auto loader = Gdk::PixbufLoader::create();
+        loader->write(st.pixbuff, sizeof (st.pixbuff));
+        Glib::RefPtr< Gdk::Pixbuf > pixbuf = loader->get_pixbuf();
 
         auto row = Gtk::manage(new ListRow(
                 st.appname,
                 st.parameters,
                 st.titlename,
-                gpixbuff));
+                pixbuf));
 
         m_ListBox.append(*row);
+
+        try {
+            loader->close();
+        } catch (Gdk::PixbufError pe) {
+            g_critical("SessionWindow::init: Gdk::PixbufError\n");
+        } catch (Glib::FileError fe) {
+            g_critical("SessionWindow::init: Glib::FileError\n");
+        }
+
     }
 
-    m_ListBox.show_all();
     fclose(f);
-
+    m_ListBox.show_all();
 }
 
 bool SessionWindow::on_delete_event(GdkEventAny* event)
@@ -241,7 +300,7 @@ void SessionWindow::addToList()
     }
 
     auto row = Gtk::manage(new ListRow(
-            m_EntryAppName.get_text(), "", the_appname, appIcon));
+            m_EntryAppName.get_text(), "", the_appname,  appIcon));
 
     m_ListBox.append(*row);
     m_ListBox.show_all();
@@ -259,10 +318,13 @@ Glib::ustring SessionWindow::getFilePath()
 
 void SessionWindow::save()
 {
+    size_t result;
     FILE* f;
     f = fopen(getFilePath().c_str(), "wb");
-    if (!f)
+    if (!f) {
+        g_critical("SessionWindow::save: can't create file.");
         return;
+    }
 
     gchar* iconBuffer;
     gsize buffer_size;
@@ -273,15 +335,16 @@ void SessionWindow::save()
     for (i = 0; i < maxrows; i++) {
         ListRow* row = (ListRow*) m_ListBox.get_row_at_index(i);
         Glib::RefPtr<Gdk::Pixbuf> appIcon = row->get_pixbuf();
-        GdkPixbuf *pixbuf = appIcon->gobj();
-        if (!gdk_pixbuf_save_to_buffer(pixbuf, &iconBuffer,
-                &buffer_size, "png", &error, NULL, "100", NULL)) {
+        try {
+            appIcon->save_to_buffer(iconBuffer, buffer_size);
+        } catch (Gdk::PixbufError pe) {
+            g_critical("SessionWindow::save: Gdk::PixbufError\n");
+        } catch (Glib::FileError fe) {
+            g_critical("SessionWindow::save: Glib::FileError\n");
+        }
 
-            if (error) {
-                g_error_free(error);
-                error = NULL;
-            }
-
+        if (buffer_size > DEF_PIXBUFFER_MAX) {
+            g_critical("SessionWindow::save: pixbuf  size out of range.");
             continue;
         }
 
@@ -289,13 +352,17 @@ void SessionWindow::save()
         std::string parameters = row->get_parameters();
         std::string titlename = row->get_titlename();
 
-
         memcpy(st.pixbuff, iconBuffer, buffer_size);
         strcpy(st.appname, appname.c_str());
         strcpy(st.parameters, parameters.c_str());
         strcpy(st.titlename, titlename.c_str());
 
-        fwrite(&st, sizeof (st), 1, f);
+        size_t result = fwrite(&st, sizeof (st), 1, f);
+        if (result == 0)
+            g_critical("SessionWindow::save:: Error writing file> fwrite\n");
+
+        delete iconBuffer;
+
     }
 
     fclose(f);

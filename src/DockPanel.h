@@ -82,7 +82,7 @@ private:
     static std::vector<sessionGrpData> m_sessiondata;
     static DockItem* m_currentsessionItem;
     
-    static void attachToSessiongrp(WnckWindow* window,const std::string& parameters);
+    static bool attachToSessiongrp(WnckWindow* window);
     int getNextSessionGrpNumber(); 
 
     std::string m_applicationpath;

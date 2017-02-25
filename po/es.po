@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.12\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-15 17:32+0700\n"
-"PO-Revision-Date: 2017-02-15 17:55+0700\n"
+"POT-Creation-Date: 2017-02-25 17:43+0700\n"
+"PO-Revision-Date: 2017-02-25 17:48+0700\n"
 "Last-Translator: FULL NAME <j-gonzalez@email.de>\n"
 "Language-Team: SPAIN\n"
 "Language: es\n"
@@ -33,7 +33,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.11\n"
 
-#: ../src/About.cpp:93
+#: ../src/About.cpp:113
 msgid ""
 "This program is a lightweight Dock Launcher for opening common applications "
 "for the GNOME Desktop"
@@ -41,59 +41,59 @@ msgstr ""
 "Docklight es un Programa para abrir aplicaciones  para el escritorio de "
 "GNOME."
 
-#: ../src/LauncherWindow.cpp:15 ../src/LauncherWindow.cpp:52
+#: ../src/LauncherWindow.cpp:35 ../src/LauncherWindow.cpp:72
 msgid "Create Launcher"
 msgstr "Crear Lanzador"
 
-#: ../src/LauncherWindow.cpp:16
+#: ../src/LauncherWindow.cpp:36
 msgid "Test Launcher"
 msgstr "Probar el Lanzador"
 
-#: ../src/LauncherWindow.cpp:17
+#: ../src/LauncherWindow.cpp:37 ../src/SessionWindow.cpp:111
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../src/LauncherWindow.cpp:49
+#: ../src/LauncherWindow.cpp:69
 msgid "Command: "
 msgstr "Comando: "
 
-#: ../src/LauncherWindow.cpp:50
+#: ../src/LauncherWindow.cpp:70
 msgid "Choose command"
 msgstr "Elegir comando"
 
-#: ../src/LauncherWindow.cpp:51
+#: ../src/LauncherWindow.cpp:71
 msgid "Choose Icon"
 msgstr "Elegir Icono"
 
-#: ../src/LauncherWindow.cpp:54
+#: ../src/LauncherWindow.cpp:74
 msgid "Available"
 msgstr "Disponible"
 
-#: ../src/LauncherWindow.cpp:56
+#: ../src/LauncherWindow.cpp:76
 msgid "Name: "
 msgstr "Nombre: "
 
-#: ../src/LauncherWindow.cpp:57
+#: ../src/LauncherWindow.cpp:77
 msgid "Comment: "
 msgstr "Comentario"
 
-#: ../src/LauncherWindow.cpp:58
+#: ../src/LauncherWindow.cpp:78
 msgid "Icon: "
 msgstr "Icono"
 
-#: ../src/LauncherWindow.cpp:59
+#: ../src/LauncherWindow.cpp:79
 msgid "Categories: "
 msgstr "Categorias"
 
-#: ../src/LauncherWindow.cpp:60
+#: ../src/LauncherWindow.cpp:80
 msgid "Close"
 msgstr "Cerrar"
 
-#: ../src/LauncherWindow.cpp:63
-msgid "DockLight Launcher"
+#: ../src/LauncherWindow.cpp:83
+msgid "Docklight Launcher"
 msgstr "Docklight Lanzador"
 
-#: ../src/LauncherWindow.cpp:186
+#: ../src/LauncherWindow.cpp:209
 #, c-format
 msgid ""
 "Launcher for %s could not be found.\n"
@@ -102,16 +102,16 @@ msgstr ""
 "No se pudo encontrar el lanzador de %s.\n"
 "Debe crear un Lanzador para esta aplicación."
 
-#: ../src/LauncherWindow.cpp:191
+#: ../src/LauncherWindow.cpp:214
 msgid " Application"
 msgstr "Aplicación"
 
-#: ../src/LauncherWindow.cpp:211
+#: ../src/LauncherWindow.cpp:234
 msgid "Launcher test Failed!"
 msgstr "La prueba del lanzador falló!"
 
 #. dialog.set_icon_name()
-#: ../src/LauncherWindow.cpp:213
+#: ../src/LauncherWindow.cpp:236
 msgid ""
 "The command you enter is invalid.\n"
 "\n"
@@ -146,7 +146,7 @@ msgstr ""
 "Abrir un terminal y navegar hasta el directorio donde está la aplicación\n"
 "ejecutar el comando desde allí ..."
 
-#: ../src/LauncherWindow.cpp:250
+#: ../src/LauncherWindow.cpp:273
 msgid ""
 "\n"
 "\n"
@@ -158,7 +158,7 @@ msgstr ""
 "Error de plantilla de copia!\n"
 "\n"
 
-#: ../src/LauncherWindow.cpp:336
+#: ../src/LauncherWindow.cpp:359
 msgid ""
 "\n"
 "\n"
@@ -170,7 +170,7 @@ msgstr ""
 "Permisos requeridos. Por favor, inténtelo de nuevo!\n"
 "\n"
 
-#: ../src/LauncherWindow.cpp:342
+#: ../src/LauncherWindow.cpp:365
 msgid ""
 "\n"
 "\n"
@@ -182,107 +182,104 @@ msgstr ""
 "Lanzador creado con éxito!\n"
 "\n"
 
-#: ../src/LauncherWindow.cpp:350 ../src/LauncherWindow.cpp:376
+#: ../src/LauncherWindow.cpp:373 ../src/LauncherWindow.cpp:399
 msgid "Please choose a file"
 msgstr "Elija un archivo"
 
 #. Add response buttons the the dialog:
-#: ../src/LauncherWindow.cpp:356 ../src/LauncherWindow.cpp:382
+#: ../src/LauncherWindow.cpp:379 ../src/LauncherWindow.cpp:405
 msgid "_Cancel"
 msgstr "Cancelar"
 
-#: ../src/LauncherWindow.cpp:357 ../src/LauncherWindow.cpp:383
+#: ../src/LauncherWindow.cpp:380 ../src/LauncherWindow.cpp:406
 msgid "_Open"
 msgstr "Abri_r"
 
-#: ../src/LauncherWindow.cpp:386
+#: ../src/LauncherWindow.cpp:409
 msgid "Image files"
 msgstr "Archivos de imagen"
 
-#: ../src/LauncherWindow.cpp:412
+#: ../src/LauncherWindow.cpp:435
 msgid "Browser could not be found!\n"
 msgstr "No se ha podido encontrar el navegador.\n"
 
-#: ../src/LauncherWindow.cpp:436
+#: ../src/LauncherWindow.cpp:459
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "Los campos Nombre y Comando no pueden estar vacíos!\n"
 
-#: ../src/DockPanel.cpp:114 ../src/DockPanel.cpp:115
+#: ../src/DockPanel.cpp:112 ../src/DockPanel.cpp:113
 msgid "Desktop"
 msgstr "Escritorio"
 
 #. Menus
 #. Home Menu items
-#: ../src/DockPanel.cpp:128
+#: ../src/DockPanel.cpp:124
 msgid "Autohide"
 msgstr "Esconder automaticamente"
 
-#: ../src/DockPanel.cpp:133 ../src/DockPanel.cpp:235
+#: ../src/DockPanel.cpp:129 ../src/DockPanel.cpp:218
 msgid "Show all"
 msgstr "Mostrar todo"
 
-#: ../src/DockPanel.cpp:137 ../src/DockPanel.cpp:239
+#: ../src/DockPanel.cpp:133 ../src/DockPanel.cpp:222
 msgid "Minimize all except active"
 msgstr "Minimizar todo menos lo activo"
 
-#: ../src/DockPanel.cpp:142 ../src/DockPanel.cpp:243
+#: ../src/DockPanel.cpp:138 ../src/DockPanel.cpp:226
 msgid "Minimize all"
 msgstr "Minimizar todo"
 
-#: ../src/DockPanel.cpp:146 ../src/DockPanel.cpp:253
+#: ../src/DockPanel.cpp:142 ../src/DockPanel.cpp:236
 msgid "Close all except active"
 msgstr "Cierra todo menos lo activo"
 
-#: ../src/DockPanel.cpp:151 ../src/DockPanel.cpp:257
+#: ../src/DockPanel.cpp:147 ../src/DockPanel.cpp:240
 msgid "Close all"
 msgstr "Cierra todo"
 
-#. m_HomeMenu_Popup.signal_enter_notify_event().
-#. connect(sigc::mem_fun(*this, &DockPanel::on_MenuEnterNotify_event());
-#. on_HomePreferences_event
-#: ../src/DockPanel.cpp:176 ../src/Preferences.cpp:25
+#: ../src/DockPanel.cpp:166 ../src/Preferences.cpp:44
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: ../src/DockPanel.cpp:181
+#: ../src/DockPanel.cpp:170
 msgid "Session-group"
 msgstr "Session de grupos"
 
-#: ../src/DockPanel.cpp:186
+#: ../src/DockPanel.cpp:174
 msgid "Help"
 msgstr "Ayuda"
 
-#: ../src/DockPanel.cpp:191
+#: ../src/DockPanel.cpp:178
 msgid "About"
 msgstr "Acerca de"
 
-#: ../src/DockPanel.cpp:195
+#: ../src/DockPanel.cpp:182
 msgid "Quit"
 msgstr "Salir"
 
 #. Item Menu
-#: ../src/DockPanel.cpp:216 ../src/DockPanel.cpp:651
+#: ../src/DockPanel.cpp:199 ../src/DockPanel.cpp:628
 msgid "Open new"
 msgstr "Abrir nuevo"
 
-#: ../src/DockPanel.cpp:223
+#: ../src/DockPanel.cpp:206
 msgid "Attach to Dock"
 msgstr "Adjuntar al Dock"
 
-#: ../src/DockPanel.cpp:228
+#: ../src/DockPanel.cpp:211
 msgid "Detach from Dock"
 msgstr "Desconectarse de el Dock"
 
-#: ../src/DockPanel.cpp:655
-msgid "Add active"
-msgstr "Añadir activo"
+#: ../src/DockPanel.cpp:632
+msgid "Configure"
+msgstr "Configurar"
 
-#: ../src/DockPanel.cpp:1209
+#: ../src/DockPanel.cpp:1170 ../src/DockPanel.cpp:1860
 #, c-format
 msgid "Session-group %d"
 msgstr "Session de grupos %d"
 
-#: ../src/DockPanel.cpp:1829
+#: ../src/DockPanel.cpp:1770
 #, c-format
 msgid ""
 "(%s) %d windows.\n"
@@ -293,17 +290,49 @@ msgstr ""
 "Hay muchas ventanas abiertas para una vista previa.\n"
 "Cierre algunas ventanas e inténtelo de nuevo."
 
-#: ../src/Launcher.cpp:12
+#: ../src/Launcher.cpp:35
 msgid "Gpk-update-viewer"
 msgstr "Actualizador de paquetes"
 
-#: ../src/Launcher.cpp:13
+#: ../src/Launcher.cpp:36
 msgid "Gpk-application"
 msgstr "Paquetes"
 
-#: ../src/Preferences.cpp:22
+#: ../src/Preferences.cpp:41
 msgid "Autohide on start"
 msgstr "Esconder automaticamente al iniciar"
+
+#: ../src/SessionWindow.cpp:42
+msgid "Launch"
+msgstr "Probar el Lanzador"
+
+#: ../src/SessionWindow.cpp:43
+msgid "Remove"
+msgstr "Borrar"
+
+#: ../src/SessionWindow.cpp:108
+msgid "Application"
+msgstr "Aplicación"
+
+#: ../src/SessionWindow.cpp:109
+msgid "Add to list"
+msgstr "Agregar a la lista"
+
+#: ../src/SessionWindow.cpp:110
+msgid "Save"
+msgstr "Guardar"
+
+#: ../src/SessionWindow.cpp:201
+#, c-format
+msgid "Session group %d"
+msgstr "Session de grupos %d"
+
+#: ../src/SessionWindow.cpp:381
+msgid "Click here to get the Application name!"
+msgstr "Haga clic aquí para obtener el nombre de la aplicación!"
+
+#~ msgid "Add active"
+#~ msgstr "Añadir activo"
 
 #, fuzzy
 #~ msgid "Session group"
