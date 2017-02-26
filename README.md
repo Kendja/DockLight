@@ -29,6 +29,12 @@ Select the window or close the desired application the real time preview make th
 	- libwnck-3.0	
 	- libx11-dev
    
+	./autogen.sh
+	./configure --prefix=/usr/lib/docklight
+	make
+	sudo make install
+
+
  Install from a debian package:
  
   you can install “Docklight” direct from the debian Package/docklight_1.0-*_amd64.deb
