@@ -311,6 +311,10 @@ void SessionWindow::on_button_clicked(guint buttonId)
 
 void SessionWindow::addToList()
 {
+    
+    if( !WNCK_IS_WINDOW(m_window))
+        return;
+            
     Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
 
     std::string the_appname;
