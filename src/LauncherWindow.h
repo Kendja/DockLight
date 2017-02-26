@@ -66,6 +66,7 @@ protected:
     Gtk::Grid m_grid;
     
     Gtk::Box m_VBox;
+    Gtk::Box m_VBoxCenter;
     Gtk::Box m_HBox;
     Gtk::Box m_HBox2;
     

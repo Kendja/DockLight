@@ -35,6 +35,7 @@ ListRow::ListRow(
         Glib::RefPtr<Gdk::Pixbuf> appIcon)
 :
 m_HBox(Gtk::ORIENTATION_HORIZONTAL),
+m_VBox(Gtk::ORIENTATION_VERTICAL),
 m_HSeparator(Gtk::ORIENTATION_HORIZONTAL),
 m_appname(appname),
 m_image(appIcon),
@@ -45,7 +46,7 @@ m_grid(),
 m_titlename(titlename)
 {
     if (!appname.empty()) {
-  
+
 
         m_parameters.set_text(parameters);
         m_parameters.set_max_length(MAX_INPUT);
@@ -68,17 +69,20 @@ m_titlename(titlename)
         this->m_HBox.add(m_image);
         this->m_HBox.add(m_grid);
         this->m_HBox.add(m_HSeparator);
-        this->m_HBox.add(m_launchButton);
-        this->m_HBox.add(m_removeButton);
+        this->m_HBox.add(m_VBox);
+
+
+        this->m_VBox.add(m_launchButton);
+        this->m_VBox.add(m_removeButton);
 
 
         this->m_parameters.set_hexpand(true);
         this->m_appname.set_halign(Gtk::Align::ALIGN_START);
-        this->m_appname.set_markup("<big>"+this->m_appname.get_text()+"</big>");
-        
+        this->m_appname.set_markup("<big>" + this->m_appname.get_text() + "</big>");
+
         this->m_titlename.set_halign(Gtk::Align::ALIGN_START);
-        
-         
+
+
         this->m_grid.attach(m_appname, 0, 0, 1, 1);
         this->m_grid.attach(m_titlename, 0, 1, 1, 1);
         this->m_grid.attach(m_parameters, 0, 2, 2, 1);
@@ -187,7 +191,6 @@ m_ListBox()
     signal_getactive().connect(sigc::mem_fun(*this,
             &SessionWindow::on_signal_getactive));
 
-    this->show_all();
 }
 
 SessionWindow::~SessionWindow()
@@ -202,7 +205,6 @@ SessionWindow::~SessionWindow()
 
 void SessionWindow::init(DockPanel& panel, const int id)
 {
-
     this->m_panel = &panel;
     char buff[100];
     sprintf(buff, _("Session group %d"), id);
@@ -211,12 +213,14 @@ void SessionWindow::init(DockPanel& panel, const int id)
     sprintf(buff, "Session-group-%d", id);
     m_sessiongrpname = buff;
     m_deleteSet = false;
-
+    std::vector<ListRow*> rows;
     size_t result;
     FILE* f;
     f = fopen(getFilePath().c_str(), "rb");
-    if (!f)
+    if (!f) {
+        g_critical("SessionWindow::init: file open Error\n");
         return;
+    }
 
     struct sessionGrpData st;
 
@@ -240,7 +244,8 @@ void SessionWindow::init(DockPanel& panel, const int id)
                 st.titlename,
                 pixbuf));
 
-        m_ListBox.append(*row);
+        rows.push_back(row);
+
 
         try {
             loader->close();
@@ -253,6 +258,31 @@ void SessionWindow::init(DockPanel& panel, const int id)
     }
 
     fclose(f);
+
+    // Sort by appname
+    int size = (int) rows.size();
+    int i, m, j;
+
+    for (i = 0; i < size - 1; i = i + 1) {
+        m = i;
+        for (j = i + 1; j < size; j = j + 1) {
+
+            std::string s1 = rows.at(j)->get_appname().c_str();
+            std::string s2 = rows.at(m)->get_appname().c_str();
+
+            std::string a = Utilities::stringToLower(s1.c_str());
+            std::string b = Utilities::stringToLower(s2.c_str());
+
+            if (a < b) {
+                m = j;
+            }
+        }
+        std::swap(rows.at(i), rows.at(m));
+    }
+    
+    for(auto row : rows)
+        m_ListBox.append(*row);
+    
     m_ListBox.show_all();
 }
 
@@ -282,9 +312,6 @@ void SessionWindow::on_button_clicked(guint buttonId)
 void SessionWindow::addToList()
 {
     Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
-    appIcon = IconLoader::GetWindowIcon(m_window);
-    appIcon = appIcon->scale_simple(DEF_ICONSIZE,
-            DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
 
     std::string the_appname;
     std::string the_instancename;
@@ -299,8 +326,12 @@ void SessionWindow::addToList()
         return;
     }
 
+    appIcon = IconLoader::GetWindowIcon(m_window);
+    appIcon = appIcon->scale_simple(DEF_ICONSIZE,
+            DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
+
     auto row = Gtk::manage(new ListRow(
-            m_EntryAppName.get_text(), "", the_appname,  appIcon));
+            m_EntryAppName.get_text(), "", the_appname, appIcon));
 
     m_ListBox.append(*row);
     m_ListBox.show_all();
@@ -328,7 +359,6 @@ void SessionWindow::save()
 
     gchar* iconBuffer;
     gsize buffer_size;
-    GError *error = NULL;
     struct sessionGrpData st;
     int i;
     int maxrows = m_ListBox.get_children().size();
@@ -361,11 +391,16 @@ void SessionWindow::save()
         if (result == 0)
             g_critical("SessionWindow::save:: Error writing file> fwrite\n");
 
-        delete iconBuffer;
+        delete [] (gchar*) iconBuffer;
 
     }
 
     fclose(f);
+
+    Gtk::MessageDialog dialog(*this, _("\n\nSession group successfully saved!\n\n"), false, Gtk::MESSAGE_INFO);
+    dialog.run();
+    close();
+
     this->close();
 }
 

@@ -96,6 +96,7 @@ private:
     Gtk::Frame m_frame;
     Gtk::Entry m_parameters;
     Gtk::Box m_HBox;
+    Gtk::Box m_VBox;
     Gtk::Box m_HSeparator;
     Gtk::Label m_appname;
     Gtk::Label m_titlename;

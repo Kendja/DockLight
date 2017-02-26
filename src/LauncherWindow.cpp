@@ -55,16 +55,16 @@ m_Button_Cancel(_("Cancel"))
     bbox->add(m_Button_testLauncher);
     bbox->add(m_Button_Cancel);
 
-    
+
 
 }
-
 
 LauncherWindow::LauncherWindow()
 : //Gtk::Window(Gtk::WindowType::WINDOW_POPUP),
 Gtk::Window(Gtk::WindowType::WINDOW_TOPLEVEL),
 m_VBox(Gtk::ORIENTATION_VERTICAL),
 m_VPaned(Gtk::ORIENTATION_VERTICAL),
+m_VBoxCenter(Gtk::ORIENTATION_VERTICAL),
 m_ButtonBox(Gtk::ORIENTATION_VERTICAL),
 m_labelFile(_("Command: ")),
 m_Button_File(_("Choose command")),
@@ -85,9 +85,9 @@ m_Button_close(_("Close"))
     this->set_resizable(false);
     this->set_keep_above(true);
     this->set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DIALOG);
-    
 
-    
+
+
     //this->set_decorated(false);
     /* Sets the border width of the window. */
     set_border_width(12);
@@ -102,12 +102,18 @@ m_Button_close(_("Close"))
     m_FrameTop.add(m_labeInfo);
     m_FrameTop.set_size_request(-1, 50);
     m_FrameTop.set_margin_bottom(10);
-    
-   // m_Frame.set_size_request(-1, 50);
-   // m_Frame.set_margin_top(10);
 
+    // m_Frame.set_size_request(-1, 50);
+    // m_Frame.set_margin_top(10);
+
+    m_VBoxCenter.set_margin_top(4);
+    m_VBoxCenter.set_margin_bottom(4);
+    m_VBoxCenter.set_margin_left(4);
+    m_VBoxCenter.set_margin_right(4);
+    
     m_VBox.add(m_Frame);
-    m_Frame.add(m_grid);
+    m_Frame.add(m_VBoxCenter);
+    m_VBoxCenter.add(m_grid);
     m_VBox.add(m_HBox);
 
 
@@ -174,16 +180,16 @@ m_Button_close(_("Close"))
 
     m_Button_CategoriesLink.signal_clicked().connect(sigc::mem_fun(*this,
             &LauncherWindow::on_button_CategoriesLink_clicked));
-    
-    
+
+
     this->signal_delete_event().
-            connect(sigc::mem_fun(*this,&LauncherWindow::on_delete_event));
-    
+            connect(sigc::mem_fun(*this, &LauncherWindow::on_delete_event));
+
     int x, y;
     DockPosition::getCenterScreenPos(440, 300, x, y);
     move(x, y);
     m_grid.show_all();
-    
+
     //std::string iconFile = Utilities::getExecPath("gnome-panel-launcher.png");
     //this->set_icon_from_file(iconFile);
 
@@ -200,6 +206,7 @@ LauncherWindow::~LauncherWindow()
 {
     g_print("LauncherWindow destroy!\n");
 }
+
 void LauncherWindow::init(DockPanel& dockpanel, DockItem* dockitem)
 {
     m_dockitem = dockitem;
@@ -211,13 +218,13 @@ void LauncherWindow::init(DockPanel& dockpanel, DockItem* dockitem)
 
     m_labeInfo.set_text(message);
     m_EntryName.set_text(m_dockitem->getTitle().c_str());
-    std::string defaultcomment(m_dockitem->getTitle() + _(" Application") );
+    std::string defaultcomment(m_dockitem->getTitle() + _(" Application"));
     m_EntryComment.set_text(defaultcomment.c_str());
     m_EntryFile.set_text("");
     m_EntryIcon.set_text("");
     m_EntryCategories.set_text("Other");
-    
-    
+
+
 }
 
 void LauncherWindow::on_button_testLauncher_clicked()
@@ -245,7 +252,7 @@ void LauncherWindow::on_button_testLauncher_clicked()
             "and trying the command from there..."));
 
     dialog.run();
-    
+
 }
 
 void LauncherWindow::on_button_createLauncher_clicked()
@@ -256,25 +263,21 @@ void LauncherWindow::on_button_createLauncher_clicked()
         return;
     }
 
-    
+
     std::string desktopfile = m_dockitem->getDesktopFileName();
-    
-    //std::string templatefileLocal(Utilities::getExecPath("data/template.desktop"));
-    //std::string desktopfileLocal(Utilities::getExecPath("data/"+desktopfile));
-    
     std::string templatefileLocal(Utilities::getExecPath(DEF_LAUCHERTEMPLATEPATH));
-    std::string desktopfileLocal(Utilities::getExecPath(DEF_DATADIRNAME+desktopfile));
-  
-    
+    std::string desktopfileLocal(Utilities::getExecPath(DEF_DATADIRNAME + desktopfile));
+
+
     // create a copy from template
     char command[NAME_MAX];
-    sprintf(command, "cp %s %s ",templatefileLocal.c_str(),desktopfileLocal.c_str());
-    if(system(command) != 0 ){
+    sprintf(command, "cp %s %s ", templatefileLocal.c_str(), desktopfileLocal.c_str());
+    if (system(command) != 0) {
         Gtk::MessageDialog dialog(*this, _("\n\nCopy template Error!\n\n"), false, Gtk::MESSAGE_INFO);
         dialog.run();
         return;
     }
-    
+
 
     GError *error = NULL;
     GKeyFile *key_file = g_key_file_new();
@@ -347,20 +350,20 @@ void LauncherWindow::on_button_createLauncher_clicked()
 
 
     g_key_file_free(key_file);
-    
-         
+
+
     //https://www.freedesktop.org/software/polkit/docs/0.105/pkexec.1.html
-    sprintf(command, "pkexec %s %s", 
+    sprintf(command, "pkexec %s %s",
             Utilities::getExecPath(DEF_LAUCHERSCRIPTPATH).c_str(),
             desktopfileLocal.c_str());
-    
-        
-    if(system(command) != 0 ){
+
+
+    if (system(command) != 0) {
         Gtk::MessageDialog dialog(*this, _("\n\nPermissions required. Please try again!\n\n"), false, Gtk::MESSAGE_INFO);
         dialog.run();
         return;
     }
- 
+
 
     Gtk::MessageDialog dialog(*this, _("\n\nLauncher created successfully!\n\n"), false, Gtk::MESSAGE_INFO);
     dialog.run();
@@ -430,16 +433,16 @@ void LauncherWindow::on_button_icon_clicked()
 void LauncherWindow::on_button_CategoriesLink_clicked()
 {
     //system("sensible-browser https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry");
-    if( system("xdg-open https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry") != 0 ){
-     
+    if (system("xdg-open https://specifications.freedesktop.org/menu-spec/menu-spec-1.0.html#category-registry") != 0) {
+
         Gtk::MessageDialog dialog(*this, _("Browser could not be found!\n"), false,
-            Gtk::MESSAGE_INFO,
-            Gtk::BUTTONS_OK,
-            true
-            );
+                Gtk::MESSAGE_INFO,
+                Gtk::BUTTONS_OK,
+                true
+                );
         dialog.run();
     }
-     
+
 }
 
 bool LauncherWindow::isFormFieldsValid()

@@ -66,31 +66,31 @@ namespace Launcher
      * @param const char* parameters
      * @return TRUE on success, FALSE if error is set
      */
-    bool LauchAsync(const char* applicationName, const char* parameters)
+    inline bool LauchAsync(const char* applicationName, const char* parameters)
     {
         GError *error = NULL;
         char command[PATH_MAX];
         *command = 0;
 
         std::string lowerappname(Utilities::stringToLower(applicationName));
-        if (parameters != NULL && (int) strlen(parameters) > 3) {
+        if (parameters != NULL && (int) strlen(parameters) > 0) {
             sprintf(command, "\"%s\" %s", lowerappname.c_str(), parameters);
         } else {
             sprintf(command, "\"%s\"", lowerappname.c_str());
         }
 
-        g_print("LauchAsync attempt to launch: %s \n",command);
+        g_print("LauchAsync attempt to launch: %s \n", command);
         gboolean launched = g_spawn_command_line_async(command, &error);
         if (error) {
             g_warning("LauchAsync: Error (%s) %s \n", lowerappname.c_str(), error->message);
             g_error_free(error);
             error = NULL;
         }
-        
+
         bool result = launched && error == NULL;
-        if(!result)
+        if (!result)
             g_warning("LauchAsync: Fails) %s \n", lowerappname.c_str());
-        
+
         return result;
     }
 
@@ -103,20 +103,20 @@ namespace Launcher
      */
     bool Launch(const char* applicationName, const char* parameters)
     {
-        if (applicationName == NULL || strlen(applicationName) < 3)
+        if (applicationName == NULL || strlen(applicationName) < 1)
             return false;
 
-        GError *error = NULL;
-        GAppLaunchContext *context = NULL;
-        GAppInfo *app_info = NULL;
-        GKeyFile *key_file = g_key_file_new();
-        
         std::string appname(applicationName);
         std::replace(appname.begin(), appname.end(), ' ', '-');
 
         if (LauchAsync(appname.c_str(), parameters)) {
             return true;
         }
+
+        GError *error = NULL;
+        GAppLaunchContext *context = NULL;
+        GAppInfo *app_info = NULL;
+        GKeyFile *key_file = g_key_file_new();
 
         if (getDesktopFile(key_file, appname.c_str())) {
             app_info = (GAppInfo*) g_desktop_app_info_new_from_keyfile(key_file);
@@ -125,26 +125,21 @@ namespace Launcher
                 GFile* file = NULL;
                 GList *glist_parameters = NULL;
 
-                if (parameters != NULL && (int) strlen(parameters) > 3 && g_app_info_supports_uris(app_info)) {
+                if (parameters != NULL && (int) strlen(parameters) > 0 && g_app_info_supports_uris(app_info)) {
                     bool validDesktopfile = false;
-                    char* execkey = g_key_file_get_string(key_file, "Desktop Entry", "Exec", &error);
+                    char* execprog = g_key_file_get_string(key_file, "Desktop Entry", "Exec", &error);
                     if (error) {
                         g_error_free(error);
                         error = NULL;
                     }
 
                     // checks if the desktop file support parameters
-                    validDesktopfile = execkey != NULL && error == NULL && strstr(execkey, "%") != NULL;
+                    validDesktopfile = execprog != NULL && error == NULL && strstr(execprog, "%") != NULL;
 
                     if (validDesktopfile) {
                         file = g_file_new_for_commandline_arg(parameters);
                         uri = g_file_get_uri(file);
                         glist_parameters = g_list_append(glist_parameters, uri);
-                    } else {
-                        if (LauchAsync(appname.c_str(), parameters)) {
-                            g_key_file_free(key_file);
-                            return true;
-                        }
                     }
                 }
 

@@ -67,10 +67,10 @@ m_ListBox(), m_FrameTop(), m_Frame() {
 
     add(m_VBox);
     m_VBox.set_size_request(300, 300);
-    m_VBox.set_margin_top(4);
-    m_VBox.set_margin_left(4);
-    m_VBox.set_margin_right(4);
-    m_VBox.set_margin_bottom(4);
+    m_VBox.set_margin_top(10);
+    m_VBox.set_margin_left(10);
+    m_VBox.set_margin_right(10);
+    m_VBox.set_margin_bottom(10);
 
 
     m_VBox.pack_start(m_CheckButton_Autohide, Gtk::PACK_SHRINK);
@@ -116,29 +116,16 @@ void Preferences::init(DockPanel& panel) {
 
     m_CheckButton_Autohide.set_active(autohide);
 
-
-
-
     guint group, key;
     gsize* length;
     gsize num_groups, num_keys;
     gchar** groups, **keys, *value;
 
     groups = g_key_file_get_groups(key_file, &num_groups);
-    //    g_print(".........%d\n", (int) num_groups);
     for (group = 1; group < num_groups; group++) {
-        // std::string grpname(group);
-        //  g_print("group %u/%u: \t%s\n", group, (num_groups - 1), groups[group]);
-        //g_print("group %u,  %d %d\n%s", group, (num_groups - 1), groups[group]);
-
         auto row = Gtk::manage(new ExampleRow(groups[group], 1));
         m_ListBox.append(*row);
-
-
     }
-
-
-
 
     g_strfreev(groups);
     g_key_file_free(key_file);
