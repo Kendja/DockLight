@@ -1,97 +1,77 @@
-# *****************************************************************
-#
-#  Copyright (C) 2015 Juan R. Gonzalez
-#  Created on Januar, 2017
-#
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# ****************************************************************
-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.1.12\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 13:21+0700\n"
-"PO-Revision-Date: 2017-02-26 13:22+0700\n"
-"Last-Translator: FULL NAME <j-gonzalez@email.de>\n"
-"Language-Team: SPAIN\n"
-"Language: es\n"
+"POT-Creation-Date: 2017-02-26 13:24+0700\n"
+"PO-Revision-Date: 2017-02-26 13:47+0700\n"
+"Last-Translator: \n"
+"Language-Team: THAI <LL@li.org>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.11\n"
 
 #: ../src/About.cpp:113
-msgid ""
-"This program is a lightweight Dock Launcher for opening common applications "
-"for the GNOME Desktop"
-msgstr ""
-"Docklight es un Programa para abrir aplicaciones  para el escritorio de "
-"GNOME."
+msgid "This program is a lightweight Dock Launcher for opening common applications for the GNOME Desktop"
+msgstr "Ce programme est un Dock lanceur léger pour l'ouverture des applications communes pour le bureau GNOME"
 
 #: ../src/LauncherWindow.cpp:35 ../src/LauncherWindow.cpp:72
 msgid "Create Launcher"
-msgstr "Crear Lanzador"
+msgstr "Créer un lanceur"
 
 #: ../src/LauncherWindow.cpp:36
 msgid "Test Launcher"
-msgstr "Probar el Lanzador"
+msgstr "Test Launcher"
 
 #: ../src/LauncherWindow.cpp:37 ../src/SessionWindow.cpp:121
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "annuler"
 
 #: ../src/LauncherWindow.cpp:69
 msgid "Command: "
-msgstr "Comando: "
+msgstr "commande:"
 
 #: ../src/LauncherWindow.cpp:70
 msgid "Choose command"
-msgstr "Elegir comando"
+msgstr "Choisissez commande"
 
 #: ../src/LauncherWindow.cpp:71
 msgid "Choose Icon"
-msgstr "Elegir Icono"
+msgstr "Choisir l'icône"
 
 #: ../src/LauncherWindow.cpp:74
 msgid "Available"
-msgstr "Disponible"
+msgstr "disponible"
 
 #: ../src/LauncherWindow.cpp:76
 msgid "Name: "
-msgstr "Nombre: "
+msgstr "Nom:"
 
 #: ../src/LauncherWindow.cpp:77
 msgid "Comment: "
-msgstr "Comentario"
+msgstr "commentaire:"
 
 #: ../src/LauncherWindow.cpp:78
 msgid "Icon: "
-msgstr "Icono"
+msgstr "icon:"
 
 #: ../src/LauncherWindow.cpp:79
 msgid "Categories: "
-msgstr "Categorias"
+msgstr "catégories:"
 
 #: ../src/LauncherWindow.cpp:80
 msgid "Close"
-msgstr "Cerrar"
+msgstr "proche"
 
 #: ../src/LauncherWindow.cpp:83
 msgid "Docklight Launcher"
-msgstr "Docklight Lanzador"
+msgstr "Docklight Launcher"
 
 #: ../src/LauncherWindow.cpp:216
 #, c-format
@@ -99,24 +79,23 @@ msgid ""
 "Launcher for %s could not be found.\n"
 "You need to create a Launcher for this Application."
 msgstr ""
-"No se pudo encontrar el lanzador de %s.\n"
-"Debe crear un Lanzador para esta aplicación."
+"Launcher pour% s est introuvable.\n"
+"Vous devez créer un lanceur d'application pour esta."
 
 #: ../src/LauncherWindow.cpp:221
 msgid " Application"
-msgstr "Aplicación"
+msgstr "application"
 
 #: ../src/LauncherWindow.cpp:241
 msgid "Launcher test Failed!"
-msgstr "La prueba del lanzador falló!"
+msgstr "Echec du test de lancement!"
 
 #. dialog.set_icon_name()
 #: ../src/LauncherWindow.cpp:243
 msgid ""
 "The command you enter is invalid.\n"
 "\n"
-"Some Applications are scripts files and others requires Administrator "
-"privileges:\n"
+"Some Applications are scripts files and others requires Administrator privileges:\n"
 "for scrips files you need to add the bash on the beginning:\n"
 "\n"
 "/bin/sh \"/usr/local/scriptfile.sh\"\n"
@@ -126,25 +105,23 @@ msgid ""
 "gksu gparted-pkexec\n"
 "\n"
 "Please make sure that the Application starts from the command line.\n"
-"Open a terminal and navigate to the directory where the application is "
-"locate\n"
+"Open a terminal and navigate to the directory where the application is locate\n"
 "and trying the command from there..."
 msgstr ""
-"El comando no es válido.\n"
+"La commande que vous entrez est invalide.\n"
 "\n"
-"Algunas aplicaciones son archivos de scripts y otras requieren privilegios "
-"de administrador:\n"
-"Para los archivos scrips se necesita agregar bash al principio:\n"
+"Certaines applications sont des fichiers de scripts et d'autres nécessite des privilèges d'administrateur:\n"
+"scripts pour les fichiers dont vous avez besoin pour ajouter le bash sur le début\n"
 "\n"
 "/bin/sh \"/usr/local/scriptfile.sh\"\n"
 "/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
 "\n"
-"Para aplicaciones que requieren privilegios de administrador agregar gksu:\n"
+"Pour les applications qui nécessite des privilèges d'administrateur:\n"
 "gksu gparted-pkexec\n"
 "\n"
-"Asegúrese de que la aplicación se inicia desde la terminal de comandos.\n"
-"Abrir un terminal y navegar hasta el directorio donde está la aplicación\n"
-"ejecutar el comando desde allí ..."
+"faire S'il vous plaît assurer l'application qui commence à partir de la ligne de commande.\n"
+"Ouvrez un terminal et accédez au répertoire Lorsque la demande est de localiser\n"
+"et d'essayer la commande à partir de là.."
 
 #: ../src/LauncherWindow.cpp:276
 msgid ""
@@ -155,7 +132,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Error de plantilla de copia!\n"
+"Copier modèle Erreur!\n"
 "\n"
 
 #: ../src/LauncherWindow.cpp:362
@@ -167,7 +144,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Permisos requeridos. Por favor, inténtelo de nuevo!\n"
+"Autorisations requises. S'il vous plaît essayer à nouveau\n"
 "\n"
 
 #: ../src/LauncherWindow.cpp:368
@@ -179,105 +156,105 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Lanzador creado con éxito!\n"
+"Launcher créé avec succès!\n"
 "\n"
 
 #: ../src/LauncherWindow.cpp:376 ../src/LauncherWindow.cpp:402
 msgid "Please choose a file"
-msgstr "Elija un archivo"
+msgstr "S'il vous plaît choisir un fichier"
 
 #. Add response buttons the the dialog:
 #: ../src/LauncherWindow.cpp:382 ../src/LauncherWindow.cpp:408
 msgid "_Cancel"
-msgstr "Cancelar"
+msgstr "_Annuler"
 
 #: ../src/LauncherWindow.cpp:383 ../src/LauncherWindow.cpp:409
 msgid "_Open"
-msgstr "Abri_r"
+msgstr "_Ouvert"
 
 #: ../src/LauncherWindow.cpp:412
 msgid "Image files"
-msgstr "Archivos de imagen"
+msgstr "Les fichiers d'image"
 
 #: ../src/LauncherWindow.cpp:438
 msgid "Browser could not be found!\n"
-msgstr "No se ha podido encontrar el navegador.\n"
+msgstr "Browser est introuvable!\n"
 
 #: ../src/LauncherWindow.cpp:462
 msgid "Fields Name and Command can't be empty!\n"
-msgstr "Los campos Nombre y Comando no pueden estar vacíos!\n"
+msgstr "Nom et les champs de commande ne peut être vide!\n"
 
 #: ../src/DockPanel.cpp:112 ../src/DockPanel.cpp:113
 msgid "Desktop"
-msgstr "Escritorio"
+msgstr "Bureau"
 
 #. Menus
 #. Home Menu items
 #: ../src/DockPanel.cpp:124
 msgid "Autohide"
-msgstr "Esconder automaticamente"
+msgstr "Autohide"
 
 #: ../src/DockPanel.cpp:129 ../src/DockPanel.cpp:218
 msgid "Show all"
-msgstr "Mostrar todo"
+msgstr "Montrer tous"
 
 #: ../src/DockPanel.cpp:133 ../src/DockPanel.cpp:222
 msgid "Minimize all except active"
-msgstr "Minimizar todo menos lo activo"
+msgstr "Minimiser tous sauf actif"
 
 #: ../src/DockPanel.cpp:138 ../src/DockPanel.cpp:226
 msgid "Minimize all"
-msgstr "Minimizar todo"
+msgstr "Réduire tout"
 
 #: ../src/DockPanel.cpp:142 ../src/DockPanel.cpp:236
 msgid "Close all except active"
-msgstr "Cierra todo menos lo activo"
+msgstr "Fermer tous sauf actif"
 
 #: ../src/DockPanel.cpp:147 ../src/DockPanel.cpp:240
 msgid "Close all"
-msgstr "Cierra todo"
+msgstr "Fermez toutes les"
 
 #: ../src/DockPanel.cpp:166 ../src/Preferences.cpp:44
 msgid "Preferences"
-msgstr "Preferencias"
+msgstr "vous préférences"
 
 #: ../src/DockPanel.cpp:170
 msgid "Session-group"
-msgstr "Session de grupos"
+msgstr "Session-groupe"
 
 #: ../src/DockPanel.cpp:174
 msgid "Help"
-msgstr "Ayuda"
+msgstr "Aider"
 
 #: ../src/DockPanel.cpp:178
 msgid "About"
-msgstr "Acerca de"
+msgstr "Sur"
 
 #: ../src/DockPanel.cpp:182
 msgid "Quit"
-msgstr "Salir"
+msgstr "Quitter"
 
 #. Item Menu
 #: ../src/DockPanel.cpp:199 ../src/DockPanel.cpp:628
 msgid "Open new"
-msgstr "Abrir nuevo"
+msgstr "Ouvrir une nouvelle"
 
 #: ../src/DockPanel.cpp:206
 msgid "Attach to Dock"
-msgstr "Adjuntar al Dock"
+msgstr "Attachez Dock"
 
 #: ../src/DockPanel.cpp:211
 msgid "Detach from Dock"
-msgstr "Desconectarse de el Dock"
+msgstr "Détachez Dock"
 
 #: ../src/DockPanel.cpp:632
 msgid "Configure"
-msgstr "Configurar"
+msgstr "Configurer"
 
 #: ../src/DockPanel.cpp:1172 ../src/DockPanel.cpp:1867
 #, c-format
 msgid "Session-group %d"
-msgstr "Session de grupos %d"
+msgstr "Session-groupe %d"
 
 #: ../src/DockPanel.cpp:1777
 #, c-format
@@ -286,46 +263,46 @@ msgid ""
 "there are to many windows open for a Preview.\n"
 "Close some windows and try again."
 msgstr ""
-"(%s) %d Ventanas.\n"
-"Hay muchas ventanas abiertas para una vista previa.\n"
-"Cierre algunas ventanas e inténtelo de nuevo."
+"(%s) %d  fenêtres.\n"
+"il y a beaucoup de fenêtres à ouvrir pour un aperçu.\n"
+"Fermez quelques fenêtres et réessayez."
 
 #: ../src/Launcher.cpp:35
 msgid "Gpk-update-viewer"
-msgstr "Actualizador de paquetes"
+msgstr "Visualiseur de package"
 
 #: ../src/Launcher.cpp:36
 msgid "Gpk-application"
-msgstr "Paquetes"
+msgstr "Paquet"
 
 #: ../src/Preferences.cpp:41
 msgid "Autohide on start"
-msgstr "Esconder automaticamente al iniciar"
+msgstr "Autohide au démarrage"
 
 #: ../src/SessionWindow.cpp:43
 msgid "Launch"
-msgstr "Probar el Lanzador"
+msgstr "lancer"
 
 #: ../src/SessionWindow.cpp:44
 msgid "Remove"
-msgstr "Borrar"
+msgstr "Supprimer"
 
 #: ../src/SessionWindow.cpp:118
 msgid "Application"
-msgstr "Aplicación"
+msgstr "Application"
 
 #: ../src/SessionWindow.cpp:119
 msgid "Add to list"
-msgstr "Agregar a la lista"
+msgstr "Ajouter à la liste"
 
 #: ../src/SessionWindow.cpp:120
 msgid "Save"
-msgstr "Guardar"
+msgstr "Sauvegarder"
 
 #: ../src/SessionWindow.cpp:210
 #, c-format
 msgid "Session group %d"
-msgstr "Session de grupos %d"
+msgstr "Groupe de session %d"
 
 #: ../src/SessionWindow.cpp:400
 msgid ""
@@ -336,25 +313,12 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"grupo de la sesión guardado correctamente!\n"
+"groupe de session enregistré avec succès!\n"
 "\n"
 
 #: ../src/SessionWindow.cpp:423
 msgid "Click here to get the Application name!"
-msgstr "Haga clic aquí para obtener el nombre de la aplicación!"
+msgstr "Cliquez ici pour obtenir le nom de l'application!"
 
 #~ msgid "Add active"
-#~ msgstr "Añadir activo"
-
-#, fuzzy
-#~ msgid "Session group"
-#~ msgstr "Grupos des sesions"
-
-#~ msgid "nemo"
-#~ msgstr "Nemo Administrador de archivos"
-
-#~ msgid "cinnamon-settings"
-#~ msgstr "Ajustes del sistema"
-
-#~ msgid "nautilus"
-#~ msgstr "Nautilus Administrador de archivos"
+#~ msgstr "เพิ่มการใช้งาน"
