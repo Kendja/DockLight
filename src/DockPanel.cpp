@@ -630,7 +630,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
             if (dockitem->m_dockitemSesssionGrpId > 0) {
 
                 m_MenuItemNewApp.set_label(_("Configure"));
-                m_MenuItemNewApp.set_sensitive(WindowControl::windowscount() > 0);
+                m_MenuItemNewApp.set_sensitive(true);
 
             }
 
