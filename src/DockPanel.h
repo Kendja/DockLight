@@ -87,7 +87,7 @@ private:
 
     std::string m_applicationpath;
     std::string m_applicationDatapath;
-    std::string m_applicationAttachmentsPath;
+    static std::string m_applicationAttachmentsPath;
     std::string m_homeiconFilePath;
     std::string m_SessionGrpIconFilePath;
       
@@ -126,6 +126,7 @@ private:
     void on_menuNew_event();
     void on_DetachFromDock_event();
     void on_AttachToDock_event();
+    static void AttachItemToDock(DockItem* dockitem);
     void on_CloseAll_event();
     void on_CloseAllExceptActive_event();
 

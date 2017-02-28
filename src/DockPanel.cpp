@@ -42,6 +42,7 @@ DockItem* DockPanel::m_currentsessionItem;
 int DockPanel::m_currentMoveIndex;
 bool DockPanel::m_previewWindowActive;
 bool DockPanel::m_dragdropsStarts;
+std::string DockPanel::m_applicationAttachmentsPath;
 
 DockPanel::DockPanel() :
 m_titleElapsedSeconds(0),
@@ -63,11 +64,11 @@ m_dragdropMouseDown(false),
 m_dragdropItemIndex(-1),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/" + DEF_DATADIRNAME),
-m_applicationAttachmentsPath(m_applicationpath + "/" + DEF_ATTACHMENTDIR),
 m_SessionGrpIconFilePath(Utilities::getExecPath(DEF_SEISSIONICONNAME)),
 m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
 {
 
+    DockPanel::m_applicationAttachmentsPath=m_applicationpath + "/" + DEF_ATTACHMENTDIR;
     DockPanel::m_currentsessionItem = nullptr;
     DockPanel::m_dragdropsStarts = false;
     DockPanel::m_currentMoveIndex = -1;
@@ -261,7 +262,7 @@ int DockPanel::preInit(Gtk::Window* window)
 void DockPanel::postInit()
 {
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
+            &DockPanel::on_timeoutDraw), DEF_FRAMERATE );
 
     // Gets the default WnckScreen on the default display.
     WnckScreen *wnckscreen = wnck_screen_get_default();
@@ -785,11 +786,20 @@ void DockPanel::on_AttachToDock_event()
 
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
+    
+    if (dockitem->m_isAttached)
+        return; // already attached
+    
+    AttachItemToDock(dockitem);
 
+}
+
+void DockPanel::AttachItemToDock(DockItem* dockitem)
+{
     if (dockitem->m_isAttached)
         return; // already attached
 
-
+   
     char filename[NAME_MAX];
     std::string s = dockitem->m_realgroupname;
     std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '_'
@@ -800,7 +810,6 @@ void DockPanel::on_AttachToDock_event()
     dockitem->m_isAttached = true;
     dockitem->m_isDirty = true;
     dockitem->m_image->save(filename, "png");
-
 }
 
 void DockPanel::on_DetachFromDock_event()
@@ -1129,7 +1138,7 @@ bool DockPanel::attachToSessiongrp(WnckWindow* window)
     childItem->m_image = NULLPB;
 
     dockItem->m_items.push_back(childItem);
-
+   
     return true;
 }
 
@@ -1182,6 +1191,8 @@ void DockPanel::CreateSessionDockItemGrp()
     dockItem->m_xid = 0;
 
     m_dockitems.push_back(std::move(dockItem));
+    
+     AttachItemToDock( dockItem );
 
 }
 
@@ -1582,8 +1593,10 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                     m_iconsize + 4, m_iconsize + 4, Gdk::INTERP_BILINEAR);
 
         }
-
-        Gdk::Cairo::set_source_pixbuf(cr, icon, col + 5, DEF_ICONTOPMARGIN);
+        
+        int offset = (m_cellwidth - m_iconsize)/2;
+        //g_print("offset %d\n",offset);
+        Gdk::Cairo::set_source_pixbuf(cr, icon, col + offset, DEF_ICONTOPMARGIN);
         cr->paint();
         cr->restore();
 
