@@ -54,6 +54,7 @@ public:
     bool visible = true;
     int m_frames;
     std::string getTitle();
+    std::string getGroupName();
     std::string getDesktopFileName();
     gboolean isMovementDetected(GdkPixbuf *pixbuf);
     int m_dockitemSesssionGrpId = 0;

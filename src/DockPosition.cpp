@@ -88,7 +88,8 @@ namespace DockPosition
             return true;
         }
 
-        int factor = abs((int) (diff / dockitemscount - 2));
+        int factor = abs((int) (diff / dockitemscount ));
+       
         m_cellwidth = cellsize = DEF_CELLWIDTH - factor;
         iconsize = DEF_ICONSIZE - factor;
 

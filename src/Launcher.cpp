@@ -109,10 +109,6 @@ namespace Launcher
         std::string appname(applicationName);
         std::replace(appname.begin(), appname.end(), ' ', '-');
 
-        if (LauchAsync(appname.c_str(), parameters)) {
-            return true;
-        }
-
         GError *error = NULL;
         GAppLaunchContext *context = NULL;
         GAppInfo *app_info = NULL;
@@ -164,8 +160,14 @@ namespace Launcher
                     g_object_unref(file);
 
                 g_key_file_free(key_file);
+                g_print("Launch via Desktop file %s\n",appname.c_str() );
                 return launched;
             }
+        }
+        
+        if (LauchAsync(appname.c_str(), parameters)) {
+            g_print("Launch via command line %s\n",appname.c_str() );
+            return true;
         }
 
         return false;

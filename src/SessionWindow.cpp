@@ -218,7 +218,6 @@ void SessionWindow::init(DockPanel& panel, const int id)
     FILE* f;
     f = fopen(getFilePath().c_str(), "rb");
     if (!f) {
-        g_critical("SessionWindow::init: file open Error\n");
         return;
     }
 

@@ -246,7 +246,7 @@ void LauncherWindow::on_button_testLauncher_clicked()
             "/bin/sh \"/usr/local/scriptfile.sh\"\n"
             "/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n\n"
             "for Applications that requires Administrator privileges:\n"
-            "gksu gparted-pkexec\n\n"
+            "pkexec Application\n\n"
             "Please make sure that the Application starts from the command line.\n"
             "Open a terminal and navigate to the directory where the application is locate\n"
             "and trying the command from there..."));

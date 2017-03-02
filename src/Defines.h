@@ -23,16 +23,16 @@
 
 #define DEF_DATADIRNAME         "data/" 
 #define DEF_ATTACHMENTDIR       "data/attachments" 
-
-#define DEF_ICONNAME            "data/docklight.home.ico"
-#define DEF_SEISSIONICONNAME    "data/docklight-session.png"
-#define DEF_LOGONAME            "data/docklight.logo.png"
+#define DEF_IMAGESDIR           "data/images" 
+#define DEF_ICONNAME            "data/images/docklight.home.ico"
+#define DEF_SEISSIONICONNAME    "data/images/docklight-session.png"
+#define DEF_LOGONAME            "data/images/docklight.logo.png"
 #define DEF_INITNAME            "data/docklight.ini"
 #define DEF_LAUCHERTEMPLATE     "docklight.template.desktop"
 #define DEF_LAUCHERTEMPLATEPATH "data/docklight.template.desktop"
 #define DEF_LAUCHERSCRIPT       "docklight.launcher.sh"
 #define DEF_LAUCHERSCRIPTPATH   "data/docklight.launcher.sh"
-
+#define DEF_MAXSESIONIMAGES     12
 
 #define DEF_LOCALEPATH          "/usr/share/locale"
 #define DEF_LOCALEPACKPATH      "/usr/share/locale-langpack"
