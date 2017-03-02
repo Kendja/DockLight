@@ -136,6 +136,11 @@ namespace Launcher
                         file = g_file_new_for_commandline_arg(parameters);
                         uri = g_file_get_uri(file);
                         glist_parameters = g_list_append(glist_parameters, uri);
+                    } else {
+                        if (LauchAsync(appname.c_str(), parameters)) {
+                            g_print("Launch via command line %s\n", appname.c_str());
+                            return true;
+                        }
                     }
                 }
 
@@ -160,13 +165,13 @@ namespace Launcher
                     g_object_unref(file);
 
                 g_key_file_free(key_file);
-                g_print("Launch via Desktop file %s\n",appname.c_str() );
+                g_print("Launch via Desktop file %s\n", appname.c_str());
                 return launched;
             }
         }
-        
+
         if (LauchAsync(appname.c_str(), parameters)) {
-            g_print("Launch via command line %s\n",appname.c_str() );
+            g_print("Launch via command line %s\n", appname.c_str());
             return true;
         }
 
