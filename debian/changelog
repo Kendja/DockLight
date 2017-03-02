@@ -1,3 +1,12 @@
+docklight (1.0-17) UNRELEASED; urgency=medium
+
+  * Add images folder
+  * fixes in attach to dock 
+  * Modify debian install script
+  * Modidy autotool data/Makefile.am
+ 	 
+ -- yoo <yoo@osx.odx.com>  Thu, 02 Mar 2017 18:52:28 +0700
+
 docklight (1.0-16) UNRELEASED; urgency=medium
 
   * Add Session Group and Persistence

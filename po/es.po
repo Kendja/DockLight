@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.12\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 13:21+0700\n"
-"PO-Revision-Date: 2017-02-26 13:22+0700\n"
+"POT-Creation-Date: 2017-03-02 19:11+0700\n"
+"PO-Revision-Date: 2017-03-02 19:12+0700\n"
 "Last-Translator: FULL NAME <j-gonzalez@email.de>\n"
 "Language-Team: SPAIN\n"
 "Language: es\n"
@@ -123,7 +123,7 @@ msgid ""
 "/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
 "\n"
 "for Applications that requires Administrator privileges:\n"
-"gksu gparted-pkexec\n"
+"pkexec Application\n"
 "\n"
 "Please make sure that the Application starts from the command line.\n"
 "Open a terminal and navigate to the directory where the application is "
@@ -139,8 +139,9 @@ msgstr ""
 "/bin/sh \"/usr/local/scriptfile.sh\"\n"
 "/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
 "\n"
-"Para aplicaciones que requieren privilegios de administrador agregar gksu:\n"
-"gksu gparted-pkexec\n"
+"Para aplicaciones que requieren privilegios de administrador agregar "
+"pkexec:\n"
+"gksu aplicacion\n"
 "\n"
 "Asegúrese de que la aplicación se inicia desde la terminal de comandos.\n"
 "Abrir un terminal y navegar hasta el directorio donde está la aplicación\n"
@@ -207,79 +208,79 @@ msgstr "No se ha podido encontrar el navegador.\n"
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "Los campos Nombre y Comando no pueden estar vacíos!\n"
 
-#: ../src/DockPanel.cpp:112 ../src/DockPanel.cpp:113
+#: ../src/DockPanel.cpp:113 ../src/DockPanel.cpp:114
 msgid "Desktop"
 msgstr "Escritorio"
 
 #. Menus
 #. Home Menu items
-#: ../src/DockPanel.cpp:124
+#: ../src/DockPanel.cpp:125
 msgid "Autohide"
 msgstr "Esconder automaticamente"
 
-#: ../src/DockPanel.cpp:129 ../src/DockPanel.cpp:218
+#: ../src/DockPanel.cpp:130 ../src/DockPanel.cpp:219
 msgid "Show all"
 msgstr "Mostrar todo"
 
-#: ../src/DockPanel.cpp:133 ../src/DockPanel.cpp:222
+#: ../src/DockPanel.cpp:134 ../src/DockPanel.cpp:223
 msgid "Minimize all except active"
 msgstr "Minimizar todo menos lo activo"
 
-#: ../src/DockPanel.cpp:138 ../src/DockPanel.cpp:226
+#: ../src/DockPanel.cpp:139 ../src/DockPanel.cpp:227
 msgid "Minimize all"
 msgstr "Minimizar todo"
 
-#: ../src/DockPanel.cpp:142 ../src/DockPanel.cpp:236
+#: ../src/DockPanel.cpp:143 ../src/DockPanel.cpp:237
 msgid "Close all except active"
 msgstr "Cierra todo menos lo activo"
 
-#: ../src/DockPanel.cpp:147 ../src/DockPanel.cpp:240
+#: ../src/DockPanel.cpp:148 ../src/DockPanel.cpp:241
 msgid "Close all"
 msgstr "Cierra todo"
 
-#: ../src/DockPanel.cpp:166 ../src/Preferences.cpp:44
+#: ../src/DockPanel.cpp:167 ../src/Preferences.cpp:44
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: ../src/DockPanel.cpp:170
+#: ../src/DockPanel.cpp:171
 msgid "Session-group"
 msgstr "Session de grupos"
 
-#: ../src/DockPanel.cpp:174
+#: ../src/DockPanel.cpp:175
 msgid "Help"
 msgstr "Ayuda"
 
-#: ../src/DockPanel.cpp:178
+#: ../src/DockPanel.cpp:179
 msgid "About"
 msgstr "Acerca de"
 
-#: ../src/DockPanel.cpp:182
+#: ../src/DockPanel.cpp:183
 msgid "Quit"
 msgstr "Salir"
 
 #. Item Menu
-#: ../src/DockPanel.cpp:199 ../src/DockPanel.cpp:628
+#: ../src/DockPanel.cpp:200 ../src/DockPanel.cpp:629
 msgid "Open new"
 msgstr "Abrir nuevo"
 
-#: ../src/DockPanel.cpp:206
+#: ../src/DockPanel.cpp:207
 msgid "Attach to Dock"
 msgstr "Adjuntar al Dock"
 
-#: ../src/DockPanel.cpp:211
+#: ../src/DockPanel.cpp:212
 msgid "Detach from Dock"
 msgstr "Desconectarse de el Dock"
 
-#: ../src/DockPanel.cpp:632
+#: ../src/DockPanel.cpp:633
 msgid "Configure"
 msgstr "Configurar"
 
-#: ../src/DockPanel.cpp:1172 ../src/DockPanel.cpp:1867
+#: ../src/DockPanel.cpp:1198 ../src/DockPanel.cpp:1899
 #, c-format
 msgid "Session-group %d"
 msgstr "Session de grupos %d"
 
-#: ../src/DockPanel.cpp:1777
+#: ../src/DockPanel.cpp:1807
 #, c-format
 msgid ""
 "(%s) %d windows.\n"
@@ -327,7 +328,7 @@ msgstr "Guardar"
 msgid "Session group %d"
 msgstr "Session de grupos %d"
 
-#: ../src/SessionWindow.cpp:400
+#: ../src/SessionWindow.cpp:403
 msgid ""
 "\n"
 "\n"
@@ -339,7 +340,7 @@ msgstr ""
 "grupo de la sesión guardado correctamente!\n"
 "\n"
 
-#: ../src/SessionWindow.cpp:423
+#: ../src/SessionWindow.cpp:426
 msgid "Click here to get the Application name!"
 msgstr "Haga clic aquí para obtener el nombre de la aplicación!"
 

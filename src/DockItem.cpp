@@ -96,17 +96,17 @@ std::string DockItem::getTitle()
     return m_realgroupname;
 }
 
+std::string DockItem::getGroupName()
+{
+    std::replace(m_realgroupname.begin(), 
+            m_realgroupname.end(), ' ', '-');
+    
+    return m_realgroupname;
+}
+
 std::string DockItem::getDesktopFileName()
 {
-    std::string desktopfile(Utilities::stringToLower(m_realgroupname.c_str()));
-    std::size_t foundspace = desktopfile.find(" ");
-    if (foundspace > 0) {
-        std::string s = desktopfile;
-        std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '-'
-        desktopfile = s;
-    }
-
-    return desktopfile + ".desktop";
+  return getGroupName() + ".desktop";
 }
 
 /**

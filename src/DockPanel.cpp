@@ -68,7 +68,7 @@ m_SessionGrpIconFilePath(Utilities::getExecPath(DEF_SEISSIONICONNAME)),
 m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
 {
 
-    DockPanel::m_applicationAttachmentsPath=m_applicationpath + "/" + DEF_ATTACHMENTDIR;
+    DockPanel::m_applicationAttachmentsPath = m_applicationpath + "/" + DEF_ATTACHMENTDIR;
     DockPanel::m_currentsessionItem = nullptr;
     DockPanel::m_dragdropsStarts = false;
     DockPanel::m_currentMoveIndex = -1;
@@ -262,7 +262,7 @@ int DockPanel::preInit(Gtk::Window* window)
 void DockPanel::postInit()
 {
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
-            &DockPanel::on_timeoutDraw), DEF_FRAMERATE );
+            &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
 
     // Gets the default WnckScreen on the default display.
     WnckScreen *wnckscreen = wnck_screen_get_default();
@@ -786,10 +786,10 @@ void DockPanel::on_AttachToDock_event()
 
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
-    
+
     if (dockitem->m_isAttached)
         return; // already attached
-    
+
     AttachItemToDock(dockitem);
 
 }
@@ -799,13 +799,19 @@ void DockPanel::AttachItemToDock(DockItem* dockitem)
     if (dockitem->m_isAttached)
         return; // already attached
 
-   
+
     char filename[NAME_MAX];
-    std::string s = dockitem->m_realgroupname;
-    std::replace(s.begin(), s.end(), ' ', '-'); // replace all ' ' to '_'
+    std::string s = dockitem->getGroupName();
     sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
             m_currentMoveIndex,
             s.c_str());
+
+    if (dockitem->m_dockitemSesssionGrpId > 0) {
+        sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
+                (int) m_dockitems.size() - 1,
+                s.c_str());
+
+    }
 
     dockitem->m_isAttached = true;
     dockitem->m_isDirty = true;
@@ -828,34 +834,39 @@ void DockPanel::on_DetachFromDock_event()
 
     char filename[PATH_MAX];
 
-    std::string s = dockitem->m_realgroupname;
-    std::replace(s.begin(), s.end(), ' ', '-');
-
+    std::string s = dockitem->getGroupName();
     sprintf(filename, "%s/%2d_%s.png",
             m_applicationAttachmentsPath.c_str(),
             dockitem->m_attachedIndex,
             s.c_str());
 
-    if (remove(filename) != 0) {
+    bool removed = remove(filename) == 0;
+    if (!removed) {
         sprintf(filename, "%s/%2d_%s.png",
                 m_applicationAttachmentsPath.c_str(),
                 m_currentMoveIndex,
                 s.c_str());
-        if (remove(filename) != 0) {
-            g_warning("DetachFromDock_event. ERROR remove file. \n");
-            return;
-        }
+
+        removed = remove(filename) == 0;
     }
 
+
+    if (!removed) {
+        g_warning("DetachFromDock_event.   ERROR remove Attachment. %s \n", filename);
+        return;
+    }
+
+
     if (dockitem->m_dockitemSesssionGrpId > 0) {
+
         sprintf(filename, "%s/%s.bin",
                 m_applicationAttachmentsPath.c_str(),
                 s.c_str());
-        if (remove(filename) != 0) {
-            g_warning("DetachFromDock_event. ERROR remove file. %s \n", filename);
-        }
 
+        remove(filename);
     }
+
+
 
     int idx = m_currentMoveIndex;
     WnckWindow *window = dockitem->m_window;
@@ -1138,7 +1149,7 @@ bool DockPanel::attachToSessiongrp(WnckWindow* window)
     childItem->m_image = NULLPB;
 
     dockItem->m_items.push_back(childItem);
-   
+
     return true;
 }
 
@@ -1154,25 +1165,31 @@ int DockPanel::getNextSessionGrpNumber()
 
 void DockPanel::CreateSessionDockItemGrp()
 {
+    int number = getNextSessionGrpNumber();
+    int imagenumber = number;
+    if (imagenumber > DEF_MAXSESIONIMAGES)
+        imagenumber = 1;
 
-    const char* filename = m_SessionGrpIconFilePath.c_str();
+    std::ostringstream session_image;
+    session_image << m_applicationpath << "/" << DEF_IMAGESDIR << "/s" << imagenumber << ".png";
+    std::string filename = session_image.str();
+
     DockItem* dockItem = new DockItem();
 
     try {
-        dockItem->m_image = Gdk::Pixbuf::create_from_file(filename,
+        dockItem->m_image = Gdk::Pixbuf::create_from_file(filename.c_str(),
                 DEF_ICONSIZE, DEF_ICONSIZE, true);
     } catch (Glib::FileError fex) {
-        g_critical("CreateSessionDockItemGrp: file %s could not be found!\n", filename);
+        g_critical("CreateSessionDockItemGrp: file %s could not be found!\n", filename.c_str());
         return;
 
     } catch (Gdk::PixbufError bex) {
-        g_critical("CreateSessionDockItemGrp: file %s PixbufError!\n", filename);
+        g_critical("CreateSessionDockItemGrp: file %s PixbufError!\n", filename.c_str());
 
         return;
     }
 
-    // Create a new Item
-    int number = getNextSessionGrpNumber();
+
     dockItem->m_dockitemSesssionGrpId = number;
     dockItem->m_isAttached = false;
     dockItem->m_appname = "session-group-" + number;
@@ -1191,8 +1208,8 @@ void DockPanel::CreateSessionDockItemGrp()
     dockItem->m_xid = 0;
 
     m_dockitems.push_back(std::move(dockItem));
-    
-     AttachItemToDock( dockItem );
+
+    AttachItemToDock(dockItem);
 
 }
 
@@ -1593,8 +1610,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                     m_iconsize + 4, m_iconsize + 4, Gdk::INTERP_BILINEAR);
 
         }
-        
-        int offset = (m_cellwidth - m_iconsize)/2;
+
+        int offset = (m_cellwidth - m_iconsize) / 2;
         //g_print("offset %d\n",offset);
         Gdk::Cairo::set_source_pixbuf(cr, icon, col + offset, DEF_ICONTOPMARGIN);
         cr->paint();
@@ -1820,6 +1837,7 @@ int DockPanel::loadAttachments()
 
     struct dirent* hFile;
     errno = 0;
+    std::string groupnamepart("Session-group-");
 
     while ((hFile = readdir(dirFile)) != NULL) {
         if (!strcmp(hFile->d_name, ".")) continue;
@@ -1871,9 +1889,10 @@ int DockPanel::loadAttachments()
             item->m_xid = 0;
             item->m_image = NULLPB;
 
-            std::string::size_type p = appname.find("Session-group-");
+
+            std::string::size_type p = appname.find(groupnamepart);
             if (p != std::string::npos) {
-                p += appname.length() - 1;
+                p += groupnamepart.length();
                 int sessionnumber = atoi(appname.substr(p, 2).c_str());
 
                 char buffer[100];

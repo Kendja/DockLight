@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-26 13:24+0700\n"
-"PO-Revision-Date: 2017-02-26 13:26+0700\n"
+"POT-Creation-Date: 2017-03-02 19:13+0700\n"
+"PO-Revision-Date: 2017-03-02 19:14+0700\n"
 "Last-Translator: \n"
 "Language-Team: THAI <LL@li.org>\n"
 "Language: th\n"
@@ -103,7 +103,7 @@ msgid ""
 "/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
 "\n"
 "for Applications that requires Administrator privileges:\n"
-"gksu gparted-pkexec\n"
+"pkexec Application\n"
 "\n"
 "Please make sure that the Application starts from the command line.\n"
 "Open a terminal and navigate to the directory where the application is locate\n"
@@ -117,7 +117,7 @@ msgstr ""
 "/usr/bin/bash \"/home/yoo/Develop/scriptfile\"\n"
 "\n"
 "สำหรับการใช้งานเฉพาะสิทธิ์ของผู้ดูแลเท่านั้น\n"
-"gksu gparted-pkexec\n"
+"pkexec ใบสมัคร\n"
 "\n"
 "กรุณาตรวจสอบให้แน่ใจก่อนว่า โปรแกรมเริ่มต้นที่บรรทัดคำสั่ง\n"
 "เปิดใช้งาน terminal กับการนำทางไปยังไดเรกทอรี่ โปรแกรมที่คุณค้นหา\n"
@@ -184,79 +184,79 @@ msgstr "ไม่พบเบราเซอร์!\n"
 msgid "Fields Name and Command can't be empty!\n"
 msgstr "เขตข้อมูลชื่อและคำสั่งต้องไม่ว่างเปล่า!\n"
 
-#: ../src/DockPanel.cpp:112 ../src/DockPanel.cpp:113
+#: ../src/DockPanel.cpp:113 ../src/DockPanel.cpp:114
 msgid "Desktop"
 msgstr "หน้าเดสทอป"
 
 #. Menus
 #. Home Menu items
-#: ../src/DockPanel.cpp:124
+#: ../src/DockPanel.cpp:125
 msgid "Autohide"
 msgstr "ซ่อนอัตโนมัติ"
 
-#: ../src/DockPanel.cpp:129 ../src/DockPanel.cpp:218
+#: ../src/DockPanel.cpp:130 ../src/DockPanel.cpp:219
 msgid "Show all"
 msgstr "เปิดทั้งหมด"
 
-#: ../src/DockPanel.cpp:133 ../src/DockPanel.cpp:222
+#: ../src/DockPanel.cpp:134 ../src/DockPanel.cpp:223
 msgid "Minimize all except active"
 msgstr "พับหน้าต่างที่ไม่ใช้งานชั่วคราว"
 
-#: ../src/DockPanel.cpp:138 ../src/DockPanel.cpp:226
+#: ../src/DockPanel.cpp:139 ../src/DockPanel.cpp:227
 msgid "Minimize all"
 msgstr "พับหน้าต่างทั้งหมด"
 
-#: ../src/DockPanel.cpp:142 ../src/DockPanel.cpp:236
+#: ../src/DockPanel.cpp:143 ../src/DockPanel.cpp:237
 msgid "Close all except active"
 msgstr "ปิดหน้าต่างที่ไม่ใช้งาน"
 
-#: ../src/DockPanel.cpp:147 ../src/DockPanel.cpp:240
+#: ../src/DockPanel.cpp:148 ../src/DockPanel.cpp:241
 msgid "Close all"
 msgstr "ปิดหน้าต่างทั้งหมด"
 
-#: ../src/DockPanel.cpp:166 ../src/Preferences.cpp:44
+#: ../src/DockPanel.cpp:167 ../src/Preferences.cpp:44
 msgid "Preferences"
 msgstr "การตั้งค่า"
 
-#: ../src/DockPanel.cpp:170
+#: ../src/DockPanel.cpp:171
 msgid "Session-group"
 msgstr "กลุ่มเซสซั่น"
 
-#: ../src/DockPanel.cpp:174
+#: ../src/DockPanel.cpp:175
 msgid "Help"
 msgstr "ช่วยเหลือ"
 
-#: ../src/DockPanel.cpp:178
+#: ../src/DockPanel.cpp:179
 msgid "About"
 msgstr "เกี่ยวกับ"
 
-#: ../src/DockPanel.cpp:182
+#: ../src/DockPanel.cpp:183
 msgid "Quit"
 msgstr "ปิดการใช้งาน"
 
 #. Item Menu
-#: ../src/DockPanel.cpp:199 ../src/DockPanel.cpp:628
+#: ../src/DockPanel.cpp:200 ../src/DockPanel.cpp:629
 msgid "Open new"
 msgstr "เปิดหน้าต่างใหม่"
 
-#: ../src/DockPanel.cpp:206
+#: ../src/DockPanel.cpp:207
 msgid "Attach to Dock"
 msgstr "แนบกับ Dock"
 
-#: ../src/DockPanel.cpp:211
+#: ../src/DockPanel.cpp:212
 msgid "Detach from Dock"
 msgstr "แยกออกจาก Dock"
 
-#: ../src/DockPanel.cpp:632
+#: ../src/DockPanel.cpp:633
 msgid "Configure"
 msgstr "กำหนดค่า"
 
-#: ../src/DockPanel.cpp:1172 ../src/DockPanel.cpp:1867
+#: ../src/DockPanel.cpp:1198 ../src/DockPanel.cpp:1899
 #, c-format
 msgid "Session-group %d"
 msgstr "กลุ่มเซสซั่น %d"
 
-#: ../src/DockPanel.cpp:1777
+#: ../src/DockPanel.cpp:1807
 #, c-format
 msgid ""
 "(%s) %d windows.\n"
@@ -304,7 +304,7 @@ msgstr "บันทึก"
 msgid "Session group %d"
 msgstr "กลุ่มเซสซั่น %d"
 
-#: ../src/SessionWindow.cpp:400
+#: ../src/SessionWindow.cpp:403
 msgid ""
 "\n"
 "\n"
@@ -316,7 +316,7 @@ msgstr ""
 "กลุ่มเซสชั่นบันทึกเรียบร้อยแล้ว!\n"
 "\n"
 
-#: ../src/SessionWindow.cpp:423
+#: ../src/SessionWindow.cpp:426
 msgid "Click here to get the Application name!"
 msgstr "คลิกที่นี่เพื่อรับชื่อโปรแกรม!"
 

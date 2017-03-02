@@ -1,14 +1,10 @@
-SUBDIRS = \
-	icons \
-	$(NULL)
+SUBDIRS = icons	
 
 EXTRA_DIST = \
+	images/docklight.home.ico \
 	docklight.menu.desktop \
 	org.freedesktop.docklight.policy \
 	docklight.template.desktop \
-	docklight.home.ico \
-	docklight-session.png \
-	docklight.logo.png \
 	docklight.ini \
 	docklight.launcher.sh \
 	$(NULL)
@@ -32,13 +28,16 @@ applications_DATA = docklight.menu.desktop
 #/docklight.data
 docklightdatadir = $(bindir)/data
 docklightdata_DATA = \
-		docklight.home.ico \
 		docklight.ini \
-		docklight.logo.png \
-		docklight-session.png \
 		docklight.launcher.sh \
 		docklight.template.desktop \
 		$(NULL)
+
+
+docklightimagesdir = $(bindir)/data/images
+docklightimages_DATA = 	images/docklight.home.ico \
+			images/*.png \
+			$(NULL)
 
 @INTLTOOL_DESKTOP_RULE@
 
