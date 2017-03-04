@@ -1,3 +1,9 @@
+docklight (1.0-18) UNRELEASED; urgency=medium
+
+  * several bug fixes 
+
+ -- yoo <yoo@osx.odx.com>  Sun, 05 Mar 2017 00:22:03 +0700
+
 docklight (1.0-17) UNRELEASED; urgency=medium
 
   * Add images folder
