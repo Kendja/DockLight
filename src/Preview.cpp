@@ -405,6 +405,9 @@ void Preview::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer 
     for (idx = (int) m_previewtems.size() - 1; idx >= 0; idx--) {
         DockItem* item = m_previewtems.at(idx);
         if (cxid == item->m_xid) {
+            if( item->m_scaledPixbuf != nullptr)
+                g_object_unref(item->m_scaledPixbuf); 
+
             m_previewtems.erase(m_previewtems.begin() + idx);
             break;
         }
