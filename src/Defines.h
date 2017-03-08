@@ -33,13 +33,11 @@
 #define DEF_LAUCHERSCRIPT       "docklight.launcher.sh"
 #define DEF_LAUCHERSCRIPTPATH   "data/docklight.launcher.sh"
 #define DEF_MAXSESIONIMAGES     12
-
 #define DEF_LOCALEPATH          "/usr/share/locale"
 #define DEF_LOCALEPACKPATH      "/usr/share/locale-langpack"
-
-
-#define DOCKLIGHT_INSTANCENAME "docklight"
-#define DOCKLIGHTLAUNCHER "DockLight Launcher"
+#define DEF_LAUNCHER_DIR        "/usr/share/applications/"
+#define DOCKLIGHT_INSTANCENAME  "docklight"
+#define DOCKLIGHTLAUNCHER       "DockLight Launcher"
 
 #define NULLPB (Glib::RefPtr<Gdk::Pixbuf>)NULL
 
@@ -72,22 +70,26 @@ typedef enum StrutsPosition_t
 } strutsPosition;
 
 
-#define DEF_LAUNCHER_DIR "/usr/share/applications/"
+
 
 #define DEF_FRAMERATE 1000/30
 
-#define DEF_CELLWIDTH 58                    // Cell Width
-#define DEF_CELLHIGHT 62                    // Cell Height
+
+#define DEF_CELLHIGHT 56//62                    // Cell Height
+#define DEF_CELLWIDTH DEF_CELLHIGHT -3//58                    // Cell Width
 #define DEF_CELLTOPMARGIN 6                 // Cell Top Position
-#define DEF_ICONSIZE 48                     // Icon Size Width and height
-#define DEF_MINCONSIZE 20                  // Minimun Icon Size allowed
+#define DEF_ICONSIZE DEF_CELLHIGHT -14      // Icon Size Width and height
+#define DEF_MINCONSIZE 20                   // Minimun Icon Size allowed
 #define DEF_ICONTOPMARGIN 10                // Icon top Margin from panel
 
 // Icon top Margin from the cell
 #define DEF_ICONTOPCELLMARGIN DEF_ICONTOPMARGIN -DEF_CELLTOPMARGIN                
 
+#define DEF_PANELHIGHT DEF_CELLHIGHT + 10 
 #define DEF_PANELHIGHTHIDE  4                 
-#define DEF_PANELHIGHT 72 
+
+
+
 #define DEF_PREVIEW_WIDTH 220               // the preview popup window width
 #define DEF_PREVIEW_HEIGHT 200              // the preview popup window height
 #define DEF_PREVIEW_MINHEIGHT 112           // the minimun preview height
@@ -95,7 +97,7 @@ typedef enum StrutsPosition_t
 #define DEF_PREVIEW_RIGHT_MARGING 30        // the preview right marging 
 #define DEF_PREVIEW_SCALE_WIDTH_OFFSET  12  // the offset for the scale method
 #define DEF_PREVIEW_SCALE_HEIGHT_OFFSET 54  // the offset for the scale method
-#define DEF_PREVIEW_PIXBUF_TOP 36       // the image pixbuf top
+#define DEF_PREVIEW_PIXBUF_TOP 36           // the image pixbuf top
 
 
 #endif /* DEFINES_H */
