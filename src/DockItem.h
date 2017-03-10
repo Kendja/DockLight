@@ -32,7 +32,7 @@ class DockItem
 {
 public:
     DockItem();
-   ~DockItem();
+    ~DockItem();
     Glib::RefPtr<Gdk::Pixbuf> m_image;
     guchar m_pixelsbuf[DEF_PREVIEW_WIDTH * DEF_PREVIEW_HEIGHT * 3] = {0};
     GdkPixbuf *m_scaledPixbuf;
@@ -48,7 +48,7 @@ public:
     std::vector<DockItem*> m_items;
     int m_xid;
     int m_index = 0;
-    int m_attachedIndex=0;
+    int m_attachedIndex = 0;
     bool m_isAttached = false;
     bool m_isDirty = false;
     bool visible = true;
@@ -60,6 +60,7 @@ public:
     int m_dockitemSesssionGrpId = 0;
 private:
     bool m_pixbufPreviousPass;
+    
 
 };
 

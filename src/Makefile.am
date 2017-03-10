@@ -60,6 +60,7 @@ docklight_SOURCES =  \
  WindowControl.h \
  SessionWindow.h \
  SessionWindow.cpp \
+ Animations.h \
  main.cpp \
  $(NULL)
 

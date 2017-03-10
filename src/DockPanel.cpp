@@ -34,6 +34,9 @@
 #include <gtkmm/messagedialog.h>
 #include <gdkmm/cursor.h>
 #include <limits.h>
+#include <math.h>
+
+
 
 // static members
 std::vector<DockItem*> DockPanel::m_dockitems;
@@ -62,6 +65,7 @@ m_mouseclickEventTime(0),
 m_dragdropTimerSet(false),
 m_dragdropMouseDown(false),
 m_dragdropItemIndex(-1),
+m_selectorAnimationItemIndex(-1),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/" + DEF_DATADIRNAME),
 m_SessionGrpIconFilePath(Utilities::getExecPath(DEF_SEISSIONICONNAME)),
@@ -472,10 +476,11 @@ void DockPanel::dropDockItem(GdkEventButton *event)
     if (m_dragdropItemIndex < 1)
         return;
 
-    // we check if the drop item is Attachhed.
-    // if not the we let in drop but we don't save anything.
+    // we check if the drop item is Attached.
+    // if not we attach it and continue;
     DockItem* a = m_dockitems[m_dragdropItemIndex];
-    bool isAttached = a->m_isAttached;
+    if (!a->m_isAttached)
+        AttachItemToDock(a);
 
     int relativeMouseX = DockPosition::getDockItemRelativeMouseXPos(
             (int) m_dockitems.size(), m_currentMoveIndex,
@@ -503,9 +508,7 @@ void DockPanel::dropDockItem(GdkEventButton *event)
 
     m_dockitems.insert(m_dockitems.begin() + dropIndex, tmp.begin(), tmp.end());
 
-    // if is not attached the we don't need to save.
-    if (isAttached)
-        saveAttachments(m_dragdropItemIndex, dropIndex);
+    saveAttachments(m_dragdropItemIndex, dropIndex);
 }
 
 /** 
@@ -605,8 +608,9 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
         return true;
 
     if (m_mouseLeftButtonDown) {
-        SelectWindow(m_currentMoveIndex, event);
         m_mouseLeftButtonDown = false;
+        
+        SelectWindow(m_currentMoveIndex, event);
         return TRUE;
     }
 
@@ -773,9 +777,11 @@ void DockPanel::on_menuNew_event()
 
     }
 
+    m_selectorAnimationItemIndex = m_currentMoveIndex;
     if (!Launcher::Launch(item->m_realgroupname)) {
         createLauncher(item);
     }
+
 
 }
 
@@ -1178,7 +1184,7 @@ void DockPanel::CreateSessionDockItemGrp()
 
     try {
         dockItem->m_image = Gdk::Pixbuf::create_from_file(filename.c_str(),
-                DEF_ICONSIZE, DEF_ICONSIZE, true);
+                DEF_ICONMAXSIZE, DEF_ICONMAXSIZE, true);
     } catch (Glib::FileError fex) {
         g_critical("CreateSessionDockItemGrp: file %s could not be found!\n", filename.c_str());
         return;
@@ -1267,10 +1273,7 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
             }
         }
 
-        Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
-        appIcon = IconLoader::GetWindowIcon(window);
-        appIcon = appIcon->scale_simple(DEF_ICONSIZE,
-                DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
+
 
         // handle DockItems groups
         for (auto item : m_dockitems) {
@@ -1300,6 +1303,12 @@ void DockPanel::Update(WnckWindow* window, Window_action actiontype)
                 return;
             }
         }
+
+
+        Glib::RefPtr<Gdk::Pixbuf> appIcon = NULLPB;
+        appIcon = IconLoader::GetWindowIcon(window);
+        appIcon = appIcon->scale_simple(DEF_ICONMAXSIZE,
+                DEF_ICONMAXSIZE, Gdk::INTERP_BILINEAR);
 
         // Create a new Item
         DockItem* dockItem = new DockItem();
@@ -1391,7 +1400,6 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     if (m_cellwidth == DEF_CELLWIDTH)
         m_cellheight = DEF_CELLHIGHT;
 
-    //g_print("m_iconsize %d\n", m_iconsize);
 
     // compute the cell height if need to resized
     if ((resizeNeeded && m_previousCellwidth != m_cellwidth)) {
@@ -1404,10 +1412,8 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
         MonitorGeometry::updateStrut(m_AppWindow, DEF_PANELHIGHT - substractpixels);
 
-        //g_print("%d %d %d\n", iconrestsapce, substractpixels, (int) m_titleTimer.elapsed());
+
     }
-
-
 
 
     // Timer control for the title Window
@@ -1452,7 +1458,9 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                         m_titlewindow.get_width()
                         );
 
-                m_titlewindow.move(centerpos, MonitorGeometry::getAppWindowTopPosition() - 30);
+                int y = MonitorGeometry::getScreenHeight() - m_titlewindow.get_height() -
+                        MonitorGeometry::getStrutHeight();
+                m_titlewindow.move(centerpos, y);
                 m_titleShow = true;
 
             }
@@ -1488,11 +1496,10 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     //    }
 
 
+
+
     int idx = 0;
     for (auto item : m_dockitems) {
-        if (item->m_image == NULLPB)
-            continue;
-
 
         if (theme.forPanel().enabled()) {
 
@@ -1599,21 +1606,63 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             icon = item->m_image->scale_simple(
                     m_iconsize, m_iconsize, Gdk::INTERP_BILINEAR);
 
+
         } else {
 
-            icon = item->m_image;
+            if (item->m_image->get_height() != DEF_ICONSIZE) {
+                icon = item->m_image->scale_simple(
+                        DEF_ICONSIZE, DEF_ICONSIZE, Gdk::INTERP_BILINEAR);
+            } else {
+                icon = item->m_image;
+            }
+
         }
+
+        int offset = (m_cellwidth - m_iconsize) / 2;
 
         if (m_currentMoveIndex == idx && theme.panelScaleOnhover()) {
 
             icon = item->m_image->scale_simple(
                     m_iconsize + 4, m_iconsize + 4, Gdk::INTERP_BILINEAR);
+            offset -= 2;
 
         }
 
-        int offset = (m_cellwidth - m_iconsize) / 2;
-        //g_print("offset %d\n",offset);
-        Gdk::Cairo::set_source_pixbuf(cr, icon, col + offset, DEF_ICONTOPMARGIN);
+
+        // animation
+        if (m_selectorAnimation.t < m_selectorAnimation.d)
+            m_selectorAnimation.t++;
+        float yPos = 0;
+        if (m_selectorAnimationItemIndex != -1 && m_selectorAnimationItemIndex == idx) {
+            if (!m_selectorAnimation.m_animationInitSet) {
+
+                m_selectorAnimation.t = 0;
+                m_selectorAnimation.b = 0;
+                m_selectorAnimation.c = DEF_ICONTOPMARGIN;
+                m_selectorAnimation.d = 1200;
+
+                m_selectorAnimation.m_animationInitSet = true;
+            }
+
+
+            if (m_selectorAnimation.t >= m_selectorAnimation.d) {
+                m_selectorAnimation.m_animationInitSet = false;
+                m_selectorAnimationItemIndex = -1;
+            }
+
+            yPos += m_selectorAnimation.compute(
+                    m_selectorAnimation.t,
+                    m_selectorAnimation.b,
+                    m_selectorAnimation.c,
+                    m_selectorAnimation.d);
+
+        } else {
+            yPos = DEF_ICONTOPMARGIN;
+        }
+
+
+
+        Gdk::Cairo::set_source_pixbuf(cr, icon, col + offset, yPos);
         cr->paint();
         cr->restore();
 
@@ -1760,6 +1809,9 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
                 }
             }
 
+            if (m_sessiondata.size() > 0)
+                m_selectorAnimationItemIndex = index;
+
 
             for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
                 bool delay = false;
@@ -1779,7 +1831,10 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
                 }
             }
 
+
         } else {
+
+            m_selectorAnimationItemIndex = index;
             createSessionWindow();
 
         }
@@ -1788,9 +1843,12 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
 
     int itemscount = dockitem->m_items.size();
     if (itemscount == 0 && dockitem->m_isAttached) {
-        if (!Launcher::Launch(dockitem->m_realgroupname)) {
-            createLauncher(dockitem);
-        }
+
+        on_menuNew_event();
+
+        //        if (!Launcher::Launch(dockitem->m_realgroupname)) {
+        //            createLauncher(dockitem);
+        //        }
 
         return;
     }
@@ -1879,7 +1937,7 @@ int DockPanel::loadAttachments()
             std::string titlename =
                     Launcher::getTitleNameFromDesktopFile(appname);
 
-            DockItem * item = new DockItem();
+            DockItem* item = new DockItem();
             item->m_appname = appname;
             item->m_attachedIndex = idx;
             item->m_instancename = Utilities::stringToLower(appname.c_str());
@@ -1911,7 +1969,6 @@ int DockPanel::loadAttachments()
 
 
             try {
-
                 item->m_image = Gdk::Pixbuf::create_from_file(imageFilePath,
                         DEF_ICONSIZE, DEF_ICONSIZE, true);
 

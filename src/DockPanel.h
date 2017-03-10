@@ -41,6 +41,7 @@
 #include "DragDropWindow.h"
 #include "Preferences.h"
 #include "SessionWindow.h"
+#include "Animations.h"
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -71,26 +72,31 @@ private:
     TitleWindow m_infowindow;
     DragDropWindow m_dragDropWindow;
 
+
+    int m_selectorAnimationItemIndex = -1;
+    ElasticEaseOut m_selectorAnimation;
+
+
     About m_about;
     Preview m_preview;
     bool m_popupMenuOn;
     static std::vector<DockItem*> m_dockitems;
     static int m_currentMoveIndex;
     static void setItemImdexFromActiveWindow();
-    static void updateSessioWindow(WnckWindow *window);
+    static void updateSessioWindow(WnckWindow* window);
     void CreateSessionDockItemGrp();
     static std::vector<sessionGrpData> m_sessiondata;
     static DockItem* m_currentsessionItem;
-    
+
     static bool attachToSessiongrp(WnckWindow* window);
-    int getNextSessionGrpNumber(); 
+    int getNextSessionGrpNumber();
 
     std::string m_applicationpath;
     std::string m_applicationDatapath;
     static std::string m_applicationAttachmentsPath;
     std::string m_homeiconFilePath;
     std::string m_SessionGrpIconFilePath;
-      
+
 
     sigc::connection m_TimeoutConnection;
 
@@ -110,11 +116,11 @@ private:
     int m_dragdropItemIndex;
     Gdk::Point m_dragdropMousePoint;
 
-    void dropDockItem(GdkEventButton *event);
-    
+    void dropDockItem(GdkEventButton* event);
+
     void saveAttachments(int aIdx, int bIdx);
     int loadAttachments();
-    void SelectWindow(int index, GdkEventButton * event);
+    void SelectWindow(int index, GdkEventButton* event);
     void createLauncher(DockItem* item);
     void createPreferences();
     void createSessionWindow();
@@ -141,7 +147,7 @@ private:
     void on_HomeUnMinimizeAllWindows_event();
     void on_HomeMinimizeAllWindowsExceptActive_event();
     void on_HomeAddSessionGrp_event();
-    void on_HomePreferences_event();  
+    void on_HomePreferences_event();
     void on_AutohideToggled_event();
     void on_MenuDeactivated_event();
     //bool on_MenuEnterNotify_event (GdkEventCrossing* crossing_event);
@@ -149,14 +155,14 @@ private:
 
     // Mome menu 
     Gtk::Menu m_HomeMenu_Popup;
-    
+
     Gtk::MenuItem m_homeSessionGrp;
     Gtk::MenuItem m_HelpMenuItem;
     Gtk::MenuItem m_AboutMenuItem;
     Gtk::MenuItem m_QuitMenuItem;
     Gtk::CheckMenuItem m_AutohideMenuItem;
     Gtk::MenuItem m_preferencesMenuItem;
-    
+
 
     // Item menu
     Gtk::Menu m_Menu_Popup;
@@ -200,10 +206,10 @@ private:
     void on_popup_menu_position(int& x, int& y, bool& push_in);
 
     static void Update(WnckWindow* window, Window_action actiontype);
-    static void on_window_opened(WnckScreen *screen, WnckWindow *window, gpointer data);
-    static void on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data);
-    static void on_active_window_changed_callback(WnckScreen *screen,
-            WnckWindow *previously_active_window, gpointer user_data);
+    static void on_window_opened(WnckScreen* screen, WnckWindow* window, gpointer data);
+    static void on_window_closed(WnckScreen* screen, WnckWindow* window, gpointer data);
+    static void on_active_window_changed_callback(WnckScreen* screen,
+            WnckWindow* previously_active_window, gpointer user_data);
 
 
     int getIndex(int x, int y);
@@ -220,9 +226,9 @@ protected:
 
     // Mouse handlers
     // http://www.horde3d.org/wiki/index.php5?title=Tutorial_-_Setup_Horde_with_Gtkmm  
-    virtual bool on_button_press_event(GdkEventButton *event);
-    virtual bool on_button_release_event(GdkEventButton *event);
-    virtual bool on_motion_notify_event(GdkEventMotion*event);
+    virtual bool on_button_press_event(GdkEventButton* event);
+    virtual bool on_button_release_event(GdkEventButton* event);
+    virtual bool on_motion_notify_event(GdkEventMotion* event);
     virtual bool on_enter_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_leave_notify_event(GdkEventCrossing* crossing_event);
     virtual bool on_scroll_event(GdkEventScroll* e);

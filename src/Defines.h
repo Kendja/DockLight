@@ -74,8 +74,8 @@ typedef enum StrutsPosition_t
 
 #define DEF_FRAMERATE 1000/30
 
-
-#define DEF_CELLHIGHT 56//62                    // Cell Height
+#define DEF_ICONMAXSIZE 64
+#define DEF_CELLHIGHT  56                    // Cell Height
 #define DEF_CELLWIDTH DEF_CELLHIGHT -3//58                    // Cell Width
 #define DEF_CELLTOPMARGIN 6                 // Cell Top Position
 #define DEF_ICONSIZE DEF_CELLHIGHT -14      // Icon Size Width and height
@@ -85,7 +85,7 @@ typedef enum StrutsPosition_t
 // Icon top Margin from the cell
 #define DEF_ICONTOPCELLMARGIN DEF_ICONTOPMARGIN -DEF_CELLTOPMARGIN                
 
-#define DEF_PANELHIGHT DEF_CELLHIGHT + 10 
+#define DEF_PANELHIGHT DEF_CELLHIGHT + 9
 #define DEF_PANELHIGHTHIDE  4                 
 
 

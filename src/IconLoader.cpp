@@ -23,6 +23,7 @@
 #include "Defines.h"
 #include "Utilities.h"
 
+#include "Launcher.h"
 #include <gtkmm/icontheme.h>
 
 namespace IconLoader
@@ -37,7 +38,7 @@ namespace IconLoader
 
     // the desired icon size. 
     // The resulting icon may not be exactly this size.
-    gint size = 64;
+    gint size = DEF_ICONMAXSIZE;
 
     /**
      * Get the window icons as Gdk::Pixbuf.
@@ -124,8 +125,11 @@ namespace IconLoader
 
             icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
                     size, flags, &error);
-            if (icon == NULL)
+
+            if (icon == NULL) {
                 icon = wnck_window_get_icon(window);
+            }
+            
         } else {
 
             // Gets the icon to be used for window.
@@ -133,7 +137,7 @@ namespace IconLoader
             // wnck_window_get_icon_is_fallback() 
             // can be used to tell if the icon is the fallback icon.
             icon = wnck_window_get_icon(window);
-
+            
             // check if the icon is the fallback icon.
             if (wnck_window_get_icon_is_fallback(window)) {
                 g_warning("isfallback none icon was set on window: (%s)", lowerName.c_str());
@@ -159,49 +163,24 @@ namespace IconLoader
      */
     Glib::RefPtr<Gdk::Pixbuf> GetWindowIconFromDesktopFile(WnckWindow* window, GdkPixbuf *icon)
     {
-        // Get the possible desktop filename.
-        const char* _desktopfilename = wnck_window_get_class_group_name(window);
-        if (_desktopfilename == NULL) {
-            return NULLPB;
-        }
-        // replace replace all ' ' to '-' 
-        std::string desktopfilename(Utilities::stringToLower(_desktopfilename));
-        std::size_t foundspace = desktopfilename.find(" ");
-        if (foundspace > 0) {
-            std::string s = desktopfilename;
-            std::replace(s.begin(), s.end(), ' ', '-');
-            desktopfilename = s;
-        }
-
-        // build the desktop file path 
-        char filepath[PATH_MAX];
-        sprintf(filepath, "/usr/share/applications/%s.desktop",
-                desktopfilename.c_str());
-
-        // https://gist.github.com/zdxerr/709169
-        // check if the file exists
+        
         GError *error = NULL;
         GKeyFile *key_file = g_key_file_new();
-        gboolean found = g_key_file_load_from_file(key_file,
-                filepath, GKeyFileFlags::G_KEY_FILE_NONE, &error);
-
-        if (!found) {
-            if (error) {
-                g_warning("Desktop file not found  %s %s",
-                        desktopfilename.c_str(), error->message);
-                g_error_free(error);
-            }
-
+        const char* appname = wnck_window_get_class_group_name(window);;
+        
+        if(!Launcher::getDesktopFile( key_file , appname))
+        {
+            g_key_file_free(key_file);
             return NULLPB;
         }
-
-        // check if the Icon Desktop Entry name exists
+        
+           // check if the Icon Desktop Entry name exists
         gchar* iconname = g_key_file_get_string(key_file,
                 "Desktop Entry", "Icon", &error);
 
         if (iconname == NULL) {
             if (error) {
-                g_warning("Icon Desktop Entry found: %s %s", iconname, error->message);
+                g_warning("Icon Desktop Entry not found: %s %s", iconname, error->message);
                 g_error_free(error);
                 error = NULL;
             }
@@ -223,20 +202,18 @@ namespace IconLoader
                 try {
                     Glib::RefPtr<Gdk::Pixbuf> fromfile;
                     return fromfile->create_from_file(iconname);
-                    
+
                 } catch (Glib::FileError fex) {
                     g_warning("Icon file: %s from desktop: %s could not be found.",
-                            iconname, desktopfilename.c_str());
+                            iconname, appname);
 
                 } catch (Gdk::PixbufError bex) {
                     g_warning("Icon file: %s from desktop: %s PixbufError.",
-                            iconname, desktopfilename.c_str());
+                            iconname, appname);
                 }
             }
             // Gets the icon to be used for window.
             // If no icon was found, a fallback icon is used. 
-            // wnck_window_get_icon_is_fallback() 
-            // can be used to tell if the icon is the fallback icon.
             icon = wnck_window_get_icon(window);
         }
 
