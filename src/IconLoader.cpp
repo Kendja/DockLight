@@ -69,112 +69,31 @@ namespace IconLoader
     Glib::RefPtr<Gdk::Pixbuf> GetWindowIcon(WnckWindow* window, GdkPixbuf *icon)
     {
         Glib::RefPtr<Gdk::Pixbuf> result = NULLPB;
-        GError *error = NULL;
 
-        // Gets the icon name of window , as it should be displayed for an icon (minimized state). 
-        // Always returns some value, even if window has no icon name set. 
-        std::string iconname = wnck_window_get_icon_name(window);
-        //Convert to lower case to get the icon name correctly.
-        std::string lowerName = Utilities::stringToLower(iconname.c_str());
 
-        // Get the icon name from wnck_window_get_icon_name(window) are far from perfect ;o(
-        // We trying here to get the icon name that can be found in the theme.
-        const char* _bettername = wnck_window_get_class_group_name(window);
-        //const char* _bettername = wnck_window_get_class_instance_name(window);
-        if (_bettername != NULL) {
+        std::string the_appname;
+        std::string the_instancename;
+        std::string the_groupname;
+        std::string the_titlename;
 
-            std::string bettername(Utilities::stringToLower(_bettername));
-            std::size_t foundspace = lowerName.find(" ");
-            if (foundspace > 0 && bettername != "wine") {
-                lowerName = bettername;
-            }
+        if (Launcher::getAppNameByWindow(window,
+                the_appname,
+                the_instancename,
+                the_groupname,
+                the_titlename) == FALSE) {
+
+            return PixbufConvert(wnck_window_get_icon(window));
         }
 
-
-        GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
-
-        //auto icon_theme2 = Gtk::IconTheme::get_default() ;	//TODO use this instead of GtkIconTheme
-        //icon_theme2->set_custom_theme( "gnome" );
-
-        //https://code.launchpad.net/~ted/libappindicator/lp875770/+merge/95685
-        /*
-        gchar **path;
-        gint n_elements,i;
-        gtk_icon_theme_get_search_path(icon_theme,&path,&n_elements);
-        for (i=0; i< n_elements || path[i] == NULL; i++) {
-            std::string p( path[i] );
-        }
-        g_strfreev (path);        
-         */
-        //gtk_icon_
-        //Glib::RefPtr<IconTheme> ttt = Gtk::IconTheme::get_default() ;	
-
-        //tt->set_custom_theme("Adwaita");
-        //const Glib::ustring themename = "Adwaita";
-        //Gtk::IconTheme::set_
-        // tt->load_icon()
-
-
-        //Sets the name of the icon theme that the Gtk::IconTheme object uses overriding system configuration. 
-
-        //Gtk::IconTheme::set_custom_theme(themename);	
-
-
-
-        if (icon_theme != NULL && gtk_icon_theme_has_icon(icon_theme, lowerName.c_str())) {
-
-            icon = gtk_icon_theme_load_icon(icon_theme, lowerName.c_str(),
-                    size, flags, &error);
-
-            if (icon == NULL) {
-                icon = wnck_window_get_icon(window);
-            }
-            
-        } else {
-
-            // Gets the icon to be used for window.
-            // If no icon was found, a fallback icon is used. 
-            // wnck_window_get_icon_is_fallback() 
-            // can be used to tell if the icon is the fallback icon.
-            icon = wnck_window_get_icon(window);
-            
-            // check if the icon is the fallback icon.
-            if (wnck_window_get_icon_is_fallback(window)) {
-                g_warning("isfallback none icon was set on window: (%s)", lowerName.c_str());
-                g_print("trying to get the icon from a desktop file: (%s)", lowerName.c_str());
-                result = GetWindowIconFromDesktopFile(window, icon);
-            }
-        }
-
-
-        if (result == NULLPB)
-            result = PixbufConvert(icon);
-
-        return result;
-
-    }
-
-    /**
-     * Get the window icon from a desktop file
-     * located at /usr/share/applications
-     * @param window
-     * @param icon The caller should reference the GdkPixbuf if it needs to keep the icon around.
-     * @return Glib::RefPtr<Gdk::Pixbuf> 
-     */
-    Glib::RefPtr<Gdk::Pixbuf> GetWindowIconFromDesktopFile(WnckWindow* window, GdkPixbuf *icon)
-    {
-        
         GError *error = NULL;
         GKeyFile *key_file = g_key_file_new();
-        const char* appname = wnck_window_get_class_group_name(window);;
-        
-        if(!Launcher::getDesktopFile( key_file , appname))
-        {
+        if (!Launcher::getDesktopFile(key_file, the_groupname.c_str())) {
+
             g_key_file_free(key_file);
-            return NULLPB;
+            return PixbufConvert(wnck_window_get_icon(window));
         }
-        
-           // check if the Icon Desktop Entry name exists
+
+        // check if the Icon Desktop Entry name exists
         gchar* iconname = g_key_file_get_string(key_file,
                 "Desktop Entry", "Icon", &error);
 
@@ -185,19 +104,15 @@ namespace IconLoader
                 error = NULL;
             }
 
-            return NULLPB;
+            g_key_file_free(key_file);
+            return PixbufConvert(wnck_window_get_icon(window));
         }
 
-        GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
-        if (icon_theme != NULL && gtk_icon_theme_has_icon(icon_theme, iconname)) {
-
-            icon = gtk_icon_theme_load_icon(icon_theme, iconname,
-                    size, flags, &error);
-            if (icon == NULL)
-                icon = wnck_window_get_icon(window);
-
-        } else {
-
+        g_key_file_free(key_file);
+        
+        
+        if (strstr(iconname, "/") != NULL) {
+            
             if (g_file_test(iconname, GFileTest::G_FILE_TEST_EXISTS)) {
                 try {
                     Glib::RefPtr<Gdk::Pixbuf> fromfile;
@@ -205,27 +120,49 @@ namespace IconLoader
 
                 } catch (Glib::FileError fex) {
                     g_warning("Icon file: %s from desktop: %s could not be found.",
-                            iconname, appname);
+                            iconname, the_groupname.c_str());
 
                 } catch (Gdk::PixbufError bex) {
                     g_warning("Icon file: %s from desktop: %s PixbufError.",
-                            iconname, appname);
+                            iconname, the_groupname.c_str());
                 }
             }
-            // Gets the icon to be used for window.
-            // If no icon was found, a fallback icon is used. 
-            icon = wnck_window_get_icon(window);
+
+        }
+        
+
+        GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
+        if (icon_theme != NULL && gtk_icon_theme_has_icon(icon_theme, iconname)) {
+
+            icon = gtk_icon_theme_load_icon(icon_theme, iconname,
+                    size, flags, &error);
+
+
+            g_print("Load Icon from Theme %s\n", iconname);
+            if (icon == NULL) {
+                icon = wnck_window_get_icon(window);
+                g_print("Load Icon from window %s\n", iconname);
+            }
         }
 
-        return PixbufConvert(icon);
+        if( icon == NULL ) {
+            icon = icon = wnck_window_get_icon(window);
+            g_print("Load Icon from window %s\n", iconname);
+        }
+            
+        result = PixbufConvert(icon);
+        if( G_IS_OBJECT (icon))
+            g_object_unref(icon);
+        return result;
     }
 
+   
     /**
      * Converts a GdkPixbuf to a Glib::RefPtr<Gdk::Pixbuf>.
      * @param icon
      * @return 
      */
-    Glib::RefPtr<Gdk::Pixbuf> PixbufConvert(GdkPixbuf* icon)
+    Glib::RefPtr<Gdk::Pixbuf> PixbufConvert(GdkPixbuf * icon)
     {
         Glib::RefPtr<Gdk::Pixbuf> result = NULLPB;
 
