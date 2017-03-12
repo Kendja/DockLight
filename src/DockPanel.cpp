@@ -56,12 +56,12 @@ void LauncherWorker::do_work(DockPanel* caller, const std::vector<sessionGrpData
         else if (strstr(data[i].appname, "Konqueror") != NULL)
             delay = true;
 
-        if (delay) {
-            Launcher::LauchAsync(data[i].appname, data[i].parameters);
+        
+       Launcher::LauchAsync(data[i].appname, data[i].parameters);
+        
+        if (delay) 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        } else {
-            Launcher::Launch(data[i].appname, data[i].parameters);
-        }
+        
     }
 
     {
