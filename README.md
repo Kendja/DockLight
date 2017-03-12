@@ -1,7 +1,7 @@
 # Docklight
 Docklight is a lightweight Dock launcher for common Applications.
 
-Docklight” is a simple but effective dock launcher for GNOME 3 desktops e.g (cinnamon).
+Docklight” is a simple but effective dock launcher for GNOME desktops e.g (gnome, cinnamon, mate etc.).
 It supports a Preview from all open Applications.
 
 The “Docklight” preview allows more control over the opened windows. You can navigate to a specific window much easier.
