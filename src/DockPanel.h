@@ -29,7 +29,8 @@
 #include <cmath>
 #include <limits>
 #include <iostream>
-
+#include <thread>
+#include <mutex>
 
 #include "DockItem.h"
 #include "Launcher.h"
@@ -42,6 +43,22 @@
 #include "Preferences.h"
 #include "SessionWindow.h"
 #include "Animations.h"
+
+class DockPanel;
+
+class LauncherWorker
+{
+public:
+    LauncherWorker();
+    // Thread function.
+    void do_work(DockPanel* caller, const std::vector<sessionGrpData> data);
+    void stop_work();
+    bool m_finish = false;
+
+private:
+    // Synchronizes access to member data.
+    mutable std::mutex m_Mutex;
+};
 
 class DockPanel : public Gtk::DrawingArea
 {
@@ -66,7 +83,14 @@ public:
     SessionWindow* m_sessionWindow;
 
     bool ispopupMenuActive();
+    void launcherThreadCompleteNotify();
+
 private:
+
+    std::thread* m_LauncherThread;
+    LauncherWorker m_Worker;
+
+
     Gtk::Window* m_AppWindow = nullptr;
     TitleWindow m_titlewindow;
     TitleWindow m_infowindow;

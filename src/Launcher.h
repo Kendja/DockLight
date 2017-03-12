@@ -33,6 +33,8 @@ namespace Launcher
     bool Launch(const std::string& appname);
     bool Launch(const char* appname);
     bool Launch(const char* applicationName, const char* parameters);
+    bool LauchAsync(const char* applicationName, const char* parameters);
+    
     void LaunchSessionGroup(const char* sessiongrpName);
     
     gboolean getDesktopFile(GKeyFile *key_file, const char* appname);

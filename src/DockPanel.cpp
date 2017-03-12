@@ -36,6 +36,46 @@
 #include <limits.h>
 #include <math.h>
 
+LauncherWorker::LauncherWorker() :
+m_Mutex()
+{
+}
+
+void LauncherWorker::do_work(DockPanel* caller, const std::vector<sessionGrpData> data)
+{
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        m_finish = false;
+    }
+    for (int i = data.size() - 1; i >= 0; i--) {
+        bool delay = false;
+        if (strstr(data[i].appname, "Firefox") != NULL) {
+            delay = true;
+        } else if (strstr(data[i].appname, "chrome") != NULL)
+            delay = true;
+        else if (strstr(data[i].appname, "Konqueror") != NULL)
+            delay = true;
+
+        if (delay) {
+            Launcher::LauchAsync(data[i].appname, data[i].parameters);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        } else {
+            Launcher::Launch(data[i].appname, data[i].parameters);
+        }
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+    }
+
+    m_finish = true;
+    caller->launcherThreadCompleteNotify();
+}
+
+void LauncherWorker::stop_work()
+{
+    std::lock_guard<std::mutex> lock(m_Mutex);
+}
 
 
 // static members
@@ -69,7 +109,9 @@ m_selectorAnimationItemIndex(-1),
 m_applicationpath(Utilities::getExecPath()),
 m_applicationDatapath(m_applicationpath + "/" + DEF_DATADIRNAME),
 m_SessionGrpIconFilePath(Utilities::getExecPath(DEF_SEISSIONICONNAME)),
-m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME))
+m_homeiconFilePath(Utilities::getExecPath(DEF_ICONNAME)),
+m_Worker(),
+m_LauncherThread(nullptr)
 {
 
     DockPanel::m_applicationAttachmentsPath = m_applicationpath + "/" + DEF_ATTACHMENTDIR;
@@ -256,6 +298,7 @@ int DockPanel::preInit(Gtk::Window* window)
 
     m_Menu_Popup.show_all();
     m_Menu_Popup.accelerate(*this);
+
     return 0;
 }
 
@@ -265,6 +308,7 @@ int DockPanel::preInit(Gtk::Window* window)
  */
 void DockPanel::postInit()
 {
+
     m_TimeoutConnection = Glib::signal_timeout().connect(sigc::mem_fun(*this,
             &DockPanel::on_timeoutDraw), DEF_FRAMERATE);
 
@@ -425,11 +469,13 @@ bool DockPanel::on_motion_notify_event(GdkEventMotion*event)
 
 void DockPanel::on_MenuDeactivated_event()
 {
+
     m_popupMenuOn = false;
 }
 
 bool DockPanel::ispopupMenuActive()
 {
+
     return m_popupMenuOn || m_previewWindowActive;
 }
 
@@ -447,6 +493,7 @@ void DockPanel::saveAttachments(int aIdx, int bIdx)
     int idx = 0;
     for (DockItem* item : m_dockitems) {
         if (!item->m_isAttached)
+
             continue;
 
         char filename[NAME_MAX];
@@ -478,7 +525,7 @@ void DockPanel::dropDockItem(GdkEventButton *event)
 
     // we check if the drop item is Attached.
     // if not we attach it and continue;
-    DockItem* a = m_dockitems[m_dragdropItemIndex];
+    DockItem * a = m_dockitems[m_dragdropItemIndex];
     if (!a->m_isAttached)
         AttachItemToDock(a);
 
@@ -609,7 +656,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
 
     if (m_mouseLeftButtonDown) {
         m_mouseLeftButtonDown = false;
-        
+
         SelectWindow(m_currentMoveIndex, event);
         return TRUE;
     }
@@ -708,6 +755,7 @@ bool DockPanel::on_button_release_event(GdkEventButton *event)
  */
 void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 {
+
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_HomeMenu_Popup.get_allocated_width() / 2);
 
@@ -723,6 +771,7 @@ void DockPanel::on_popup_homemenu_position(int& x, int& y, bool& push_in)
 
 void DockPanel::on_popup_menu_position(int& x, int& y, bool& push_in)
 {
+
     int center = (MonitorGeometry::getGeometry().width / 2) -
             (m_Menu_Popup.get_allocated_width() / 2);
 
@@ -744,6 +793,7 @@ void DockPanel::on_HomePreferences_event()
 
 void DockPanel::on_HomeAddSessionGrp_event()
 {
+
     CreateSessionDockItemGrp();
 }
 
@@ -755,11 +805,13 @@ void DockPanel::on_HelpMenu_event()
 
 void DockPanel::on_AboutMenu_event()
 {
+
     m_about.show(m_AppWindow);
 }
 
 void DockPanel::on_QuitMenu_event()
 {
+
     m_AppWindow->close();
 }
 
@@ -769,7 +821,7 @@ void DockPanel::on_menuNew_event()
     if (index < 1)
         return;
 
-    DockItem* item = m_dockitems.at(index);
+    DockItem * item = m_dockitems.at(index);
 
     if (item->m_dockitemSesssionGrpId > 0) {
         createSessionWindow();
@@ -779,6 +831,7 @@ void DockPanel::on_menuNew_event()
 
     m_selectorAnimationItemIndex = m_currentMoveIndex;
     if (!Launcher::Launch(item->m_realgroupname)) {
+
         createLauncher(item);
     }
 
@@ -794,6 +847,7 @@ void DockPanel::on_AttachToDock_event()
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (dockitem->m_isAttached)
+
         return; // already attached
 
     AttachItemToDock(dockitem);
@@ -813,6 +867,7 @@ void DockPanel::AttachItemToDock(DockItem* dockitem)
             s.c_str());
 
     if (dockitem->m_dockitemSesssionGrpId > 0) {
+
         sprintf(filename, "%s/%2d_%s.png", m_applicationAttachmentsPath.c_str(),
                 (int) m_dockitems.size() - 1,
                 s.c_str());
@@ -829,7 +884,7 @@ void DockPanel::on_DetachFromDock_event()
     if (m_currentMoveIndex < 0)
         return;
 
-    DockItem* dockitem = m_dockitems.at(m_currentMoveIndex);
+    DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
 
     if (!dockitem->m_isAttached)
         return;
@@ -886,6 +941,7 @@ void DockPanel::on_DetachFromDock_event()
 void DockPanel::on_CloseAllExceptActive_event()
 {
     if (m_currentMoveIndex < 0)
+
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
@@ -895,6 +951,7 @@ void DockPanel::on_CloseAllExceptActive_event()
 void DockPanel::on_CloseAll_event()
 {
     if (m_currentMoveIndex < 0)
+
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
@@ -904,6 +961,7 @@ void DockPanel::on_CloseAll_event()
 void DockPanel::on_UnMinimieAll_event()
 {
     if (m_currentMoveIndex < 0)
+
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
@@ -913,6 +971,7 @@ void DockPanel::on_UnMinimieAll_event()
 void DockPanel::on_MinimieAllExceptActive_event()
 {
     if (m_currentMoveIndex < 0)
+
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
@@ -922,6 +981,7 @@ void DockPanel::on_MinimieAllExceptActive_event()
 void DockPanel::on_MinimieAll_event()
 {
     if (m_currentMoveIndex < 0)
+
         return;
 
     DockItem * dockitem = m_dockitems.at(m_currentMoveIndex);
@@ -934,6 +994,7 @@ void DockPanel::on_AutohideToggled_event()
     //discover the new state.
     bool autohide = m_AutohideMenuItem.get_active();
     Configuration::setAutohide(autohide);
+
     if (autohide)
         MonitorGeometry::RemoveStrut();
 
@@ -943,26 +1004,31 @@ void DockPanel::on_AutohideToggled_event()
 
 void DockPanel::on_HomeMinimizeAllWindows_event()
 {
+
     WindowControl::HomeMinimizeAll();
 }
 
 void DockPanel::on_HomeUnMinimizeAllWindows_event()
 {
+
     WindowControl::HomeUnMinimizeAll();
 }
 
 void DockPanel::on_HomeMinimizeAllWindowsExceptActive_event()
 {
+
     WindowControl::HomeMinimizeAllExceptActive();
 }
 
 void DockPanel::on_HomeCloseAllWindowsExceptActive_event()
 {
+
     WindowControl::HomeCloseAllExceptActive();
 }
 
 void DockPanel::on_HomeCloseAllWindows_event()
 {
+
     WindowControl::HomeCloseAllWindows();
 
 }
@@ -1018,6 +1084,7 @@ bool DockPanel::on_timeoutDraw()
     }
 
     Gtk::Widget::queue_draw();
+
     return true;
 }
 
@@ -1029,6 +1096,7 @@ bool DockPanel::on_timeoutDraw()
  */
 void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointer data)
 {
+
     Update(window, Window_action::OPEN);
 }
 
@@ -1040,6 +1108,7 @@ void DockPanel::on_window_opened(WnckScreen *screen, WnckWindow* window, gpointe
  */
 void DockPanel::on_window_closed(WnckScreen *screen, WnckWindow *window, gpointer data)
 {
+
     updateSessioWindow(window);
     Update(window, Window_action::CLOSE);
 }
@@ -1076,6 +1145,7 @@ void DockPanel::on_active_window_changed_callback(WnckScreen *screen,
 
     WnckWindow * window = wnck_screen_get_active_window(screen);
     if (window == NULL)
+
         return;
 
     DockPanel::setItemImdexFromActiveWindow();
@@ -1089,7 +1159,7 @@ void DockPanel::setItemImdexFromActiveWindow()
 
     m_currentMoveIndex = -1;
 
-    WnckWindow *window = WindowControl::getActive();
+    WnckWindow * window = WindowControl::getActive();
     if (window == nullptr)
         return;
 
@@ -1180,7 +1250,7 @@ void DockPanel::CreateSessionDockItemGrp()
     session_image << m_applicationpath << "/" << DEF_IMAGESDIR << "/s" << imagenumber << ".png";
     std::string filename = session_image.str();
 
-    DockItem* dockItem = new DockItem();
+    DockItem * dockItem = new DockItem();
 
     try {
         dockItem->m_image = Gdk::Pixbuf::create_from_file(filename.c_str(),
@@ -1642,6 +1712,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 m_selectorAnimation.d = 1200;
 
                 m_selectorAnimation.m_animationInitSet = true;
+
             }
 
 
@@ -1743,6 +1814,7 @@ bool DockPanel::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
                 /* Bottom  */
                 bit = CHECK_BIT(value, 0);
                 if (bit == 1) {
+
                     cr->set_line_width(theme.forPanel().lineWith());
                     cr->move_to(pos_x, DEF_CELLTOPMARGIN + m_cellheight);
                     cr->line_to(pos_x + 4, DEF_CELLTOPMARGIN + m_cellheight);
@@ -1766,12 +1838,22 @@ std::string DockPanel::getApplicationPath()
     return m_applicationpath;
 }
 
+void DockPanel::launcherThreadCompleteNotify()
+{
+    if (m_LauncherThread) {
+        m_Worker.stop_work();
+        m_LauncherThread->detach();
+        delete m_LauncherThread;
+        m_LauncherThread = nullptr;
+    }
+}
+
 void DockPanel::SelectWindow(int index, GdkEventButton * event)
 {
-    if (index < 1)
+    if (index < 1 || m_LauncherThread != nullptr)
         return;
 
-    DockItem* dockitem = m_dockitems.at(index);
+    DockItem * dockitem = m_dockitems.at(index);
 
     m_currentsessionItem = nullptr;
     m_sessiondata.clear();
@@ -1813,22 +1895,15 @@ void DockPanel::SelectWindow(int index, GdkEventButton * event)
                 m_selectorAnimationItemIndex = index;
 
 
-            for (int i = m_sessiondata.size() - 1; i >= 0; i--) {
-                bool delay = false;
-                if (strstr(m_sessiondata[i].appname, "Firefox") != NULL)
-                    delay = true;
-
-                else if (strstr(m_sessiondata[i].appname, "chrome") != NULL)
-                    delay = true;
-
-                else if (strstr(m_sessiondata[i].appname, "Konqueror") != NULL)
-                    delay = true;
-
-                Launcher::Launch(m_sessiondata[i].appname, m_sessiondata[i].parameters);
-
-                if (delay) {
-                    usleep(1000000);
-                }
+            if (m_LauncherThread) {
+                std::cout << "Can't start a worker thread while another one is running." << std::endl;
+            } else {
+                // Start a new worker thread.
+                m_LauncherThread = new std::thread(
+                        [this]
+                        {
+                            m_Worker.do_work(this, m_sessiondata);
+                        });
             }
 
 

@@ -64,6 +64,15 @@ AC_CHECK_LIB([X11], [XOpenDisplay])
 # check wnck-3 this add -lwnck-3 and substiture the wnck-3_CFLAGS and wnck-3_LIBS variables.
 AC_CHECK_LIB([wnck-3],[wnck_screen_get_default])
 
+#AC_CHECK_LIB([pthreads])
+AC_CHECK_LIB(pthread, pthread_create, [PTHREAD_LIBS+=-lpthread])
+
+ACX_PTHREAD
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
+
+
 dnl ======================================================
 #AC_SUBST_FILE([ouptput_bin])
 #  ouptput_bin=$srcdir/bin/docklight

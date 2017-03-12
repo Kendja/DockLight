@@ -108,7 +108,7 @@ namespace Launcher
 
         std::string appname(applicationName);
         std::replace(appname.begin(), appname.end(), ' ', '-');
-
+        
         GError *error = NULL;
         GAppLaunchContext *context = NULL;
         GAppInfo *app_info = NULL;

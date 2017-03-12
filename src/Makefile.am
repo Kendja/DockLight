@@ -1,6 +1,8 @@
 ACLOCAL_AMFLAGS = -I m4 --install
 bin_PROGRAMS = docklight
 
+
+#ALLCPPFLAGS = -pthread -L /lib64 
 ALLCPPFLAGS = $(GTKMM_CFLAGS)
 ALLCPPFLAGS += $(WNCK_CFLAGS)
 
@@ -15,11 +17,13 @@ docklight_CPPFLAGS = $(ALLCPPFLAGS)
 ALLDADDLIBS = $(GTKMM_LIBS)
 #ALLDADDLIBS +=$(WNCK_LIBS)
 docklight_LDADD = $(ALLDADDLIBS)
+#docklight_LDADD += -llibz
 
 
 #  flags for the C compiler & linker
-AM_CPPFLAGS = -g -Wall -Wno-reorder -std=c++11 
-
+AM_CPPFLAGS = -g -Wall   -Wno-reorder -std=c++11  
+#-pthread
+#-pedantic  -lpthread 
 
 # list of source files needed to generate target (docklight)
 docklight_SOURCES =  \
